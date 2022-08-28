@@ -1,7 +1,7 @@
 #include <string.h>
 #include <string>
 
-#include "utils.cpp"
+#include "../libs/utils.h"
 
 using namespace std;
 
@@ -14,8 +14,8 @@ typedef struct Token {
 int main() {
     Token *TokenList = (Token *) malloc(sizeof(Token));
 
-    FILE *f = openFile((char *) "gera1.txt");
-    cout << fgetc(f) << endl;
-
+    FILE *f = openFile((char *) "../docs/gera1.txt");
+    cout << (char) fgetc(f) << endl;
+    cout << "Teste" << endl;
     return 0;
 }

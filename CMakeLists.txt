@@ -3,4 +3,5 @@ project(Compiler)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(Compiler main.cpp)
+add_executable(Compiler source/main.cpp libs/lexical_analiser.cpp
+        libs/lexical_analiser.h libs/utils.cpp libs/utils.h )
