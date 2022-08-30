@@ -44,6 +44,7 @@ Token *handleDigit(FILE *file) {
         digito += character;
         character = fgetc(file);
     }
+
     token->lexema = digito;
     token->simbolo = "snumero";
     token = token->next;
@@ -105,6 +106,7 @@ Token *handleIdAndSpecialWord(FILE *file) {
     } else {
         token->simbolo = "sidentificador";
     }
+
     token = token->next;
     return token;
 }
@@ -125,6 +127,7 @@ Token *handleAttribution(FILE *file) {
             exit(1);
         }
     }
+
     token->lexema = palavra;
     token->simbolo = "satribuicao";
     token = token->next;
@@ -132,21 +135,119 @@ Token *handleAttribution(FILE *file) {
     return token;
 }
 
+Token *handleArithmeticOperator(FILE *file) {
+    Token *token;
+    string palavra;
+
+    if (character == '+') {
+        token->simbolo = "smais";
+    } else if (character == '-') {
+        token->simbolo = "smenos";
+    } else if (character == '*') {
+        token->simbolo = "smult";
+    } else if (character == 'd') {
+        palavra += character;
+        character = fgetc(file);
+
+        if (character == 'i') {
+            palavra += character;
+            character = fgetc(file);
+
+            if (character != 'v') {
+                printf("Error");
+                exit(1);
+            }
+        } else {
+            printf("Error");
+            exit(1);
+        }
+    }
+    palavra += character;
+    character = fgetc(file);
+
+    token->lexema = palavra;
+    token = token->next;
+
+    return token;
+}
+
+Token *handleRelationalOperator(FILE *file) {
+    Token *token;
+    string palavra;
+
+    if (character == '!') {
+        token->simbolo = 'sdif';
+    } else if (character == '<') {
+        token->simbolo = 'smenor';
+    } else if (character == '>') {
+        token->simbolo = 'smaior';
+    } else if (character == '=') {
+        palavra += character;
+        character = fgetc(file);
+
+        token->lexema = palavra;
+        token->simbolo = 'sig';
+        token = token->next;
+
+        return token;
+    }
+    palavra += character;
+    character = fgetc(file);
+
+    if (character == '=') {
+        palavra += character;
+
+        if (token->simbolo != "sdif") {
+            token->simbolo += 'ig';
+        }
+
+        character = fgetc(file);
+    }
+
+    token->lexema = palavra;
+    token = token->next;
+
+    return token;
+}
+
+Token *handlePunctuation(FILE *file) {
+    Token *token;
+    string palavra;
+
+    if (character == ';') {
+        token->simbolo = "sponto_virgula";
+    } else if (character == ',') {
+        token->simbolo = "svirgula";
+    } else if (character == '(') {
+        token->simbolo = "sabre_parenteses";
+    } else if (character == ')') {
+        token->simbolo = "sfecha_parenteses";
+    } else if (character == '.') {
+        token->simbolo = "sponto";
+    }
+    palavra += character;
+    character = fgetc(file);
+
+    token->lexema = palavra;
+    token = token->next;
+
+    return token;
+}
 
 Token *getToken(FILE *file) {
     if (isDigit()) {
         handleDigit(file);
     } else if (isLetter()) {
-        // handleIdAndSpecialWord(file);
+        handleIdAndSpecialWord(file);
 
         if (character == ':') {
             handleAttribution(file);
         } else if (isArithmeticOperator()) {
-            // handleArithmeticOperator(file);
+            handleArithmeticOperator(file);
         } else if (isRelationalOperator()) {
-            // handleRelationalOperator(file);
+            handleRelationalOperator(file);
         } else if (isPunctuation()) {
-            // handlePunctuation(file);
+            handlePunctuation(file);
         } else {
             printf("Error");
             exit(1);
