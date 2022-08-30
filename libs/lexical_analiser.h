@@ -1,8 +1,0 @@
-//
-// Created by hvdia on 28/08/2022.
-//
-
-#ifndef COMPILER_LEXICAL_ANALISER_H
-#define COMPILER_LEXICAL_ANALISER_H
-
-#endif //COMPILER_LEXICAL_ANALISER_H

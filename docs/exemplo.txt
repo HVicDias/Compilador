@@ -1,0 +1,88 @@
+Algoritmo Analisador Lexical (Nível 1)
+Def. token: TipoToken
+Inicio
+Abre arquivo fonte
+Ler(caracter)
+Enquanto não acabou o arquivo fonte
+Faça {Enquanto ((caractere = “{“) ou
+ (caractere = espaço)) e
+ (não acabou o arquivo fonte)
+ Faça { Se caractere = “{“
+ Então {Enquanto (caractere  “}” ) e
+ (não acabou o arquivo fonte)
+ Faça Ler(caracter)
+Ler(caracter)}
+ Enquanto (caractere = espaço) e
+ (não acabou o arquivo fonte)
+ Faça Ler(caracter)
+ }
+ se caractere != fim de arquivo
+então {Pega Token
+ Insere Lista}
+ }
+Fecha arquivo fonte
+Fim.
+
+Algoritmo Pega Token
+Inicio
+Se caractere é digito
+ Então Trata Digito
+ Senão Se caractere é letra
+ Então Trata Identificador e Palavra Reservada
+ Senão Se caractere = “:”
+ Então Trata Atribuição
+ Senão Se caractere  {+,-,*}
+ Então Trata Operador Aritmético
+ Senão Se caractere  {!,<,>,=}
+ EntãoTrataOperadorRelacional
+ Senão Se caractere  {; , ( ) .}
+ Então Trata Pontuação
+Senão ERRO
+Fim.
+Algoritmo Trata Dígito
+Def num : Palavra
+Inicio
+ num  caractere
+ Ler(caracter)
+ Enquanto caractere é dígito
+ Faça {
+ num  num + caractere
+ Ler(caracter)
+ }
+ token.símbolo  snúmero
+ token.lexema  num
+Fim.
+Algoritmo Trata Identificador e Palavra Reservada
+Def id: Palavra
+Inicio
+ id  caractere
+ Ler(caracter)
+ Enquanto caractere é letra ou dígito ou “_”
+ Faça {id  id + caractere
+ Ler(caracter)
+ }
+ token.lexema  id
+ caso
+ id = “programa” : token.símbolo  sprograma
+ id = “se” : token.símbolo  sse
+ id = “entao” : token.símbolo  sentao
+ id = “senao” : token.símbolo  ssenao
+ id = “enquanto” : token.símbolo  senquanto
+ id = “faca” : token.símbolo  sfaca
+ id = “início” : token.símbolo  sinício
+id = “fim” : token.símbolo  sfim
+ id = “escreva” : token.símbolo  sescreva
+ id = “leia” :token.símbolo  sleia
+ id = “var” : token.símbolo  svar
+ id = “inteiro” : token.símbolo  sinteiro
+ id = “booleano” : token.símbolo  sbooleano
+ id = “verdadeiro” : token.símbolo  sverdadeiro
+ id = “falso” : token.símbolo  sfalso
+ id = “procedimento” : token.símbolo  sprocedimento
+ id = “funcao” : token.símbolo  sfuncao
+ id = “div” : token.símbolo  sdiv
+ id = “e” : token.símbolo  se
+ id = “ou” : token.símbolo  sou
+ id = “nao” : token.símbolo  snao
+ senão : token.símbolo  sidentificador
+Fim.

@@ -1,0 +1,6 @@
+#ifndef COMPILER_LEXICAL_ANALYSER_H
+#define COMPILER_LEXICAL_ANALYSER_H
+
+extern char character;
+
+#endif //COMPILER_LEXICAL_ANALYSER_H
