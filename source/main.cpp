@@ -6,19 +6,34 @@
 
 using namespace std;
 
+
+
 int main() {
     LinkedList list;
     FILE *file = openFile((char *) "../docs/gera1.txt");
     char character;
     do{
         character = (char) fgetc(file);
-        cout << character << endl;
+        if(character == '{'){
+            do{
+                character = (char) fgetc(file); //Ler caracter
+            } while (character != '}' && character != EOF);
+        }else if(character == ' '){
+            do{
+                character = (char) fgetc(file); //Ler caracter
+            } while (character != ' ' && character != EOF);
+        }
+        if(character != EOF){
+            // {Pega Token
+            // Insere Lista}
+        }
     } while (character != EOF);
 
     fclose(file);
     return 0;
 
-    // Inserting nodes
+    ///LIST USAGE EXAMPLE
+    /* Inserting nodes
     list.insertNode("1","2");
     list.insertNode("3","4");
     list.insertNode("5","6");
@@ -35,5 +50,5 @@ int main() {
 
     cout << "Elements of the list are: " << endl;
     list.printList();
-    return 0;
+    return 0; */
 }
