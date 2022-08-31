@@ -1,15 +1,17 @@
-#include "lexical_analyser.h"
 #include <string>
+#include "lexical_analyser.h"
 
 using namespace std;
 
 char character;
 
-typedef struct Token {
-    string lexema;
-    string simbolo;
-    Token *next;
-} Token;
+bool isSpace() {
+    return (character == ' ' || character == '\n');
+}
+
+bool isCommentary() {
+    return (character == '{');
+}
 
 bool isDigit() {
     return (character > 47 && character < 58);
@@ -35,243 +37,209 @@ bool isPunctuation() {
     return (character == 59 || character == 44 || character == 40 || character == 41 || character == 46);
 }
 
-
-Token *handleDigit(FILE *file) {
-    Token *token;
-    string digito;
-
-    while (!isDigit()) {
-        digito += character;
-        character = fgetc(file);
+void jumpSpaces(FILE *file) {
+    while (character == ' ' || character == '\n') {
+        character = (char) fgetc(file);
     }
-
-    token->lexema = digito;
-    token->simbolo = "snumero";
-    token = token->next;
-    return token;
 }
 
-Token *handleIdAndSpecialWord(FILE *file) {
-    Token *token;
-    string palavra;
+void jumpComentary(FILE *file) {
+    do {
+        character = (char) fgetc(file);
 
-    while (isLetter() || isUnderscore()) {
-        palavra += character;
-        character = fgetc(file);
+        if (character == EOF) {
+            exit(1);
+        }
+    } while (character != '}');
+
+    character = (char) fgetc(file);
+}
+
+Node handleDigit(FILE *file) {
+    string lexema;
+
+    while (isDigit()) {
+        lexema += character;
+        character = (char) fgetc(file);
+    }
+    character = (char) fgetc(file);
+
+    return {lexema, "snumero"};
+}
+
+Node handleIdAndSpecialWord(FILE *file) {
+    string lexema;
+    string simbolo;
+
+    while (isLetter() || isDigit() || isUnderscore()) {
+        lexema += character;
+        character = (char) fgetc(file);
     }
 
-    token->lexema = palavra;
-    if (palavra == "programa") {
-        token->simbolo = "sprograma";
-    } else if (palavra == "se") {
-        token->simbolo = "sse";
-    } else if (palavra == "entao") {
-        token->simbolo = "sentao";
-    } else if (palavra == "senao") {
-        token->simbolo = "ssenao";
-    } else if (palavra == "enquanto") {
-        token->simbolo = "senquanto";
-    } else if (palavra == "faca") {
-        token->simbolo = "sfaca";
-    } else if (palavra == "inicio") {
-        token->simbolo = "sinicio";
-    } else if (palavra == "fim") {
-        token->simbolo = "sfim";
-    } else if (palavra == "escreva") {
-        token->simbolo = "sescreva";
-    } else if (palavra == "leia") {
-        token->simbolo = "sleia";
-    } else if (palavra == "var") {
-        token->simbolo = "svar";
-    } else if (palavra == "inteiro") {
-        token->simbolo = "sinteiro";
-    } else if (palavra == "booleano") {
-        token->simbolo = "sbooleano";
-    } else if (palavra == "verdadeiro") {
-        token->simbolo = "sverdadeiro";
-    } else if (palavra == "falso") {
-        token->simbolo = "sfalso";
-    } else if (palavra == "procedimento") {
-        token->simbolo = "sprocediento";
-    } else if (palavra == "funcao") {
-        token->simbolo = "sfuncao";
-    } else if (palavra == "div") {
-        token->simbolo = "sdiv";
-    } else if (palavra == "e") {
-        token->simbolo = "se";
-    } else if (palavra == "ou") {
-        token->simbolo = "sou";
-    } else if (palavra == "nao") {
-        token->simbolo = "snao";
+    if (lexema == "programa") {
+        simbolo = "sprograma";
+    } else if (lexema == "se") {
+        simbolo = "sse";
+    } else if (lexema == "entao") {
+        simbolo = "sentao";
+    } else if (lexema == "senao") {
+        simbolo = "ssenao";
+    } else if (lexema == "enquanto") {
+        simbolo = "senquanto";
+    } else if (lexema == "faca") {
+        simbolo = "sfaca";
+    } else if (lexema == "inicio") {
+        simbolo = "sinicio";
+    } else if (lexema == "fim") {
+        simbolo = "sfim";
+    } else if (lexema == "escreva") {
+        simbolo = "sescreva";
+    } else if (lexema == "leia") {
+        simbolo = "sleia";
+    } else if (lexema == "var") {
+        simbolo = "svar";
+    } else if (lexema == "inteiro") {
+        simbolo = "sinteiro";
+    } else if (lexema == "booleano") {
+        simbolo = "sbooleano";
+    } else if (lexema == "verdadeiro") {
+        simbolo = "sverdadeiro";
+    } else if (lexema == "falso") {
+        simbolo = "sfalso";
+    } else if (lexema == "procedimento") {
+        simbolo = "sprocediento";
+    } else if (lexema == "funcao") {
+        simbolo = "sfuncao";
+    } else if (lexema == "div") {
+        simbolo = "sdiv";
+    } else if (lexema == "e") {
+        simbolo = "se";
+    } else if (lexema == "ou") {
+        simbolo = "sou";
+    } else if (lexema == "nao") {
+        simbolo = "snao";
     } else {
-        token->simbolo = "sidentificador";
+        simbolo = "sidentificador";
     }
 
-    token = token->next;
-    return token;
+    return {lexema, simbolo};
 }
 
 
-Token *handleAttribution(FILE *file) {
-    Token *token;
-    string palavra;
+Node handleAttribution(FILE *file) {
+    string lexema;
 
     if (character == ':') {
-        palavra += character;
-        character = fgetc(file);
+        lexema += character;
+        character = (char) fgetc(file);
 
         if (character == '=') {
-            palavra += character;
-            character = fgetc(file);
+            lexema += character;
+//            character = (char) fgetc(file);
+            return {lexema, "satribuicao"};
         } else {
-            exit(1);
+            return {lexema, "sdois_pontos"};
         }
+    } else {
+        exit(1);
     }
-
-    token->lexema = palavra;
-    token->simbolo = "satribuicao";
-    token = token->next;
-
-    return token;
 }
 
-Token *handleArithmeticOperator(FILE *file) {
-    Token *token;
-    string palavra;
+Node handleArithmeticOperator(FILE *file) {
+    string lexema;
+    string simbolo;
 
     if (character == '+') {
-        token->simbolo = "smais";
+        simbolo = "smais";
     } else if (character == '-') {
-        token->simbolo = "smenos";
+        simbolo = "smenos";
     } else if (character == '*') {
-        token->simbolo = "smult";
-    } else if (character == 'd') {
-        palavra += character;
-        character = fgetc(file);
-
-        if (character == 'i') {
-            palavra += character;
-            character = fgetc(file);
-
-            if (character != 'v') {
-                printf("Error");
-                exit(1);
-            }
-        } else {
-            printf("Error");
-            exit(1);
-        }
+        simbolo = "smult";
     }
-    palavra += character;
-    character = fgetc(file);
+    lexema += character;
+    character = (char) fgetc(file);
 
-    token->lexema = palavra;
-    token = token->next;
-
-    return token;
+    return {lexema, simbolo};
 }
 
-Token *handleRelationalOperator(FILE *file) {
-    Token *token;
-    string palavra;
+Node handleRelationalOperator(FILE *file) {
+    string lexema;
+    string simbolo;
 
     if (character == '!') {
-        token->simbolo = 'sdif';
+        simbolo = "sdif";
     } else if (character == '<') {
-        token->simbolo = 'smenor';
+        simbolo = "smenor";
     } else if (character == '>') {
-        token->simbolo = 'smaior';
+        simbolo = "smaior";
     } else if (character == '=') {
-        palavra += character;
-        character = fgetc(file);
+        lexema += character;
+        simbolo = "sig";
+        character = (char) fgetc(file);
 
-        token->lexema = palavra;
-        token->simbolo = 'sig';
-        token = token->next;
-
-        return token;
+        return {lexema, simbolo};
     }
-    palavra += character;
-    character = fgetc(file);
+    lexema += character;
+    character = (char) fgetc(file);
 
     if (character == '=') {
-        palavra += character;
+        lexema += character;
 
-        if (token->simbolo != "sdif") {
-            token->simbolo += 'ig';
+        if (simbolo != "sdif") {
+            simbolo += "ig";
         }
-
-        character = fgetc(file);
     }
 
-    token->lexema = palavra;
-    token = token->next;
-
-    return token;
+    return {lexema, simbolo};
 }
 
-Token *handlePunctuation(FILE *file) {
-    Token *token;
-    string palavra;
+Node handlePunctuation(FILE *file) {
+    string lexema;
+    string simbolo;
 
     if (character == ';') {
-        token->simbolo = "sponto_virgula";
+        simbolo = "sponto_virgula";
     } else if (character == ',') {
-        token->simbolo = "svirgula";
+        simbolo = "svirgula";
     } else if (character == '(') {
-        token->simbolo = "sabre_parenteses";
+        simbolo = "sabre_parenteses";
     } else if (character == ')') {
-        token->simbolo = "sfecha_parenteses";
+        simbolo = "sfecha_parenteses";
     } else if (character == '.') {
-        token->simbolo = "sponto";
+        simbolo = "sponto";
     }
-    palavra += character;
-    character = fgetc(file);
-
-    token->lexema = palavra;
-    token = token->next;
-
-    return token;
+    lexema += character;
+    character = (char) fgetc(file);
+    return {lexema, simbolo};
 }
 
-Token *getToken(FILE *file) {
+Node getToken(FILE *file) {
+    if (isCommentary()) {
+        jumpComentary(file);
+    }
+
+    if (isSpace()) {
+        jumpSpaces(file);
+    }
+
     if (isDigit()) {
-        handleDigit(file);
-    } else if (isLetter()) {
-        handleIdAndSpecialWord(file);
-
-        if (character == ':') {
-            handleAttribution(file);
-        } else if (isArithmeticOperator()) {
-            handleArithmeticOperator(file);
-        } else if (isRelationalOperator()) {
-            handleRelationalOperator(file);
-        } else if (isPunctuation()) {
-            handlePunctuation(file);
-        } else {
-            printf("Error");
-            exit(1);
-        }
+        return handleDigit(file);
     }
+    if (isLetter()) {
+        return handleIdAndSpecialWord(file);
+    }
+    if (character == ':') {
+        return handleAttribution(file);
+    }
+    if (isArithmeticOperator()) {
+        return handleArithmeticOperator(file);
+    }
+    if (isRelationalOperator()) {
+        return handleRelationalOperator(file);
+    }
+    if (isPunctuation()) {
+        return handlePunctuation(file);
+    }
+
+    return {"", ""};
 }
-
-
-
-
-
-//Algoritmo Pega Token
-//Inicio
-// Se caractere é digito
-//   Então Trata Digito
-//   Senão Se caractere é letra
-//              Então Trata Identificador e Palavra Reservada
-//                      Senão Se caractere = “:”
-//                                    Então Trata Atribuição
-//                                    Senão Se caractere E {+,-,*}
-//                                                Então Trata Operador Aritmético
-//                                                Senão Se caractere E {!,<,>,=}
-//                                                             EntãoTrataOperadorRelacional
-//                                                             Senão Se caractere E {;  ,  (  ) .}
-//                                                                         Então Trata Pontuação
-//                                                                         Senão ERRO
-//Fim.

@@ -1,13 +1,13 @@
 #include "utils.h"
 
 FILE *openFile(char *path) {
-    FILE *f;
-    f = fopen(path, "r");
+    FILE *file;
+    file = fopen(path, "r");
 
-    if (f == NULL) {
+    if (file == nullptr) {
         printf("Erro ao tentar abrir o arquivo!");
         exit(1);
     }
 
-    return f;
+    return file;
 }

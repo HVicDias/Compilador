@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <utility>
 #include "linkedList.h"
 
 using namespace std;
@@ -7,28 +8,28 @@ using namespace std;
 Node::Node() {
     lexema = "";
     simbolo = "";
-    next = NULL;
+    next = nullptr;
 }
 
 // Parameterised Constructor
 Node::Node(string lexema, string simbolo) {
-    this->lexema = lexema;
-    this->simbolo = simbolo;
-    this->next = NULL;
+    this->lexema = std::move(lexema);
+    this->simbolo = std::move(simbolo);
+    this->next = nullptr;
 }
 
-LinkedList::LinkedList() { head = NULL; }
+LinkedList::LinkedList() { head = nullptr; }
 
 void LinkedList::deleteNode(int nodeIndex) {
-    Node *currentNode = head, *auxList = NULL;
+    Node *currentNode = head, *auxList = nullptr;
     int ListLen = 0;
 
-    if (head == NULL) {
+    if (head == nullptr) {
         cout << "List empty." << endl;
         return;
     }
 
-    while (currentNode != NULL) {
+    while (currentNode != nullptr) {
         currentNode = currentNode->next;
         ListLen++;
     }
@@ -57,15 +58,15 @@ void LinkedList::deleteNode(int nodeIndex) {
 }
 
 void LinkedList::insertNode(string lexema, string simbolo) {
-    Node *newNode = new Node(lexema, simbolo);
+    Node *newNode = new Node(std::move(lexema), std::move(simbolo));
 
-    if (head == NULL) {
+    if (head == nullptr) {
         head = newNode;
         return;
     }
 
     Node *auxNode = head;
-    while (auxNode->next != NULL) {
+    while (auxNode->next != nullptr) {
         auxNode = auxNode->next;
     }
 
@@ -77,13 +78,14 @@ void LinkedList::printList() {
     Node *auxNode = head;
 
     // Check for empty list.
-    if (head == NULL) {
+    if (head == nullptr) {
         cout << "List empty" << endl;
         return;
     }
 
-    while (auxNode != NULL) {
-        cout << auxNode->simbolo << " : " << auxNode->lexema << "\n";
+    cout << "Lexema" << "\tSimbolo" << endl;
+    while (auxNode != nullptr) {
+        cout << auxNode->lexema << " : " << auxNode->simbolo << "\n";
         auxNode = auxNode->next;
     }
     cout << endl;
