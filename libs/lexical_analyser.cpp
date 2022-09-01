@@ -48,6 +48,7 @@ void jumpComentary(FILE *file) {
         character = (char) fgetc(file);
 
         if (character == EOF) {
+            printf("erro falta de }");
             exit(1);
         }
     } while (character != '}');
@@ -135,7 +136,7 @@ Node handleAttribution(FILE *file) {
 
         if (character == '=') {
             lexema += character;
-//            character = (char) fgetc(file);
+            character = (char) fgetc(file);
             return {lexema, "satribuicao"};
         } else {
             return {lexema, "sdois_pontos"};
@@ -184,7 +185,7 @@ Node handleRelationalOperator(FILE *file) {
 
     if (character == '=') {
         lexema += character;
-
+        character = (char) fgetc(file);
         if (simbolo != "sdif") {
             simbolo += "ig";
         }
