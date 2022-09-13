@@ -30,7 +30,7 @@ bool isArithmeticOperator() {
 }
 
 bool isRelationalOperator() {
-    return (character == 21 || character == 60 || character == 61 || character == 62);
+    return (character == 33 || character == 60 || character == 61 || character == 62);
 }
 
 bool isPunctuation() {
@@ -63,7 +63,6 @@ Node handleDigit(FILE *file) {
         lexema += character;
         character = (char) fgetc(file);
     }
-    character = (char) fgetc(file);
 
     return {lexema, "snumero"};
 }
@@ -217,26 +216,26 @@ Node handlePunctuation(FILE *file) {
 Node getToken(FILE *file) {
     if (isCommentary()) {
         jumpComentary(file);
-    }else if (isSpace()) {
+    } else if (isSpace()) {
         jumpSpaces(file);
-    }else if (isDigit()) {
+    } else if (isDigit()) {
         return handleDigit(file);
-    }else if (isLetter()) {
+    } else if (isLetter()) {
         return handleIdAndSpecialWord(file);
-    }else if (character == ':') {
+    } else if (character == ':') {
         return handleAttribution(file);
-    }else if (isArithmeticOperator()) {
+    } else if (isArithmeticOperator()) {
         return handleArithmeticOperator(file);
-    }else if (isRelationalOperator()) {
+    } else if (isRelationalOperator()) {
         return handleRelationalOperator(file);
-    }else if (isPunctuation()) {
+    } else if (isPunctuation()) {
         return handlePunctuation(file);
-    }else {
+    } else {
         string s_character;
         s_character += character;
         character = (char) fgetc(file);
         return {s_character, "invalid symbol"};
     }
 
-    return {"",""};
+    return {"", ""};
 }
