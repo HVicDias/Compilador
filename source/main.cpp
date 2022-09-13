@@ -7,7 +7,7 @@ using namespace std;
 int main() {
     LinkedList TokenList;
     Node token;
-    FILE *file = openFile((char *) "../Lexico/teste_1.txt");
+    FILE *file = openFile((char *) "../Lexico/teste_9.txt");
     int c = 0;
     character = (char) fgetc(file);
     do {

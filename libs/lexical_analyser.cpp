@@ -217,30 +217,26 @@ Node handlePunctuation(FILE *file) {
 Node getToken(FILE *file) {
     if (isCommentary()) {
         jumpComentary(file);
-    }
-
-    if (isSpace()) {
+    }else if (isSpace()) {
         jumpSpaces(file);
-    }
-
-    if (isDigit()) {
+    }else if (isDigit()) {
         return handleDigit(file);
-    }
-    if (isLetter()) {
+    }else if (isLetter()) {
         return handleIdAndSpecialWord(file);
-    }
-    if (character == ':') {
+    }else if (character == ':') {
         return handleAttribution(file);
-    }
-    if (isArithmeticOperator()) {
+    }else if (isArithmeticOperator()) {
         return handleArithmeticOperator(file);
-    }
-    if (isRelationalOperator()) {
+    }else if (isRelationalOperator()) {
         return handleRelationalOperator(file);
-    }
-    if (isPunctuation()) {
+    }else if (isPunctuation()) {
         return handlePunctuation(file);
+    }else {
+        string s_character;
+        s_character += character;
+        character = (char) fgetc(file);
+        return {s_character, "invalid symbol"};
     }
 
-    return {"", ""};
+    return {"",""};
 }
