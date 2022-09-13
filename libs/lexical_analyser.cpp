@@ -173,6 +173,7 @@ Node handleRelationalOperator(FILE *file) {
     }
 
     if (character == '!') {
+        lexema += character;
         simbolo = "sdif";
         character = (char) fgetc(file);
     }
