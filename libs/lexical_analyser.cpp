@@ -166,30 +166,28 @@ Node handleRelationalOperator(FILE *file) {
     string lexema;
     string simbolo;
 
-    if (character == '!') {
-        simbolo = "sdif";
-    } else if (character == '<') {
+    if (character == '<') {
         simbolo = "smenor";
     } else if (character == '>') {
         simbolo = "smaior";
-    } else if (character == '=') {
-        lexema += character;
-        simbolo = "sig";
-        character = (char) fgetc(file);
-
-        return {lexema, simbolo};
     }
-    lexema += character;
-    character = (char) fgetc(file);
 
+    if (character == '!') {
+        simbolo = "sdif";
+        character = (char) fgetc(file);
+    }
     if (character == '=') {
         lexema += character;
-        character = (char) fgetc(file);
-        if (simbolo != "sdif") {
-            simbolo += "ig";
+        if(lexema != "!") {
+            simbolo = "sig";
         }
     }
 
+    if(lexema == "!") {
+        simbolo = "caracter invalido";
+    }
+
+    character = (char) fgetc(file);
     return {lexema, simbolo};
 }
 
