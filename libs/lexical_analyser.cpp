@@ -165,30 +165,39 @@ Node handleArithmeticOperator(FILE *file) {
 Node handleRelationalOperator(FILE *file) {
     string lexema;
     string simbolo;
+    simbolo = "";
 
     if (character == '<') {
+        lexema += character;
         simbolo = "smenor";
+        character = (char) fgetc(file);
     } else if (character == '>') {
+        lexema += character;
         simbolo = "smaior";
-    }
-
-    if (character == '!') {
+        character = (char) fgetc(file);
+    }else if (character == '!') {
         lexema += character;
         simbolo = "sdif";
         character = (char) fgetc(file);
     }
+
     if (character == '=') {
         lexema += character;
-        if(lexema != "!") {
+        if(simbolo == ""){
             simbolo = "sig";
+            character = (char) fgetc(file);
+        }else{
+            if(simbolo == "smenor" || simbolo == "smaior"){
+                simbolo += "ig";
+            }
         }
+        character = (char) fgetc(file);
     }
 
     if(lexema == "!") {
         simbolo = "caracter invalido";
     }
 
-    character = (char) fgetc(file);
     return {lexema, simbolo};
 }
 
