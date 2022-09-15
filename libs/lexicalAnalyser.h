@@ -1,5 +1,5 @@
-#ifndef COMPILER_LEXICAL_ANALYSER_H
-#define COMPILER_LEXICAL_ANALYSER_H
+#ifndef COMPILER_LEXICALANALYSER_H
+#define COMPILER_LEXICALANALYSER_H
 
 #include "linkedList.h"
 
@@ -41,4 +41,4 @@ Node handlePunctuation(FILE *file);
 
 Node getToken(FILE *file);
 
-#endif //COMPILER_LEXICAL_ANALYSER_H
+#endif //COMPILER_LEXICALANALYSER_H

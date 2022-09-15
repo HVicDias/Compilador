@@ -1,6 +1,6 @@
 #include "../libs/utils.h"
 #include "../libs/linkedList.h"
-#include "../libs/lexical_analyser.h"
+#include "../libs/lexicalAnalyser.h"
 
 using namespace std;
 

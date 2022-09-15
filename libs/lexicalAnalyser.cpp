@@ -1,5 +1,5 @@
 #include <string>
-#include "lexical_analyser.h"
+#include "lexicalAnalyser.h"
 
 using namespace std;
 
@@ -183,7 +183,7 @@ Node handleRelationalOperator(FILE *file) {
 
     if (character == '=') {
         lexema += character;
-        if(simbolo == ""){
+        if(simbolo.empty()){
             simbolo = "sig";
             character = (char) fgetc(file);
         }else{
