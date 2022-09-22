@@ -3,29 +3,50 @@
 
 #include <string>
 
-class Node {
+class SymbolNode {
 public:
-    std::string lexema;
-    std::string simbolo;
-    Node *previous;
-    Node *next;
+    std::string identifier;
+    std::string scope;
+    std::string type;
+    int lineNo;
+    SymbolNode *next;
 
-    Node(std::string, std::string);
+    SymbolNode(std::string, std::string, std::string, int);
 
-    Node();
+    SymbolNode();
 };
 
-class LinkedList {
+class SymbolList {
 private:
-    Node *head;
+    SymbolNode *head;
 public:
-    LinkedList();
+    SymbolList();
+
+    void insertNode(std::string, std::string, std::string, int);
+
+    void printList();
+
+    void deleteNode(int);
+};
+
+class SymbolListNode : public SymbolList{
+public:
+    SymbolListNode *previous;
+
+    SymbolListNode();
+};
+
+class SymbolTable{
+private:
+    SymbolListNode *head;
+public:
+    SymbolTable();
 
     void insertNode(std::string, std::string);
 
     void printList();
 
-    void deleteNode(int);
+    void deleteNode();
 };
 
 #endif //COMPILER_LINKEDLIST_H
