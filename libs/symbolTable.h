@@ -7,6 +7,7 @@ class Node {
 public:
     std::string lexema;
     std::string simbolo;
+    Node *previous;
     Node *next;
 
     Node(std::string, std::string);
