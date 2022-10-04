@@ -64,7 +64,6 @@ Node handleDigit(FILE *file) {
         lexema += character;
         character = (char) fgetc(file);
     }
-    cout << lexema << " : " << "snumero" << endl;
 
     return {lexema, "snumero"};
 }
@@ -123,7 +122,6 @@ Node handleIdAndSpecialWord(FILE *file) {
     } else {
         simbolo = "sidentificador";
     }
-    cout << lexema << " : " << simbolo << endl;
 
     return {lexema, simbolo};
 }
@@ -139,11 +137,9 @@ Node handleAttribution(FILE *file) {
         if (character == '=') {
             lexema += character;
             character = (char) fgetc(file);
-            cout << lexema << " : " << "satribuicao" << endl;
 
             return {lexema, "satribuicao"};
         } else {
-            cout << lexema << " : " << "sdoispontos" << endl;
 
             return {lexema, "sdoispontos"};
         }
@@ -165,7 +161,6 @@ Node handleArithmeticOperator(FILE *file) {
     }
     lexema += character;
     character = (char) fgetc(file);
-    cout << lexema << " : " << simbolo << endl;
     return {lexema, simbolo};
 }
 
@@ -204,7 +199,6 @@ Node handleRelationalOperator(FILE *file) {
     if (lexema == "!") {
         simbolo = "caracter invalido";
     }
-    cout << lexema << " : " << simbolo << endl;
 
     return {lexema, simbolo};
 }
@@ -226,7 +220,6 @@ Node handlePunctuation(FILE *file) {
     }
     lexema += character;
     character = (char) fgetc(file);
-    cout << lexema << " : " << simbolo << endl;
     return {lexema, simbolo};
 }
 

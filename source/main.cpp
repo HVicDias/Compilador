@@ -27,9 +27,7 @@ int main() {
 
     do {
         token = getToken(file);
-        cout << (int) token.simbolo[0] << endl;
-        cout << token.simbolo << endl;
-        cout << token.lexema << endl;
+
         if (!token.lexema.empty() && !token.simbolo.empty()) {
             if (token.simbolo == "sprograma") {
                 token = getToken(file);

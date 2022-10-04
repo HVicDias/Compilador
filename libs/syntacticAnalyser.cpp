@@ -18,7 +18,6 @@ Node analyseVariables(FILE *file, Node token) {
     do {
         if (token.simbolo == "sidentificador") {
             token = getToken(file);
-            cout << token.simbolo << endl;
             if (token.simbolo == "svirgula" || token.simbolo == "sdoispontos") {
                 if (token.simbolo == "svirgula") {
                     token = getToken(file);
@@ -58,7 +57,6 @@ Node analyseEtVariables(FILE *file, Node token) {
         }
     }
 
-    cout << "Saida etapa variavel: " << token.simbolo << " " << token.lexema << endl;
     return token;
 }
 
@@ -120,11 +118,7 @@ Node analyseBlock(FILE *file, Node token) {
     token = getToken(file);
 
     token = analyseEtVariables(file, token);
-//    token = getToken(file);
-
-    cout << "Entrando Subrotina: " << token.simbolo << endl;
     token = analyseSubroutine(file, token);
-    cout << "Saindo Subrotina: " << token.simbolo << endl;
     token = analyseCommands(file, token);
 
     return token;
@@ -323,9 +317,9 @@ Node analyseWhile(FILE *file, Node token) {
 }
 
 Node analyseIf(FILE *file, Node token) {
-
     token = getToken(file);
     token = analyseExpressions(file, token);
+
     if (token.simbolo == "sentão") {
         token = getToken(file);
         token = analyseSimpleCommands(file, token);
