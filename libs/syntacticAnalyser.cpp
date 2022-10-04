@@ -178,6 +178,7 @@ Node analyseFunctionCall(FILE *file, Node token) {
 Node analyseFactor(FILE *file, Node token) {
     if (token.simbolo == "sidentificador") {
         token = analyseFunctionCall(file, token);
+        token = getToken(file);
     } else if (token.simbolo == "snumero") {
         token = getToken(file);
     } else if (token.simbolo == "snao") {
@@ -203,15 +204,17 @@ Node analyseFactor(FILE *file, Node token) {
 Node analyseTerm(FILE *file, Node token) {
     token = analyseFactor(file, token);
 
-    while (token.simbolo == "smult" || token.simbolo == "sdiv" || token.simbolo == "if") {
+    while (token.simbolo == "smult" || token.simbolo == "sdiv" || token.simbolo == "sse") {
         token = getToken(file);
         token = analyseFactor(file, token);
     }
+
     return token;
 }
 
 Node analyseExpressions(FILE *file, Node token) {
     token = analyseSimpleExpressions(file, token);
+
     if (token.simbolo == "smaior" || token.simbolo == "smaiorig" ||
         token.simbolo == "smenor" || token.simbolo == "smenorig" ||
         token.simbolo == "sdif") {
@@ -225,11 +228,13 @@ Node analyseExpressions(FILE *file, Node token) {
 Node analyseSimpleExpressions(FILE *file, Node token) {
     if (token.simbolo == "smais" || token.simbolo == "smenos") {
         token = getToken(file);
+    }
+
+    token = analyseTerm(file, token);
+
+    while (token.simbolo == "smais" || token.simbolo == "smenos" || token.simbolo == "sou") {
+        token = getToken(file);
         token = analyseTerm(file, token);
-        while (token.simbolo == "smais" || token.simbolo == "smenos" || token.simbolo == "sou") {
-            token = getToken(file);
-            token = analyseTerm(file, token);
-        }
     }
 
     return token;
@@ -259,8 +264,8 @@ Node analyseAttributionAndProcedureCall(FILE *file, Node token) {
 }
 
 Node analyseRead(FILE *file, Node token) {
-
     token = getToken(file);
+
     if (token.simbolo == "sabre_parenteses") {
         token = getToken(file);
         if (token.simbolo == "sidentificador") {
@@ -319,11 +324,11 @@ Node analyseWhile(FILE *file, Node token) {
 Node analyseIf(FILE *file, Node token) {
     token = getToken(file);
     token = analyseExpressions(file, token);
-
-    if (token.simbolo == "sentão") {
+    cout << token.simbolo << endl;
+    if (token.simbolo == "sentao") {
         token = getToken(file);
         token = analyseSimpleCommands(file, token);
-        if (token.simbolo == "Ssenão") {
+        if (token.simbolo == "Ssenao") {
             token = getToken(file);
             token = analyseSimpleCommands(file, token);
         }
