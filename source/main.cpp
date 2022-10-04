@@ -9,7 +9,7 @@ int main() {
     LinkedList TokenList;
     Node token;
 
-    FILE *file = openFile((char *) "../Sintatico/sint1.txt");
+    FILE *file = openFile((char *) "../Sintatico/sint19.txt");
 
     int c = 0;
 
@@ -50,7 +50,9 @@ int main() {
                     cout << "Erro27" << endl;
                 }
             } else {
-                cout << "Erro28" << endl;
+                if(character != EOF) {
+                    cout << "Erro28" << endl;
+                }
             }
         } else {
             cout << "Erro29" << endl;
@@ -60,7 +62,7 @@ int main() {
 
     fclose(file);
 
-    TokenList.printList();
+    //TokenList.printList();
     if (c == 10000) {
         cout << "Lexema nao identificado" << endl;
     }

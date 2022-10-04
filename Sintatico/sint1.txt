@@ -33,4 +33,4 @@ inicio
     senao escreva(c)
 fim.
 
-{fim}   
+{fim}

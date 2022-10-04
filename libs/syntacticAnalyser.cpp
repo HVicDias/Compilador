@@ -101,9 +101,14 @@ Node analyseCommands(FILE *file, Node token) {
         token = analyseSimpleCommands(file, token);
         while (token.simbolo != "sfim") {
             if (token.simbolo == "sponto_virgula") {
-                token = analyseSimpleCommands(file, token);
-            } else {
+                token = getToken(file);
+                if(token.simbolo != "sfim") {
+                    token = analyseSimpleCommands(file, token);
+                }
+            } else{
+                cout << token.simbolo << " : " << token.lexema << endl;
                 printf("Erro8");
+                exit(0);
             }
         }
         token = getToken(file);
@@ -232,7 +237,7 @@ Node analyseSimpleExpressions(FILE *file, Node token) {
 
     token = analyseTerm(file, token);
 
-    while (token.simbolo == "smais" || token.simbolo == "smenos" || token.simbolo == "sou") {
+    while (token.simbolo == "smais" || token.simbolo == "smenos" || token.simbolo == "sou" || token.simbolo == "se") {
         token = getToken(file);
         token = analyseTerm(file, token);
     }
@@ -254,7 +259,7 @@ Node analyseProcedureCall(FILE *file, Node token) {
 
 Node analyseAttributionAndProcedureCall(FILE *file, Node token) {
     token = getToken(file);
-    if (token.simbolo == "satribuição") {
+    if (token.simbolo == "satribuicao") {
         token = analyseAttribution(file, token);
     } else {
         token = analyseProcedureCall(file, token);
@@ -308,10 +313,9 @@ Node analyseWrite(FILE *file, Node token) {
 }
 
 Node analyseWhile(FILE *file, Node token) {
-
     token = getToken(file);
     token = analyseExpressions(file, token);
-    if (token.simbolo == "sfaça") {
+    if (token.simbolo == "sfaca") {
         token = getToken(file);
         token = analyseSimpleCommands(file, token);
     } else {
@@ -324,11 +328,10 @@ Node analyseWhile(FILE *file, Node token) {
 Node analyseIf(FILE *file, Node token) {
     token = getToken(file);
     token = analyseExpressions(file, token);
-    cout << token.simbolo << endl;
     if (token.simbolo == "sentao") {
         token = getToken(file);
         token = analyseSimpleCommands(file, token);
-        if (token.simbolo == "Ssenao") {
+        if (token.simbolo == "ssenao") {
             token = getToken(file);
             token = analyseSimpleCommands(file, token);
         }
