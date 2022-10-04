@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include "lexicalAnalyser.h"
 
 using namespace std;
@@ -63,6 +64,7 @@ Node handleDigit(FILE *file) {
         lexema += character;
         character = (char) fgetc(file);
     }
+    cout << lexema << " : " << "snumero" << endl;
 
     return {lexema, "snumero"};
 }
@@ -107,7 +109,7 @@ Node handleIdAndSpecialWord(FILE *file) {
     } else if (lexema == "falso") {
         simbolo = "sfalso";
     } else if (lexema == "procedimento") {
-        simbolo = "sprocediento";
+        simbolo = "sprocedimento";
     } else if (lexema == "funcao") {
         simbolo = "sfuncao";
     } else if (lexema == "div") {
@@ -121,6 +123,7 @@ Node handleIdAndSpecialWord(FILE *file) {
     } else {
         simbolo = "sidentificador";
     }
+    cout << lexema << " : " << simbolo << endl;
 
     return {lexema, simbolo};
 }
@@ -136,9 +139,13 @@ Node handleAttribution(FILE *file) {
         if (character == '=') {
             lexema += character;
             character = (char) fgetc(file);
+            cout << lexema << " : " << "satribuicao" << endl;
+
             return {lexema, "satribuicao"};
         } else {
-            return {lexema, "sdois_pontos"};
+            cout << lexema << " : " << "sdoispontos" << endl;
+
+            return {lexema, "sdoispontos"};
         }
     } else {
         exit(1);
@@ -158,7 +165,7 @@ Node handleArithmeticOperator(FILE *file) {
     }
     lexema += character;
     character = (char) fgetc(file);
-
+    cout << lexema << " : " << simbolo << endl;
     return {lexema, simbolo};
 }
 
@@ -175,7 +182,7 @@ Node handleRelationalOperator(FILE *file) {
         lexema += character;
         simbolo = "smaior";
         character = (char) fgetc(file);
-    }else if (character == '!') {
+    } else if (character == '!') {
         lexema += character;
         simbolo = "sdif";
         character = (char) fgetc(file);
@@ -183,20 +190,21 @@ Node handleRelationalOperator(FILE *file) {
 
     if (character == '=') {
         lexema += character;
-        if(simbolo.empty()){
+        if (simbolo.empty()) {
             simbolo = "sig";
             character = (char) fgetc(file);
-        }else{
-            if(simbolo == "smenor" || simbolo == "smaior"){
+        } else {
+            if (simbolo == "smenor" || simbolo == "smaior") {
                 simbolo += "ig";
             }
         }
         character = (char) fgetc(file);
     }
 
-    if(lexema == "!") {
+    if (lexema == "!") {
         simbolo = "caracter invalido";
     }
+    cout << lexema << " : " << simbolo << endl;
 
     return {lexema, simbolo};
 }
@@ -218,15 +226,22 @@ Node handlePunctuation(FILE *file) {
     }
     lexema += character;
     character = (char) fgetc(file);
+    cout << lexema << " : " << simbolo << endl;
     return {lexema, simbolo};
 }
 
 Node getToken(FILE *file) {
-    if (isCommentary()) {
-        jumpComentary(file);
-    } else if (isSpace()) {
-        jumpSpaces(file);
-    } else if (isDigit()) {
+    while (isSpace() || isCommentary()) {
+        if (isCommentary()) {
+            jumpComentary(file);
+        }
+
+        if (isSpace()) {
+            jumpSpaces(file);
+        }
+    }
+
+    if (isDigit()) {
         return handleDigit(file);
     } else if (isLetter()) {
         return handleIdAndSpecialWord(file);
@@ -242,6 +257,7 @@ Node getToken(FILE *file) {
         string s_character;
         s_character += character;
         character = (char) fgetc(file);
+
         return {s_character, "invalid symbol"};
     }
 
