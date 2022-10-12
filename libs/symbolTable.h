@@ -29,20 +29,24 @@ public:
     void deleteNode(int);
 };
 
-class SymbolListNode : public SymbolList{
+class SymbolListNode : public SymbolList {
 public:
     SymbolListNode *previous;
 
     SymbolListNode();
 };
 
-class SymbolTable{
+class SymbolTable {
 private:
     SymbolListNode *head;
 public:
+    static SymbolTable SymbolTableInstance;
+
     SymbolTable();
 
-    void insertNode(std::string, std::string);
+    void insertSymbol(std::string, std::string, std::string, int);
+
+    void insertList();
 
     void printList();
 

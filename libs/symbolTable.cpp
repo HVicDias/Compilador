@@ -62,7 +62,7 @@ void SymbolList::deleteNode(int nodeIndex) {
 }
 
 void SymbolList::insertNode(string identifier, string scope, string type, int lineNo) {
-    SymbolNode *newNode = new SymbolNode(std::move(identifier), std::move(scope), std::move(type), lineNo);
+    auto *newNode = new SymbolNode(std::move(identifier), std::move(scope), std::move(type), lineNo);
 
     if (head == nullptr) {
         head = newNode;
@@ -87,20 +87,20 @@ void SymbolList::printList() {
         return;
     }
 
-    cout << "Identifier" << "\tScope" << "\ttype" << "\tLineNumber" <<  endl;
+    cout << "Identifier" << "\tScope" << "\ttype" << "\tLineNumber" << endl;
     while (auxNode != nullptr) {
-        cout << auxNode->identifier << " : "<< auxNode->scope << " : " << auxNode->type << " : " << auxNode->lineNo << "\n";
+        cout << auxNode->identifier << " : " << auxNode->scope << " : " << auxNode->type << " : " << auxNode->lineNo
+             << "\n";
         auxNode = auxNode->next;
     }
     cout << endl;
 }
 
-SymbolListNode::SymbolListNode() : SymbolList(){
+SymbolListNode::SymbolListNode() : SymbolList() {
     previous = nullptr;
 }
 
-SymbolTable::SymbolTable()
-{
+SymbolTable::SymbolTable() {
     head = nullptr;
 }
 
@@ -114,13 +114,21 @@ void SymbolTable::deleteNode() {
 
     head = head->previous;
     delete currentNode;
-    return;
 }
 
-void SymbolTable::insertNode(string lexema, string simbolo) {
+void SymbolTable::insertList() {
     SymbolListNode *newNode = new SymbolListNode();
     newNode->previous = head;
     head = newNode;
+}
+
+void SymbolTable::insertSymbol(string identifier, string scope, string type, int lineNo) {
+    if (head != nullptr) {
+        head->insertNode(identifier, scope, type, lineNo);
+    } else {
+        cout << "SymbolTable Head is null" << endl;
+        exit(1);
+    }
 }
 
 void SymbolTable::printList() {
@@ -142,3 +150,4 @@ void SymbolTable::printList() {
     }
     cout << endl;
 }
+

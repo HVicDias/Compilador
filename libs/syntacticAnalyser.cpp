@@ -6,6 +6,8 @@
 
 using namespace std;
 
+// Tabela de simbolos var
+
 Node analyseType(FILE *file, Node token) {
     if (token.simbolo != "sinteiro" && token.simbolo != "sbooleano") {
         printf("Erro1");
@@ -102,10 +104,10 @@ Node analyseCommands(FILE *file, Node token) {
         while (token.simbolo != "sfim") {
             if (token.simbolo == "sponto_virgula") {
                 token = getToken(file);
-                if(token.simbolo != "sfim") {
+                if (token.simbolo != "sfim") {
                     token = analyseSimpleCommands(file, token);
                 }
-            } else{
+            } else {
                 cout << token.simbolo << " : " << token.lexema << endl;
                 printf("Erro8");
                 exit(0);

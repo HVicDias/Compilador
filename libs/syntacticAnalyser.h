@@ -1,6 +1,10 @@
 #ifndef COMPILER_SYNTACTICANALYSER_H
 #define COMPILER_SYNTACTICANALYSER_H
 
+#include "linkedList.h"
+
+extern int lineNumber;
+
 Node analyseType(FILE *file, Node token);
 
 Node analyseVariables(FILE *file, Node token);

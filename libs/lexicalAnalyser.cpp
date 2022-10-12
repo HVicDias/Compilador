@@ -7,6 +7,10 @@ using namespace std;
 char character;
 
 bool isSpace() {
+    if (character == '\n') {
+        cout << (int) character << "//" << lineNumber << endl;
+        lineNumber++;
+    }
     return (character == ' ' || character == '\n');
 }
 
@@ -253,6 +257,4 @@ Node getToken(FILE *file) {
 
         return {s_character, "invalid symbol"};
     }
-
-    return {"", ""};
 }

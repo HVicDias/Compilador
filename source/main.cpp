@@ -2,18 +2,21 @@
 #include "../libs/linkedList.h"
 #include "../libs/lexicalAnalyser.h"
 #include "../libs/syntacticAnalyser.h"
+#include "../libs/semanticAnalyser.h"
+#include "../libs/symbolTable.h"
 
 using namespace std;
 
 int main() {
     LinkedList TokenList;
     Node token;
-
+    lineNumber = 0;
     FILE *file = openFile((char *) "../Sintatico/sint19.txt");
-
-    int c = 0;
+    cout << lineNumber;
+//    int c = 0;
 
     character = (char) fgetc(file);
+//    Léxico
 //    do {
 //        token = getToken(file);
 //        if (!token.lexema.empty() && !token.simbolo.empty()) {
@@ -24,6 +27,11 @@ int main() {
 //        }
 //
 //    } while (character != EOF && c != 10000);
+//
+//    TokenList.printList();
+//    if (c == 10000) {
+//        cout << "Lexema nao identificado" << endl;
+//    }
 
     do {
         token = getToken(file);
@@ -33,6 +41,7 @@ int main() {
                 token = getToken(file);
 
                 if (token.simbolo == "sidentificador") {
+                    symbolTable.insertNode(token.lexema, "nomedeprograma", "", "");
                     token = getToken(file);
 
                     if (token.simbolo == "sponto_virgula") {
@@ -50,7 +59,7 @@ int main() {
                     cout << "Erro27" << endl;
                 }
             } else {
-                if(character != EOF) {
+                if (character != EOF) {
                     cout << "Erro28" << endl;
                 }
             }
@@ -62,36 +71,5 @@ int main() {
 
     fclose(file);
 
-    //TokenList.printList();
-    if (c == 10000) {
-        cout << "Lexema nao identificado" << endl;
-    }
     return 0;
 }
-
-
-//Algoritmo Analisador Sintático <programa>
-//início
-//Léxico(token)
-//se token.simbolo = sprograma
-
-//então início
-//Léxico(token)
-//se token.simbolo = sidentificador
-//então início
-//Léxico(token)
-//se token.simbolo = spontovirgula
-//então início
-//analisa_bloco
-//        se token.simbolo = sponto
-//então se acabou arquivo ou é comentário
-//        então sucesso
-//        senão ERRO
-//            senão ERRO
-//   fim
-//senão ERRO
-//fim
-//        senão ERRO
-//        fim
-//senão ERRO
-//fim.
