@@ -96,15 +96,16 @@ void SymbolList::printList() {
     cout << endl;
 }
 
-SymbolListNode::SymbolListNode() : SymbolList() {
+SymbolListNode::SymbolListNode(std::string layerName) : SymbolList() {
     previous = nullptr;
+    this->layerName = layerName;
 }
 
 SymbolTable::SymbolTable() {
     head = nullptr;
 }
 
-void SymbolTable::deleteNode() {
+void SymbolTable::deleteLayer() {
     SymbolListNode *currentNode = head;
 
     if (head == nullptr) {
@@ -116,8 +117,8 @@ void SymbolTable::deleteNode() {
     delete currentNode;
 }
 
-void SymbolTable::insertList() {
-    SymbolListNode *newNode = new SymbolListNode();
+void SymbolTable::downLayer(std::string layerName) {
+    SymbolListNode *newNode = new SymbolListNode(layerName);
     newNode->previous = head;
     head = newNode;
 }
@@ -150,4 +151,3 @@ void SymbolTable::printList() {
     }
     cout << endl;
 }
-

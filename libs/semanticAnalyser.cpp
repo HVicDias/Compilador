@@ -1,3 +1,5 @@
 #include "semanticAnalyser.h"
 
-int lineNumber;
+int lineNo;
+
+SymbolTable symbolTable;

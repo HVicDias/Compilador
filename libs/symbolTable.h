@@ -1,5 +1,5 @@
-#ifndef COMPILER_LINKEDLIST_H
-#define COMPILER_LINKEDLIST_H
+#ifndef COMPILER_SYMBOLTABLE_H
+#define COMPILER_SYMBOLTABLE_H
 
 #include <string>
 
@@ -19,6 +19,7 @@ public:
 class SymbolList {
 private:
     SymbolNode *head;
+
 public:
     SymbolList();
 
@@ -33,24 +34,25 @@ class SymbolListNode : public SymbolList {
 public:
     SymbolListNode *previous;
 
-    SymbolListNode();
+    std::string layerName;
+
+    SymbolListNode(std::string);
 };
 
 class SymbolTable {
 private:
     SymbolListNode *head;
-public:
-    static SymbolTable SymbolTableInstance;
 
+public:
     SymbolTable();
 
     void insertSymbol(std::string, std::string, std::string, int);
 
-    void insertList();
+    void downLayer(std::string);
 
     void printList();
 
-    void deleteNode();
+    void deleteLayer();
 };
 
-#endif //COMPILER_LINKEDLIST_H
+#endif //COMPILER_SYMBOLTABLE_H

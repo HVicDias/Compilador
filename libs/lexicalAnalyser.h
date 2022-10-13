@@ -3,9 +3,7 @@
 
 #include "linkedList.h"
 
-extern int lineNumber;
-
-using namespace std;
+extern int lineNo;
 
 extern char character;
 

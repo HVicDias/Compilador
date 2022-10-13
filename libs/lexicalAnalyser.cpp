@@ -7,10 +7,6 @@ using namespace std;
 char character;
 
 bool isSpace() {
-    if (character == '\n') {
-        cout << (int) character << "//" << lineNumber << endl;
-        lineNumber++;
-    }
     return (character == ' ' || character == '\n');
 }
 
@@ -44,6 +40,10 @@ bool isPunctuation() {
 
 void jumpSpaces(FILE *file) {
     while (character == ' ' || character == '\n') {
+        if (character == '\n') {
+            cout << (int) character << "//" << lineNo << endl;
+            lineNo++;
+        }
         character = (char) fgetc(file);
     }
 }
