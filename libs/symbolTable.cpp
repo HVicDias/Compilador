@@ -22,13 +22,13 @@ SymbolNode::SymbolNode(string identifier, string scope, string type, int lineNo)
     this->next = nullptr;
 }
 
-SymbolList::SymbolList() { head = nullptr; }
+SymbolList::SymbolList() { symbolNode = nullptr; }
 
 void SymbolList::deleteNode(int nodeIndex) {
-    SymbolNode *currentNode = head, *auxList = nullptr;
+    SymbolNode *currentNode = symbolNode, *auxList = nullptr;
     int ListLen = 0;
 
-    if (head == nullptr) {
+    if (symbolNode == nullptr) {
         cout << "List empty." << endl;
         return;
     }
@@ -43,10 +43,10 @@ void SymbolList::deleteNode(int nodeIndex) {
         return;
     }
 
-    currentNode = head;
+    currentNode = symbolNode;
 
     if (nodeIndex == 1) {
-        head = head->next;
+        symbolNode = symbolNode->next;
         delete currentNode;
         return;
     }
@@ -64,12 +64,12 @@ void SymbolList::deleteNode(int nodeIndex) {
 void SymbolList::insertNode(string identifier, string scope, string type, int lineNo) {
     auto *newNode = new SymbolNode(std::move(identifier), std::move(scope), std::move(type), lineNo);
 
-    if (head == nullptr) {
-        head = newNode;
+    if (symbolNode == nullptr) {
+        symbolNode = newNode;
         return;
     }
 
-    SymbolNode *auxNode = head;
+    SymbolNode *auxNode = symbolNode;
     while (auxNode->next != nullptr) {
         auxNode = auxNode->next;
     }
@@ -79,10 +79,10 @@ void SymbolList::insertNode(string identifier, string scope, string type, int li
 }
 
 void SymbolList::printList() {
-    SymbolNode *auxNode = head;
+    SymbolNode *auxNode = symbolNode;
 
     // Check for empty list.
-    if (head == nullptr) {
+    if (symbolNode == nullptr) {
         cout << "List empty" << endl;
         return;
     }
@@ -102,52 +102,81 @@ SymbolListNode::SymbolListNode(std::string layerName) : SymbolList() {
 }
 
 SymbolTable::SymbolTable() {
-    head = nullptr;
-}
-
-void SymbolTable::deleteLayer() {
-    SymbolListNode *currentNode = head;
-
-    if (head == nullptr) {
-        cout << "List empty." << endl;
-        return;
-    }
-
-    head = head->previous;
-    delete currentNode;
-}
-
-void SymbolTable::downLayer(std::string layerName) {
-    SymbolListNode *newNode = new SymbolListNode(layerName);
-    newNode->previous = head;
-    head = newNode;
+    symbolListNode = nullptr;
 }
 
 void SymbolTable::insertSymbol(string identifier, string scope, string type, int lineNo) {
-    if (head != nullptr) {
-        head->insertNode(identifier, scope, type, lineNo);
+    if (symbolListNode != nullptr) {
+        symbolListNode->insertNode(identifier, scope, type, lineNo);
     } else {
         cout << "SymbolTable Head is null" << endl;
         exit(1);
     }
 }
 
+void SymbolTable::downLayer(std::string layerName) {
+    SymbolListNode *newNode = new SymbolListNode(layerName);
+    newNode->previous = symbolListNode;
+    symbolListNode = newNode;
+}
+
+SymbolNode* SymbolTable::searchSymbol(std::string lexema) {
+    SymbolListNode *currentNode = symbolListNode;
+
+    if (currentNode == nullptr) {
+        cout << "SymbolTable Head is null" << endl;
+        exit(1);
+    }
+
+    SymbolNode* currentSymbol = symbolListNode->symbolNode;
+
+    if (currentSymbol == nullptr) {
+        cout << "SymbolTable have no node is null" << endl;
+        exit(1);
+    }
+
+    while(currentNode != nullptr) {
+        while (currentSymbol != nullptr){
+            if(currentSymbol->identifier == lexema){
+                return currentSymbol;
+            }
+            currentSymbol = currentSymbol->next;
+        }
+        currentNode = currentNode->previous;
+        currentSymbol = currentNode->symbolNode;
+    }
+
+    return nullptr;
+}
+
 void SymbolTable::printList() {
-    SymbolListNode *auxNode = head;
+    SymbolListNode *auxNode = symbolListNode;
     int leafs = 0;
 
     // Check for empty list.
-    if (head == nullptr) {
+    if (symbolListNode == nullptr) {
         cout << "Empty Tree" << endl;
         return;
     }
 
-    cout << "Head" << endl;
+    cout << "Head " << auxNode->layerName << endl;
     while (auxNode != nullptr) {
         auxNode->printList();
         auxNode = auxNode->previous;
-        cout << "Head -" << leafs << endl;
+        cout << "Head -" << leafs << " " << auxNode->layerName << endl;
         leafs++;
     }
     cout << endl;
+}
+
+void SymbolTable::deleteLayer() {
+    SymbolListNode *currentNode = symbolListNode;
+
+    if (currentNode == nullptr) {
+        cout << "List empty." << endl;
+        return;
+    }
+
+    symbolListNode = symbolListNode->previous;
+    delete currentNode;
 }
