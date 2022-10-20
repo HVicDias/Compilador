@@ -22,10 +22,8 @@ int main() {
                 token = getToken(file);
 
                 if (token.simbolo == "sidentificador") {
-                    symbolTable.downLayer("nomedeprograma");
-                    symbolTable.insertSymbol(token.lexema, "nomedeprograma", "", lineNo);
-                    aux = symbolTable.searchSymbol(token.lexema);
-                    cout << aux->identifier << endl;
+                    symbolTable.downLayer("nomedeprograma", token.lexema, "nomedeprograma", "", lineNo);
+
                     token = getToken(file);
 
                     if (token.simbolo == "sponto_virgula") {
@@ -56,7 +54,9 @@ int main() {
     } while (character != EOF);
 
     fclose(file);
-    cout << lineNo;
+    cout << lineNo << endl;
+
+    symbolTable.printList();
     return 0;
 }
 

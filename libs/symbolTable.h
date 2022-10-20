@@ -35,21 +35,26 @@ public:
 
     std::string layerName;
 
-    explicit SymbolListNode(std::string);
+    SymbolNode headNode;
+
+    explicit SymbolListNode(std::string, std::string, std::string, std::string, int);
 };
 
 class SymbolTable {
-private:
+public:
     SymbolListNode *symbolListNode;
 
-public:
     SymbolTable();
 
     void insertSymbol(std::string, std::string, std::string, int);
 
-    void downLayer(std::string);
+    void downLayer(std::string, std::string, std::string, std::string, int);
 
     SymbolNode* searchSymbol(std::string);
+
+    SymbolNode* searchLocalSymbol(std::string);
+
+    SymbolNode* searchScopeSymbol(std::string, std::string);
 
     void printList();
 

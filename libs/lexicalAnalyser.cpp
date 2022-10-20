@@ -130,7 +130,6 @@ Node handleIdAndSpecialWord(FILE *file) {
     return {lexema, simbolo};
 }
 
-
 Node handleAttribution(FILE *file) {
     string lexema;
 

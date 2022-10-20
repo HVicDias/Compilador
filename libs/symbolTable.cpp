@@ -90,15 +90,16 @@ void SymbolList::printList() {
     cout << "Identifier" << "\tScope" << "\ttype" << "\tLineNumber" << endl;
     while (auxNode != nullptr) {
         cout << auxNode->identifier << " : " << auxNode->scope << " : " << auxNode->type << " : " << auxNode->lineNo
-             << "\n";
+             << endl;
         auxNode = auxNode->next;
     }
-    cout << endl;
 }
 
-SymbolListNode::SymbolListNode(std::string layerName) : SymbolList() {
+SymbolListNode::SymbolListNode(std::string layerName, string identifier, string scope, string type, int lineNo)
+        : SymbolList() {
     previous = nullptr;
     this->layerName = layerName;
+    symbolNode = new SymbolNode(identifier, scope, type, lineNo);
 }
 
 SymbolTable::SymbolTable() {
@@ -114,38 +115,84 @@ void SymbolTable::insertSymbol(string identifier, string scope, string type, int
     }
 }
 
-void SymbolTable::downLayer(std::string layerName) {
-    SymbolListNode *newNode = new SymbolListNode(layerName);
+void SymbolTable::downLayer(std::string layerName, string identifier, string scope, string type, int lineNo) {
+    SymbolListNode *newNode = new SymbolListNode(layerName, identifier, scope, type, lineNo);
     newNode->previous = symbolListNode;
     symbolListNode = newNode;
 }
 
-SymbolNode* SymbolTable::searchSymbol(std::string lexema) {
+SymbolNode *SymbolTable::searchSymbol(std::string lexema) {
     SymbolListNode *currentNode = symbolListNode;
+    SymbolNode *currentSymbol;
 
     if (currentNode == nullptr) {
         cout << "SymbolTable Head is null" << endl;
         exit(1);
     }
 
-    SymbolNode* currentSymbol = symbolListNode->symbolNode;
+    while (currentNode != nullptr) {
+        currentSymbol = currentNode->symbolNode;
+        currentNode->printList();
 
-    if (currentSymbol == nullptr) {
-        cout << "SymbolTable have no node is null" << endl;
-        exit(1);
-    }
-
-    while(currentNode != nullptr) {
-        while (currentSymbol != nullptr){
-            if(currentSymbol->identifier == lexema){
+        while (currentSymbol != 0) {
+            if (currentSymbol->identifier == lexema) {
                 return currentSymbol;
             }
             currentSymbol = currentSymbol->next;
         }
+
         currentNode = currentNode->previous;
-        currentSymbol = currentNode->symbolNode;
     }
 
+    return nullptr;
+}
+
+SymbolNode *SymbolTable::searchScopeSymbol(std::string lexema, std::string scope) {
+    SymbolListNode *currentNode = symbolListNode;
+    SymbolNode *currentSymbol;
+
+    if (currentNode == nullptr) {
+        cout << "SymbolTable Head is null" << endl;
+        exit(1);
+    }
+
+    while (currentNode != nullptr) {
+        currentSymbol = currentNode->symbolNode;
+
+        if (currentNode->layerName == scope) {
+            while (currentSymbol != 0) {
+                if (currentSymbol->identifier == lexema) {
+                    return currentSymbol;
+                }
+                currentSymbol = currentSymbol->next;
+            }
+            return nullptr;
+        }
+
+        currentNode = currentNode->previous;
+    }
+
+    return nullptr;
+}
+
+SymbolNode *SymbolTable::searchLocalSymbol(std::string lexema) {
+    SymbolListNode *currentNode = symbolListNode;
+    SymbolNode *currentSymbol;
+
+    if (currentNode == nullptr) {
+        cout << "SymbolTable Head is null" << endl;
+        exit(1);
+    }
+
+    currentSymbol = currentNode->symbolNode;
+
+
+    while (currentSymbol != 0) {
+        if (currentSymbol->identifier == lexema) {
+            return currentSymbol;
+        }
+        currentSymbol = currentSymbol->next;
+    }
     return nullptr;
 }
 
@@ -160,10 +207,13 @@ void SymbolTable::printList() {
     }
 
     cout << "Head " << auxNode->layerName << endl;
+    cout << "Head Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
+         << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << endl;
     while (auxNode != nullptr) {
         auxNode->printList();
+        cout << "Head Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
+             << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << endl;
         auxNode = auxNode->previous;
-        cout << "Head -" << leafs << " " << auxNode->layerName << endl;
         leafs++;
     }
     cout << endl;

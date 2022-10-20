@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "lexicalAnalyser.h"
 #include "syntacticAnalyser.h"
+#include "semanticAnalyser.h"
 
 using namespace std;
 
@@ -10,7 +11,7 @@ using namespace std;
 
 Node analyseType(FILE *file, Node token) {
     if (token.simbolo != "sinteiro" && token.simbolo != "sbooleano") {
-        printf("Erro1");
+        cout << "This type is invalid, are you trying to say inteiro or booleano." << endl;
     }
     token = getToken(file);
     return token;
@@ -19,19 +20,22 @@ Node analyseType(FILE *file, Node token) {
 Node analyseVariables(FILE *file, Node token) {
     do {
         if (token.simbolo == "sidentificador") {
+            if(!searchDuplicatedVariableTable(token)) {
+                symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName, "", lineNo);
+            }
             token = getToken(file);
             if (token.simbolo == "svirgula" || token.simbolo == "sdoispontos") {
                 if (token.simbolo == "svirgula") {
                     token = getToken(file);
                     if (token.simbolo == "sdoispontos") {
-                        printf("Erro2");
+                        cout << "Invalid expression, indentificador is expected after virgula." << endl;
                     }
                 }
             } else {
-                printf("Erro3");
+                cout << "Invalid expression, virgula ou doispontos is expected after identificador." << endl;
             }
         } else {
-            printf("Erro4");
+            cout << "Invalid expression, expected identificador." << endl;
         }
     } while (token.simbolo != "sdoispontos");
 
@@ -135,6 +139,9 @@ Node analyseProcedureDeclaration(FILE *file, Node token) {
     token = getToken(file);
 
     if (token.simbolo == "sidentificador") {
+            if(!searchDuplicatedProcedureTable(token)){
+                symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "", lineNo);
+        }
         token = getToken(file);
 
         if (token.simbolo == "sponto_virgula") {
