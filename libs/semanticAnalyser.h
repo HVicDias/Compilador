@@ -10,12 +10,12 @@ extern SymbolTable symbolTable;
 
 bool searchDuplicatedVariableTable(Node token);
 
-bool searchDeclaratedVariableTable(Node token);
+bool searchDeclaratedVariableTable(std::string);
 
-bool searchDeclaratedFunctionTable(Node token);
+bool searchDeclaratedFunctionTable(std::string);
+
+bool searchDeclaratedVariableOrFunctionTable(std::string);
 
 bool searchDuplicatedProcedureTable(Node token);
-
-void setType(Node token);
 
 #endif //COMPILER_SEMANTICANALYSER_H

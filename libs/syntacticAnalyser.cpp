@@ -174,7 +174,7 @@ Node analyseFunctionDeclaration(FILE *file, Node token) {
 
     if (token.simbolo == "sidentificador") {
         token = getToken(file);
-        if (!searchDeclaratedFunctionTable(token)) {
+        if (!searchDeclaratedVariableOrFunctionTable(token.lexema)) {
             identifier = token.lexema;
         }
 
@@ -209,7 +209,7 @@ Node analyseFunctionCall(FILE *file, Node token) {
 
 Node analyseFactor(FILE *file, Node token) {
     if (token.simbolo == "sidentificador") {
-        
+
         token = analyseFunctionCall(file, token);
         token = getToken(file);
     } else if (token.simbolo == "snumero") {
