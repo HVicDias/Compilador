@@ -7,21 +7,33 @@
 
 using namespace std;
 
-// Tabela de simbolos var
 
-Node analyseType(FILE *file, Node token) {
+Node analyseType(FILE *file, Node token, std::queue<string> identifierQueue, std::queue<int> lineNumberQueue) {
     if (token.simbolo != "sinteiro" && token.simbolo != "sbooleano") {
         cout << "This type is invalid, are you trying to say inteiro or booleano." << endl;
     }
+    while (!identifierQueue.empty()) {
+        symbolTable.insertSymbol(identifierQueue.front(), symbolTable.symbolListNode->layerName, token.lexema,
+                                 lineNumberQueue.front());
+        identifierQueue.pop();
+        lineNumberQueue.pop();
+    }
+
     token = getToken(file);
     return token;
 }
 
 Node analyseVariables(FILE *file, Node token) {
+    std::queue<string> identifierQueue;
+    std::queue<int> lineNumberQueue;
     do {
         if (token.simbolo == "sidentificador") {
-            if(!searchDuplicatedVariableTable(token)) {
-                symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName, "", lineNo);
+            if (!searchDuplicatedVariableTable(token)) {
+                identifierQueue.push(token.lexema);
+                lineNumberQueue.push(lineNo);
+            } else {
+                cout << "ERRO " << endl;
+                exit(1);
             }
             token = getToken(file);
             if (token.simbolo == "svirgula" || token.simbolo == "sdoispontos") {
@@ -40,7 +52,7 @@ Node analyseVariables(FILE *file, Node token) {
     } while (token.simbolo != "sdoispontos");
 
     token = getToken(file);
-    token = analyseType(file, token);
+    token = analyseType(file, token, identifierQueue, lineNumberQueue);
     return token;
 }
 
@@ -139,8 +151,8 @@ Node analyseProcedureDeclaration(FILE *file, Node token) {
     token = getToken(file);
 
     if (token.simbolo == "sidentificador") {
-            if(!searchDuplicatedProcedureTable(token)){
-                symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "", lineNo);
+        if (!searchDuplicatedProcedureTable(token)) {
+            symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo);
         }
         token = getToken(file);
 
@@ -157,15 +169,21 @@ Node analyseProcedureDeclaration(FILE *file, Node token) {
 }
 
 Node analyseFunctionDeclaration(FILE *file, Node token) {
+    std::string identifier;
     token = getToken(file);
 
     if (token.simbolo == "sidentificador") {
         token = getToken(file);
+        if (!searchDeclaratedFunctionTable(token)) {
+            identifier = token.lexema;
+        }
 
         if (token.simbolo == "sdoispontos") {
             token = getToken(file);
 
             if (token.simbolo == "sinteiro" || token.simbolo == "sbooleano") {
+                symbolTable.insertSymbol(identifier, identifier, "função " + token.lexema, lineNo);
+
                 token = getToken(file);
 
                 if (token.simbolo == "sponto_virgula") {
@@ -191,6 +209,7 @@ Node analyseFunctionCall(FILE *file, Node token) {
 
 Node analyseFactor(FILE *file, Node token) {
     if (token.simbolo == "sidentificador") {
+        
         token = analyseFunctionCall(file, token);
         token = getToken(file);
     } else if (token.simbolo == "snumero") {

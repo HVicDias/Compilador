@@ -10,9 +10,9 @@ bool searchDuplicatedVariableTable(Node token) {
 
     nodeToken = symbolTable.searchLocalSymbol(token.lexema);
 
-    if(nodeToken == nullptr){
+    if (nodeToken == nullptr) {
         return false;
-    }else{
+    } else {
         return true;
     }
 }
@@ -23,9 +23,9 @@ bool searchDeclaratedVariableTable(Node token) {
 
     nodeToken = symbolTable.searchLocalSymbol(token.lexema);
 
-    if(nodeToken == nullptr){
+    if (nodeToken == nullptr) {
         return false;
-    }else{
+    } else {
         return true;
     }
 }
@@ -36,9 +36,9 @@ bool searchDeclaratedFunctionTable(Node token) {
 
     nodeToken = symbolTable.searchLocalSymbol(token.lexema);
 
-    if(nodeToken == nullptr){
+    if (nodeToken == nullptr) {
         return false;
-    }else{
+    } else {
         return true;
     }
 }
@@ -49,11 +49,15 @@ bool searchDuplicatedProcedureTable(Node token) {
 
     nodeToken = symbolTable.searchLocalSymbol(token.lexema);
 
-    if(nodeToken == nullptr){
+    if (nodeToken == nullptr) {
         return false;
-    }else{
+    } else {
         return true;
     }
+}
+
+void setType(Node token) {
+
 }
 
 

@@ -1,11 +1,12 @@
 #ifndef COMPILER_SYNTACTICANALYSER_H
 #define COMPILER_SYNTACTICANALYSER_H
 
+#include <queue>
 #include "linkedList.h"
 
 extern int lineNumber;
 
-Node analyseType(FILE *file, Node token);
+Node analyseType(FILE *file, Node token, std::queue<std::string>, std::queue<int>);
 
 Node analyseVariables(FILE *file, Node token);
 

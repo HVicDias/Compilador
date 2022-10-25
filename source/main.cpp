@@ -7,7 +7,7 @@ using namespace std;
 
 int main() {
     Node token;
-    SymbolNode* aux;
+    SymbolNode *aux;
     lineNo = 1;
     FILE *file = openFile((char *) "../testes/sintatico/sint19.txt");
     cout << lineNo << endl;
@@ -22,7 +22,7 @@ int main() {
                 token = getToken(file);
 
                 if (token.simbolo == "sidentificador") {
-                    symbolTable.downLayer("nomedeprograma", token.lexema, "nomedeprograma", "", lineNo);
+                    symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa", lineNo);
 
                     token = getToken(file);
 

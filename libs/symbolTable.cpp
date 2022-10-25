@@ -87,7 +87,7 @@ void SymbolList::printList() {
         return;
     }
 
-    cout << "Identifier" << "\tScope" << "\ttype" << "\tLineNumber" << endl;
+    cout << "Identifier" << "\tScope" << "\tType" << "\tLineNumber" << endl;
     while (auxNode != nullptr) {
         cout << auxNode->identifier << " : " << auxNode->scope << " : " << auxNode->type << " : " << auxNode->lineNo
              << endl;
@@ -132,7 +132,6 @@ SymbolNode *SymbolTable::searchSymbol(std::string lexema) {
 
     while (currentNode != nullptr) {
         currentSymbol = currentNode->symbolNode;
-        currentNode->printList();
 
         while (currentSymbol != 0) {
             if (currentSymbol->identifier == lexema) {
@@ -206,17 +205,16 @@ void SymbolTable::printList() {
         return;
     }
 
-    cout << "Head " << auxNode->layerName << endl;
-    cout << "Head Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
+    cout << "\nCurrent Head: " << auxNode->layerName << endl;
+    cout << "\nHead Info:  " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
          << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << endl;
     while (auxNode != nullptr) {
         auxNode->printList();
-        cout << "Head Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
+        cout << "\nHead Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
              << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << endl;
         auxNode = auxNode->previous;
         leafs++;
     }
-    cout << endl;
 }
 
 void SymbolTable::deleteLayer() {

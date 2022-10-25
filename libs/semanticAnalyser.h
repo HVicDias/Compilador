@@ -16,4 +16,6 @@ bool searchDeclaratedFunctionTable(Node token);
 
 bool searchDuplicatedProcedureTable(Node token);
 
+void setType(Node token);
+
 #endif //COMPILER_SEMANTICANALYSER_H
