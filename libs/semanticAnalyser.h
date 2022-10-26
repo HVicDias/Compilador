@@ -16,6 +16,8 @@ bool searchDeclaratedFunctionTable(std::string);
 
 bool searchDeclaratedVariableOrFunctionTable(std::string);
 
+bool searchDeclaratedProcedureTable(std::string);
+
 bool searchDuplicatedProcedureTable(Node token);
 
 #endif //COMPILER_SEMANTICANALYSER_H

@@ -56,7 +56,7 @@ int main() {
     fclose(file);
     cout << lineNo << endl;
 
-    symbolTable.printList();
+//    symbolTable.printList();
     return 0;
 }
 

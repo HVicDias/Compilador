@@ -1,3 +1,4 @@
+#include <iostream>
 #include "semanticAnalyser.h"
 
 int lineNo;
@@ -22,7 +23,7 @@ bool searchDeclaratedVariableTable(std::string lexema) {
     nodeToken = symbolTable.searchSymbol(lexema);
 
     if (nodeToken == nullptr
-        || nodeToken->type == "booleano"
+        //        || nodeToken->type == "booleano"
         || nodeToken->type == "função inteiro"
         || nodeToken->type == "função booleano"
         || nodeToken->type == "procedimento") {
@@ -61,13 +62,31 @@ bool searchDeclaratedVariableOrFunctionTable(std::string lexema) {
     }
 }
 
+bool searchDeclaratedProcedureTable(std::string lexema) {
+    SymbolNode *nodeToken;
+
+    nodeToken = symbolTable.searchSymbol(lexema);
+
+    if (nodeToken == nullptr
+        || nodeToken->type == "inteiro"
+        || nodeToken->type == "booleano"
+        || nodeToken->type == "função inteiro"
+        || nodeToken->type == "função booleano"
+            ) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 bool searchDuplicatedProcedureTable(Node token) {
-    //analisa_declaração_procedimento
     SymbolNode *nodeToken;
 
     nodeToken = symbolTable.searchLocalSymbol(token.lexema);
 
-    if (nodeToken == nullptr) {
+    if (nodeToken == nullptr
+        || nodeToken->type == "função booleano"
+            ) {
         return false;
     } else {
         return true;

@@ -151,9 +151,10 @@ Node analyseProcedureDeclaration(FILE *file, Node token) {
     token = getToken(file);
 
     if (token.simbolo == "sidentificador") {
-        if (!searchDuplicatedProcedureTable(token)) {
+        if (!searchDeclaratedProcedureTable(token.lexema)) {
             symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo);
         }
+
         token = getToken(file);
 
         if (token.simbolo == "sponto_virgula") {
@@ -164,6 +165,8 @@ Node analyseProcedureDeclaration(FILE *file, Node token) {
     } else {
         printf("Erro10");
     }
+
+    symbolTable.deleteLayer();
 
     return token;
 }
@@ -187,7 +190,6 @@ Node analyseFunctionDeclaration(FILE *file, Node token) {
                 token = getToken(file);
 
                 if (token.simbolo == "sponto_virgula") {
-
                     token = analyseBlock(file, token);
                 } else {
                     printf("Erro11");
@@ -200,18 +202,43 @@ Node analyseFunctionDeclaration(FILE *file, Node token) {
         printf("Erro14");
     }
 
+    symbolTable.deleteLayer();
+
     return token;
 }
 
 Node analyseFunctionCall(FILE *file, Node token) {
+    if (searchDeclaratedFunctionTable(token.lexema)) {
+        token = getToken(file);
+
+        if (token.simbolo != "sponto_virgula") {
+            cout << "Expected end of line" << endl;
+            exit(1);
+        }
+    } else {
+        cout << "Funtion has not been declared in the code" << endl;
+        exit(1);
+    }
+
+    token = getToken(file);
+
     return token;
 }
 
 Node analyseFactor(FILE *file, Node token) {
-    if (token.simbolo == "sidentificador") {
+    SymbolNode *currentNode = symbolTable.searchSymbol(token.lexema);
 
-        token = analyseFunctionCall(file, token);
-        token = getToken(file);
+    if (token.simbolo == "sidentificador") {
+        if (currentNode != nullptr) {
+            if (currentNode->type == "função inteiro" || currentNode->type == "função booleano") {
+                token = analyseFunctionCall(file, token);
+            } else {
+                token = getToken(file);
+            }
+        } else {
+            printf("Erro15555");
+        }
+
     } else if (token.simbolo == "snumero") {
         token = getToken(file);
     } else if (token.simbolo == "snao") {
@@ -223,7 +250,7 @@ Node analyseFactor(FILE *file, Node token) {
         if (token.simbolo == "sfecha_parenteses") {
             token = getToken(file);
         } else {
-            printf("Erro15");
+
         }
     } else if (token.lexema == "verdadeiro" || token.lexema == "falso") {
         token = getToken(file);
@@ -282,6 +309,24 @@ Node analyseAttribution(FILE *file, Node token) {
 }
 
 Node analyseProcedureCall(FILE *file, Node token) {
+    token = getToken(file);
+    cout << token.lexema << endl;
+    if (searchDeclaratedProcedureTable(token.lexema)) {
+        token = getToken(file);
+
+        if (token.simbolo != "sponto_virgula") {
+            cout << "Expected end of line" << endl;
+            exit(1);
+        }
+
+        token = getToken(file);
+    } else {
+        cout << "Procedure has not been declared in the code" << endl;
+        exit(1);
+    }
+
+    token = getToken(file);
+
     return token;
 }
 
@@ -290,6 +335,7 @@ Node analyseAttributionAndProcedureCall(FILE *file, Node token) {
     if (token.simbolo == "satribuicao") {
         token = analyseAttribution(file, token);
     } else {
+        cout << "eh aqui" << endl;
         token = analyseProcedureCall(file, token);
     }
 
@@ -302,14 +348,18 @@ Node analyseRead(FILE *file, Node token) {
     if (token.simbolo == "sabre_parenteses") {
         token = getToken(file);
         if (token.simbolo == "sidentificador") {
-            token = getToken(file);
-            if (token.simbolo == "sfecha_parenteses") {
+            if (searchDeclaratedVariableTable(token.lexema)) {
                 token = getToken(file);
+                if (token.simbolo == "sfecha_parenteses") {
+                    token = getToken(file);
+                } else {
+                    printf("Erro17");
+                }
             } else {
-                printf("Erro17");
+                printf("Erro18");
             }
         } else {
-            printf("Erro18");
+            printf("Erro188");
         }
     } else {
         printf("Erro19");
@@ -324,11 +374,15 @@ Node analyseWrite(FILE *file, Node token) {
     if (token.simbolo == "sabre_parenteses") {
         token = getToken(file);
         if (token.simbolo == "sidentificador") {
-            token = getToken(file);
-            if (token.simbolo == "sfecha_parenteses") {
+            if (searchDeclaratedVariableOrFunctionTable(token.lexema)) {
                 token = getToken(file);
+                if (token.simbolo == "sfecha_parenteses") {
+                    token = getToken(file);
+                } else {
+                    printf("Erro20");
+                }
             } else {
-                printf("Erro20");
+                printf("Erro2111");
             }
         } else {
             printf("Erro21");

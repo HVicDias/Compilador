@@ -17,7 +17,7 @@ booleano sbooleano
 identificador sidentificador
 número snúmero
 . sponto
-; sponto_vírgula
+; sponto_virgula
 , svírgula
 ( sabre_parênteses
 ) sfecha_parênteses
