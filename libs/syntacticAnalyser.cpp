@@ -166,7 +166,7 @@ Node analyseProcedureDeclaration(FILE *file, Node token) {
         printf("Erro10");
     }
 
-    symbolTable.deleteLayer();
+//    symbolTable.deleteLayer();
 
     return token;
 }
@@ -202,20 +202,14 @@ Node analyseFunctionDeclaration(FILE *file, Node token) {
         printf("Erro14");
     }
 
-    symbolTable.deleteLayer();
+//    symbolTable.deleteLayer();
 
     return token;
 }
 
 Node analyseFunctionCall(FILE *file, Node token) {
-    if (searchDeclaratedFunctionTable(token.lexema)) {
-        token = getToken(file);
-
-        if (token.simbolo != "sponto_virgula") {
-            cout << "Expected end of line" << endl;
-            exit(1);
-        }
-    } else {
+    token = getToken(file);
+    if (!searchDeclaratedFunctionTable(token.lexema)) {
         cout << "Funtion has not been declared in the code" << endl;
         exit(1);
     }
@@ -310,17 +304,8 @@ Node analyseAttribution(FILE *file, Node token) {
 
 Node analyseProcedureCall(FILE *file, Node token) {
     token = getToken(file);
-    cout << token.lexema << endl;
-    if (searchDeclaratedProcedureTable(token.lexema)) {
-        token = getToken(file);
 
-        if (token.simbolo != "sponto_virgula") {
-            cout << "Expected end of line" << endl;
-            exit(1);
-        }
-
-        token = getToken(file);
-    } else {
+    if (!searchDeclaratedProcedureTable(token.lexema)) {
         cout << "Procedure has not been declared in the code" << endl;
         exit(1);
     }
@@ -332,10 +317,10 @@ Node analyseProcedureCall(FILE *file, Node token) {
 
 Node analyseAttributionAndProcedureCall(FILE *file, Node token) {
     token = getToken(file);
+
     if (token.simbolo == "satribuicao") {
         token = analyseAttribution(file, token);
     } else {
-        cout << "eh aqui" << endl;
         token = analyseProcedureCall(file, token);
     }
 
@@ -410,6 +395,7 @@ Node analyseWhile(FILE *file, Node token) {
 Node analyseIf(FILE *file, Node token) {
     token = getToken(file);
     token = analyseExpressions(file, token);
+
     if (token.simbolo == "sentao") {
         token = getToken(file);
         token = analyseSimpleCommands(file, token);

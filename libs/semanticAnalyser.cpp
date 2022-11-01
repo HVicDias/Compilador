@@ -1,4 +1,3 @@
-#include <iostream>
 #include "semanticAnalyser.h"
 
 int lineNo;
