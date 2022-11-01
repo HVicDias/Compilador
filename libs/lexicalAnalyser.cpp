@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include "lexicalAnalyser.h"
+#include <limits>
 
 using namespace std;
 
