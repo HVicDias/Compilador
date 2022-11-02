@@ -1,71 +1,164 @@
 #include <stack>
+#include <list>
 #include "../libs/utils.h"
 #include "../libs/lexicalAnalyser.h"
 #include "../libs/syntacticAnalyser.h"
 #include "../libs/semanticAnalyser.h"
 
+list<string> createInfixListFromExpression(string basicString);
+
 using namespace std;
 
-int priority(char alpha) {
-    if (alpha == '+' || alpha == '-')
+int priority(string op) {
+    if (op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" || op == "==")
         return 1;
 
-    if (alpha == '*' || alpha == '/')
+    if (op == "+" || op == "-")
         return 2;
 
-    if (alpha == '^')
+    if (op == "*" || op == "div")
         return 3;
+
     return 0;
 }
 
-string convert(string infix) {
+// string convert(list<string> expressionList) {
+//    int i = 0;
+//    string postfix = "";
+//    stack<string> s;
+//
+//
+//    while (!expressionList.empty()) {
+//        if (expressionList.front() >= "a" && expressionList.front() <= "z" ||
+//            expressionList.front() >= "A" && expressionList.front() <= "Z" ||
+//            expressionList.front() >= "0" && expressionList.front() <= "9") {
+//            postfix += expressionList.front();
+//            expressionList.pop_front();
+//            i++;
+//        } else if (expressionList.front() == "(") {
+//            s.push(expressionList.front());
+//            expressionList.pop_front();
+//            i++;
+//        } else if (expressionList.front() == ")") {
+//            while (s.top() != "(") {
+//                postfix += s.top();
+//                s.pop();
+//            }
+//            s.pop();
+//            i++;
+//        } else {
+//            while (!s.empty() && priority(expressionList.front()) <= priority(s.top())) {
+//                postfix += s.top();
+//                s.pop();
+//            }
+//            s.push(expressionList.front());
+//            expressionList.pop_front();
+//        }
+//    }
+//    while (!s.empty()) {
+//        postfix += s.top();
+//        s.pop();
+//    }
+//
+//
+//    cout << postfix;
+//    return postfix;
+// }
+
+list<string> createInfixListFromExpression(string infixExpression) {
     int i = 0;
-    string postfix = "";
-    stack<int> s;
+    list<string> resultList;
+    string result;
+    string aux1, aux2;
 
+    do {
+        if (infixExpression[i] >= 'a' && infixExpression[i] <= 'z' || infixExpression[i] >= 'A' &&
+                                                                      infixExpression[i] <= 'Z' ||
+            infixExpression[i] >= '0' && infixExpression[i] <= '9') {
+            while (infixExpression[i] >= 'a' && infixExpression[i] <= 'z' || infixExpression[i] >= 'A' &&
+                                                                             infixExpression[i] <= 'Z' ||
+                   infixExpression[i] >= '0' && infixExpression[i] <= '9') {
 
-    while (infix[i] != '\0') {
-        if (infix[i] >= 'a' && infix[i] <= 'z' || infix[i] >= 'A' && infix[i] <= 'Z' ||
-            infix[i] >= '0' && infix[i] <= '9') {
-            postfix += infix[i];
-            i++;
-        } else if (infix[i] == '(') {
-            s.push(infix[i]);
-            i++;
-        } else if (infix[i] == ')') {
-            while (s.top() != '(') {
-                postfix += s.top();
-                s.pop();
+                if (infixExpression[i] == 'd') {
+                    aux1 = result;
+                    aux2 += infixExpression[i];
+                    result += infixExpression[i];
+                    i++;
+
+                    if (infixExpression[i] == 'i') {
+                        aux2 += infixExpression[i];
+                        result += infixExpression[i];
+                        i++;
+                        if (infixExpression[i] == 'v') {
+                            aux2 += infixExpression[i];
+                            resultList.push_front(aux1);
+                            resultList.push_front(aux2);
+                            result = "";
+                            aux1 = aux2 = "";
+                            i++;
+                        } else {
+                            aux2 = aux1 = "";
+                        }
+                    } else {
+                        aux2 = aux1 = "";
+                    }
+                } else {
+                    result += infixExpression[i];
+                    i++;
+                }
             }
-            s.pop();
-            i++;
-        } else {
-            while (!s.empty() && priority(infix[i]) <= priority(s.top())) {
-                postfix += s.top();
-                s.pop();
-            }
-            s.push(infix[i]);
+
+            resultList.push_front(result);
+            result = "";
+        }
+
+        if (infixExpression[i] == '(') {
+            result += infixExpression[i];
+            resultList.push_front(result);
+            result = "";
             i++;
         }
-    }
-    while (!s.empty()) {
-        postfix += s.top();
-        s.pop();
-    }
 
+        if (infixExpression[i] == ')') {
+            result += infixExpression[i];
+            resultList.push_front(result);
+            result = "";
+            i++;
+        }
 
-    cout << postfix;
-    return postfix;
+        if (infixExpression[i] == '+' || infixExpression[i] == '-' || infixExpression[i] == '*') {
+            result += infixExpression[i];
+            resultList.push_front(result);
+            result = "";
+            i++;
+        } else {
+            if (infixExpression[i] == '<' || infixExpression[i] == '>' || infixExpression[i] == '!') {
+                result += infixExpression[i];
+                i++;
+            }
+
+            if (infixExpression[i] == '=') {
+                result += infixExpression[i];
+                i++;
+
+                if (infixExpression[i] == '=') {
+                    result += infixExpression[i];
+                    i++;
+                }
+            }
+            resultList.push_front(result);
+            result = "";
+        }
+
+        while (infixExpression[i] == ' ') {
+            i++;
+        }
+    } while (infixExpression[i] != '\0');
+
+    resultList.reverse();
+    resultList.remove("");
+    return resultList;
 }
-
-// var+abc
-// |var||abc|+
-// replace('|', '')
-// verificar se variaveis ja foram declaradas
-// adicionar precedencia de >, >=, <, <=, !=, ==
-// montar conforme recebe a expressâo?
-
-// x > 10 -> x10>
 
 int main() {
     Node token;
@@ -117,18 +210,18 @@ int main() {
 //
     fclose(file);
 //    cout << lineNo << endl;
+    list<string> expressionList;
+    string infix = "a+b*(c-d+e)>(f+g-h)+i";
 
-    string exp = "a+b*(c^d-e)^(f+g*h)-i";
-    string a = toPostfix(exp);
-    cout << a << endl;
+    expressionList = createInfixListFromExpression(infix);
 
-    string infix = "a+b*(c^d-e)^(f+g*h)-i";
-    string postfix;
-    postfix = convert(infix);
+//    string postfix;
+//    postfix = convert(expressionList);
 
 //    symbolTable.printList();
     return 0;
 }
+
 
 //    Léxico
 //    LinkedList TokenList;
