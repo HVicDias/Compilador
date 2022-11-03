@@ -25,6 +25,6 @@ std::list<std::string> createInfixListFromExpression(std::string);
 
 int precedence(const std::string &);
 
-std::string toPostfix(std::list<std::string> expressionList);
+std::list<std::string> toPostfix(std::list<std::string> expressionList);
 
 #endif //COMPILER_SEMANTICANALYSER_H

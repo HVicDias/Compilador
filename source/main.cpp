@@ -14,55 +14,57 @@ int main() {
 
     character = (char) fgetc(file);
 
-//    do {
-//        token = getToken(file);
-//
-//        if (!token.lexema.empty() && !token.simbolo.empty()) {
-//            if (token.simbolo == "sprograma") {
-//                token = getToken(file);
-//
-//                if (token.simbolo == "sidentificador") {
-//                    symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa", lineNo);
-//
-//                    token = getToken(file);
-//
-//                    if (token.simbolo == "sponto_virgula") {
-//                        token = analyseBlock(file, token);
-//
-//                        if (token.simbolo == "sponto") {
-//                            cout << "Sucesso" << endl;
-//                        } else {
-//                            cout << "Erro25" << endl;
-//                        }
-//                    } else {
-//                        cout << "Erro26" << endl;
-//                    }
-//                } else {
-//                    cout << "Erro27" << endl;
-//                }
-//            } else {
-//                if (character != EOF) {
-//                    cout << "Erro28" << endl;
-//                }
-//            }
-//
-//        } else {
-//            cout << "Erro29" << endl;
-//        }
-//
-//
-//    } while (character != EOF);
-//
+    do {
+        token = getToken(file);
+
+        if (!token.lexema.empty() && !token.simbolo.empty()) {
+            if (token.simbolo == "sprograma") {
+                token = getToken(file);
+
+                if (token.simbolo == "sidentificador") {
+                    symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa", lineNo);
+
+                    token = getToken(file);
+
+                    if (token.simbolo == "sponto_virgula") {
+                        token = analyseBlock(file, token);
+
+                        if (token.simbolo == "sponto") {
+                            cout << "Sucesso" << endl;
+                        } else {
+                            cout << "Erro25" << endl;
+                        }
+                    } else {
+                        cout << "Erro26" << endl;
+                    }
+                } else {
+                    cout << "Erro27" << endl;
+                }
+            } else {
+                if (character != EOF) {
+                    cout << "Erro28" << endl;
+                }
+            }
+
+        } else {
+            cout << "Erro29" << endl;
+        }
+
+
+    } while (character != EOF);
+
     fclose(file);
-//    cout << lineNo << endl;
+    cout << lineNo << endl;
     list<string> expressionList;
-    string infix = "a+b*(c-d+e)+(f+g-h)+i";
+    string infix = "diva div b*(c-d+e)+(f+g-h)+i";
 
     expressionList = createInfixListFromExpression(infix);
-
-    string postfix;
+    for (const string &c: expressionList)
+        cout << c << endl;
+    list<string> postfix;
     postfix = toPostfix(expressionList);
-    cout << postfix << endl;
+    for (const string &c: postfix)
+        cout << c;
 
 //    symbolTable.printList();
     return 0;

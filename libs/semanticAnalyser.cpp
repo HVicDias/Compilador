@@ -107,33 +107,9 @@ std::list<std::string> createInfixListFromExpression(std::string infixExpression
                                                                              infixExpression[i] <= 'Z' ||
                    infixExpression[i] >= '0' && infixExpression[i] <= '9') {
 
-                if (infixExpression[i] == 'd') {
-                    aux1 = result;
-                    aux2 += infixExpression[i];
-                    result += infixExpression[i];
-                    i++;
+                result += infixExpression[i];
+                i++;
 
-                    if (infixExpression[i] == 'i') {
-                        aux2 += infixExpression[i];
-                        result += infixExpression[i];
-                        i++;
-                        if (infixExpression[i] == 'v') {
-                            aux2 += infixExpression[i];
-                            resultList.push_front(aux1);
-                            resultList.push_front(aux2);
-                            result = "";
-                            aux1 = aux2 = "";
-                            i++;
-                        } else {
-                            aux2 = aux1 = "";
-                        }
-                    } else {
-                        aux2 = aux1 = "";
-                    }
-                } else {
-                    result += infixExpression[i];
-                    i++;
-                }
             }
 
             resultList.push_front(result);
@@ -199,29 +175,29 @@ int precedence(const std::string &op) {
         return 0;
 }
 
-std::string toPostfix(std::list<std::string> expressionList) {
-    std::string postfix;
+std::list<std::string> toPostfix(std::list<std::string> expressionList) {
+    std::list<std::string> result;
     std::stack<std::string> s;
 
     while (!expressionList.empty()) {
         if (expressionList.front() >= "a" && expressionList.front() <= "z" ||
             expressionList.front() >= "A" && expressionList.front() <= "Z" ||
             expressionList.front() >= "0" && expressionList.front() <= "9") {
-            postfix += expressionList.front();
+            result.push_back(expressionList.front());
             expressionList.pop_front();
         } else if (expressionList.front() == "(") {
             s.push(expressionList.front());
             expressionList.pop_front();
         } else if (expressionList.front() == ")") {
             while (s.top() != "(") {
-                postfix += s.top();
+                result.push_back(s.top());
                 s.pop();
             }
             s.pop();
             expressionList.pop_front();
         } else {
             while (!s.empty() && precedence(expressionList.front()) <= precedence(s.top())) {
-                postfix += s.top();
+                result.push_back(s.top());
                 s.pop();
             }
 
@@ -231,9 +207,9 @@ std::string toPostfix(std::list<std::string> expressionList) {
     }
 
     while (!s.empty()) {
-        postfix += s.top();
+        result.push_back(s.top());
         s.pop();
     }
 
-    return postfix;
+    return result;
 }
