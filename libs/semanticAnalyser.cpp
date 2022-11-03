@@ -93,65 +93,147 @@ bool searchDuplicatedProcedureTable(Node token) {
     }
 }
 
-int precedence(char c) {
-    if (c == '^')
-        return 3;
-    else if (c == '/' || c == '*')
-        return 2;
-    else if (c == '+' || c == '-')
-        return 1;
-    else
-        return -1;
-}
-
-std::string toPostfix(std::string expression) {
-    std::stack<char> st; // For stack operations, we are using
-    // C++ built in stack
+std::list<std::string> createInfixListFromExpression(std::string infixExpression) {
+    int i = 0;
+    std::list<std::string> resultList;
     std::string result;
+    std::string aux1, aux2;
 
-    for (int i = 0; i < expression.length(); i++) {
-        char c = expression[i];
+    do {
+        if (infixExpression[i] >= 'a' && infixExpression[i] <= 'z' || infixExpression[i] >= 'A' &&
+                                                                      infixExpression[i] <= 'Z' ||
+            infixExpression[i] >= '0' && infixExpression[i] <= '9') {
+            while (infixExpression[i] >= 'a' && infixExpression[i] <= 'z' || infixExpression[i] >= 'A' &&
+                                                                             infixExpression[i] <= 'Z' ||
+                   infixExpression[i] >= '0' && infixExpression[i] <= '9') {
 
-        // If the scanned character is
-        // an operand, add it to output string.
-        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-            || (c >= '0' && c <= '9'))
-            result += c;
+                if (infixExpression[i] == 'd') {
+                    aux1 = result;
+                    aux2 += infixExpression[i];
+                    result += infixExpression[i];
+                    i++;
 
-            // If the scanned character is an
-            // ‘(‘, push it to the stack.
-        else if (c == '(')
-            st.push('(');
-
-            // If the scanned character is an ‘)’,
-            // pop and to output string from the stack
-            // until an ‘(‘ is encountered.
-        else if (c == ')') {
-            while (st.top() != '(') {
-                result += st.top();
-                st.pop();
+                    if (infixExpression[i] == 'i') {
+                        aux2 += infixExpression[i];
+                        result += infixExpression[i];
+                        i++;
+                        if (infixExpression[i] == 'v') {
+                            aux2 += infixExpression[i];
+                            resultList.push_front(aux1);
+                            resultList.push_front(aux2);
+                            result = "";
+                            aux1 = aux2 = "";
+                            i++;
+                        } else {
+                            aux2 = aux1 = "";
+                        }
+                    } else {
+                        aux2 = aux1 = "";
+                    }
+                } else {
+                    result += infixExpression[i];
+                    i++;
+                }
             }
-            st.pop();
+
+            resultList.push_front(result);
+            result = "";
         }
 
-            // If an operator is scanned
-        else {
-            while (!st.empty()
-                   && precedence(expression[i]) <= precedence(st.top())) {
-                result += st.top();
-                st.pop();
-            }
-            st.push(c);
+        if (infixExpression[i] == '(') {
+            result += infixExpression[i];
+            resultList.push_front(result);
+            result = "";
+            i++;
         }
-    }
 
-    // Pop all the remaining elements from the stack
-    while (!st.empty()) {
-        result += st.top();
-        st.pop();
-    }
+        if (infixExpression[i] == ')') {
+            result += infixExpression[i];
+            resultList.push_front(result);
+            result = "";
+            i++;
+        }
 
-    return result;
+        if (infixExpression[i] == '+' || infixExpression[i] == '-' || infixExpression[i] == '*') {
+            result += infixExpression[i];
+            resultList.push_front(result);
+            result = "";
+            i++;
+        } else {
+            if (infixExpression[i] == '<' || infixExpression[i] == '>' || infixExpression[i] == '!') {
+                result += infixExpression[i];
+                i++;
+            }
+
+            if (infixExpression[i] == '=') {
+                result += infixExpression[i];
+                i++;
+
+                if (infixExpression[i] == '=') {
+                    result += infixExpression[i];
+                    i++;
+                }
+            }
+            resultList.push_front(result);
+            result = "";
+        }
+
+        while (infixExpression[i] == ' ') {
+            i++;
+        }
+    } while (infixExpression[i] != '\0');
+
+    resultList.reverse();
+    resultList.remove("");
+    return resultList;
 }
 
+int precedence(const std::string &op) {
+    if (op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" || op == "==")
+        return 1;
+    else if (op == "+" || op == "-")
+        return 2;
+    else if (op == "*" || op == "div")
+        return 3;
+    else
+        return 0;
+}
 
+std::string toPostfix(std::list<std::string> expressionList) {
+    std::string postfix;
+    std::stack<std::string> s;
+
+    while (!expressionList.empty()) {
+        if (expressionList.front() >= "a" && expressionList.front() <= "z" ||
+            expressionList.front() >= "A" && expressionList.front() <= "Z" ||
+            expressionList.front() >= "0" && expressionList.front() <= "9") {
+            postfix += expressionList.front();
+            expressionList.pop_front();
+        } else if (expressionList.front() == "(") {
+            s.push(expressionList.front());
+            expressionList.pop_front();
+        } else if (expressionList.front() == ")") {
+            while (s.top() != "(") {
+                postfix += s.top();
+                s.pop();
+            }
+            s.pop();
+            expressionList.pop_front();
+        } else {
+            while (!s.empty() && precedence(expressionList.front()) <= precedence(s.top())) {
+                postfix += s.top();
+                s.pop();
+            }
+
+            s.push(expressionList.front());
+            expressionList.pop_front();
+        }
+    }
+
+    while (!s.empty()) {
+        postfix += s.top();
+        s.pop();
+    }
+
+    return postfix;
+}

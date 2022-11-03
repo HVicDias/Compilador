@@ -1,6 +1,7 @@
 #ifndef COMPILER_SEMANTICANALYSER_H
 #define COMPILER_SEMANTICANALYSER_H
 
+#include <list>
 #include "linkedList.h"
 #include "symbolTable.h"
 
@@ -20,8 +21,10 @@ bool searchDeclaratedProcedureTable(std::string);
 
 bool searchDuplicatedProcedureTable(Node);
 
-int precedence(char);
+std::list<std::string> createInfixListFromExpression(std::string);
 
-std::string toPostfix(std::string);
+int precedence(const std::string &);
+
+std::string toPostfix(std::list<std::string> expressionList);
 
 #endif //COMPILER_SEMANTICANALYSER_H
