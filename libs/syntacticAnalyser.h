@@ -24,13 +24,13 @@ Node analyseBlock(FILE *file, Node token);
 
 Node analyseFunctionCall(FILE *file, Node token);
 
-Node analyseFactor(FILE *file, Node token);
+std::pair<Node, std::string> analyseFactor(FILE *file, Node token, std::string);
 
-Node analyseTerm(FILE *file, Node token);
+std::pair<Node, std::string> analyseTerm(FILE *file, Node token, std::string);
 
-Node analyseExpressions(FILE *file, Node token);
+std::pair<Node, std::string> analyseExpressions(FILE *file, Node token, std::string);
 
-Node analyseSimpleExpressions(FILE *file, Node token);
+std::pair<Node, std::string> analyseSimpleExpressions(FILE *file, Node token, std::string);
 
 Node analyseAttribution(FILE *file, Node token);
 

@@ -55,16 +55,6 @@ int main() {
 
     fclose(file);
     cout << lineNo << endl;
-    list<string> expressionList;
-    string infix = "diva div b*(c-d+e)+(f+g-h)+i";
-
-    expressionList = createInfixListFromExpression(infix);
-    for (const string &c: expressionList)
-        cout << c << endl;
-    list<string> postfix;
-    postfix = toPostfix(expressionList);
-    for (const string &c: postfix)
-        cout << c;
 
 //    symbolTable.printList();
     return 0;

@@ -9,6 +9,7 @@ public:
     std::string scope;
     std::string type;
     int lineNo;
+    int label; //ToDo Add Label HERE DO NOT FORGET TO CHANGE
     SymbolNode *next;
 
     SymbolNode(std::string, std::string, std::string, int);
@@ -50,11 +51,11 @@ public:
 
     void downLayer(std::string, std::string, std::string, std::string, int);
 
-    SymbolNode* searchSymbol(std::string);
+    SymbolNode *searchSymbol(std::string);
 
-    SymbolNode* searchLocalSymbol(std::string);
+    SymbolNode *searchLocalSymbol(std::string);
 
-    SymbolNode* searchScopeSymbol(std::string, std::string);
+    SymbolNode *searchScopeSymbol(std::string, std::string);
 
     void printList();
 
