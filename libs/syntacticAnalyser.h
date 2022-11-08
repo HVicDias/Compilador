@@ -4,7 +4,11 @@
 #include <queue>
 #include "linkedList.h"
 
-extern int lineNumber;
+class TokenExpression {
+public:
+    Node token;
+    std::string expression;
+};
 
 Node analyseType(FILE *file, Node token, std::queue<std::string>, std::queue<int>);
 
@@ -24,13 +28,13 @@ Node analyseBlock(FILE *file, Node token);
 
 Node analyseFunctionCall(FILE *file, Node token);
 
-std::pair<Node, std::string> analyseFactor(FILE *file, Node token, std::string);
+TokenExpression analyseFactor(FILE *file, TokenExpression);
 
-std::pair<Node, std::string> analyseTerm(FILE *file, Node token, std::string);
+TokenExpression analyseTerm(FILE *file, TokenExpression);
 
-std::pair<Node, std::string> analyseExpressions(FILE *file, Node token, std::string);
+TokenExpression analyseExpressions(FILE *file, TokenExpression);
 
-std::pair<Node, std::string> analyseSimpleExpressions(FILE *file, Node token, std::string);
+TokenExpression analyseSimpleExpressions(FILE *file, TokenExpression);
 
 Node analyseAttribution(FILE *file, Node token);
 

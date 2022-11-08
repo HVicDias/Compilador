@@ -5,12 +5,10 @@
 #include "syntacticAnalyser.h"
 #include "semanticAnalyser.h"
 
-using namespace std;
 
-
-Node analyseType(FILE *file, Node token, std::queue<string> identifierQueue, std::queue<int> lineNumberQueue) {
+Node analyseType(FILE *file, Node token, std::queue<std::string> identifierQueue, std::queue<int> lineNumberQueue) {
     if (token.simbolo != "sinteiro" && token.simbolo != "sbooleano") {
-        cout << "This type is invalid, are you trying to say inteiro or booleano." << endl;
+        std::cout << "This type is invalid, are you trying to say inteiro or booleano." << std::endl;
     }
     while (!identifierQueue.empty()) {
         symbolTable.insertSymbol(identifierQueue.front(), symbolTable.symbolListNode->layerName, token.lexema,
@@ -24,7 +22,7 @@ Node analyseType(FILE *file, Node token, std::queue<string> identifierQueue, std
 }
 
 Node analyseVariables(FILE *file, Node token) {
-    std::queue<string> identifierQueue;
+    std::queue<std::string> identifierQueue;
     std::queue<int> lineNumberQueue;
 
     do {
@@ -33,7 +31,7 @@ Node analyseVariables(FILE *file, Node token) {
                 identifierQueue.push(token.lexema);
                 lineNumberQueue.push(lineNo);
             } else {
-                cout << "ERRO " << endl;
+                std::cout << "ERRO " << std::endl;
                 exit(1);
             }
             token = getToken(file);
@@ -42,14 +40,14 @@ Node analyseVariables(FILE *file, Node token) {
                 if (token.simbolo == "svirgula") {
                     token = getToken(file);
                     if (token.simbolo == "sdoispontos") {
-                        cout << "Invalid expression, indentificador is expected after virgula." << endl;
+                        std::cout << "Invalid expression, indentificador is expected after virgula." << std::endl;
                     }
                 }
             } else {
-                cout << "Invalid expression, virgula ou doispontos is expected after identificador." << endl;
+                std::cout << "Invalid expression, virgula ou doispontos is expected after identificador." << std::endl;
             }
         } else {
-            cout << "Invalid expression, expected identificador." << endl;
+            std::cout << "Invalid expression, expected identificador." << std::endl;
         }
     } while (token.simbolo != "sdoispontos");
 
@@ -126,7 +124,7 @@ Node analyseCommands(FILE *file, Node token) {
                     token = analyseSimpleCommands(file, token);
                 }
             } else {
-                cout << token.simbolo << " : " << token.lexema << endl;
+                std::cout << token.simbolo << " : " << token.lexema << " " << lineNo << std::endl;
                 printf("Erro8");
                 exit(0);
             }
@@ -212,7 +210,7 @@ Node analyseFunctionDeclaration(FILE *file, Node token) {
 Node analyseFunctionCall(FILE *file, Node token) {
     token = getToken(file);
     if (!searchDeclaratedFunctionTable(token.lexema)) {
-        cout << "Funtion has not been declared in the code" << endl;
+        std::cout << "Funtion has not been declared in the code" << std::endl;
         exit(1);
     }
 
@@ -221,110 +219,115 @@ Node analyseFunctionCall(FILE *file, Node token) {
     return token;
 }
 
-std::pair<Node, std::string> analyseExpressions(FILE *file, Node token, std::string expression) {
-    std::pair(token, expression) = analyseSimpleExpressions(file, token, expression);
+TokenExpression analyseExpressions(FILE *file, TokenExpression te) {
+    te = analyseSimpleExpressions(file, te);
 
-    if (token.simbolo == "smaior" || token.simbolo == "smaiorig" ||
-        token.simbolo == "smenor" || token.simbolo == "smenorig" ||
-        token.simbolo == "sdif") {
-        expression += token.lexema + ' ';
-        token = getToken(file);
-        std::pair(token, expression) = analyseSimpleExpressions(file, token, expression);
+    if (te.token.simbolo == "smaior" || te.token.simbolo == "smaiorig" ||
+        te.token.simbolo == "smenor" || te.token.simbolo == "smenorig" ||
+        te.token.simbolo == "sdif") {
+        te.expression += te.token.lexema + " ";
+        te.token = getToken(file);
+        te = analyseSimpleExpressions(file, te);
     }
 
-
-    return {token, expression};
+    return te;
 }
 
-std::pair<Node, std::string> analyseFactor(FILE *file, Node token, std::string expression) {
-    SymbolNode *currentNode = symbolTable.searchSymbol(token.lexema);
+TokenExpression analyseFactor(FILE *file, TokenExpression te) {
+    SymbolNode *currentNode = symbolTable.searchSymbol(te.token.lexema);
 
-    if (token.simbolo == "sidentificador") {
+    if (te.token.simbolo == "sidentificador") {
         if (currentNode != nullptr) {
             if (currentNode->type == "função inteiro" || currentNode->type == "função booleano") {
-                token = analyseFunctionCall(file, token);
+                te.token = analyseFunctionCall(file, te.token);
             } else {
-                expression += token.lexema + " ";
-                token = getToken(file);
+                te.expression += te.token.lexema + " ";
+                te.token = getToken(file);
             }
         } else {
             printf("Erro15555");
         }
 
-    } else if (token.simbolo == "snumero") {
-        expression += token.lexema + " ";
-        token = getToken(file);
-    } else if (token.simbolo == "snao") {
-        expression += token.lexema + " ";
-        token = getToken(file);
-        std::pair(token, expression) = analyseFactor(file, token, expression);
-    } else if (token.simbolo == "sabre_parenteses") {
-        expression += token.lexema + " ";
-        token = getToken(file);
-        std::pair(token, expression) = analyseExpressions(file, token, expression);
-        if (token.simbolo == "sfecha_parenteses") {
-            expression += token.lexema + " ";
-            token = getToken(file);
+    } else if (te.token.simbolo == "snumero") {
+        te.expression += te.token.lexema + " ";
+        te.token = getToken(file);
+    } else if (te.token.simbolo == "snao") {
+        te.expression += te.token.lexema + " ";
+        te.token = getToken(file);
+        te = analyseFactor(file, te);
+    } else if (te.token.simbolo == "sabre_parenteses") {
+        te.expression += te.token.lexema + " ";
+        te.token = getToken(file);
+        te = analyseExpressions(file, te);
+        if (te.token.simbolo == "sfecha_parenteses") {
+            te.expression += te.token.lexema + " ";
+            te.token = getToken(file);
         } else {
 
         }
-    } else if (token.lexema == "verdadeiro" || token.lexema == "falso") {
+    } else if (te.token.lexema == "verdadeiro" || te.token.lexema == "falso") {
 //        expression += token.lexema + " ";
-        token = getToken(file);
+        te.token = getToken(file);
     } else {
         printf("Erro16");
     }
 
-    return {token, expression};
+    return te;
 }
 
-std::pair<Node, std::string> analyseTerm(FILE *file, Node token, std::string expression) {
-    std::pair(token, expression) = analyseFactor(file, token, expression);
+TokenExpression analyseTerm(FILE *file, TokenExpression te) {
+    te = analyseFactor(file, te);
 
-    while (token.simbolo == "smult" || token.simbolo == "sdiv" || token.simbolo == "sse") {
-        expression += token.lexema + ' ';
-        token = getToken(file);
-        std::pair(token, expression) = analyseFactor(file, token, expression);
+    while (te.token.simbolo == "smult" || te.token.simbolo == "sdiv" || te.token.simbolo == "sse") {
+        te.expression += te.token.lexema + " ";
+        te.token = getToken(file);
+        te = analyseFactor(file, te);
     }
 
-    return {token, expression};
+    return te;
 }
 
-std::pair<Node, std::string> analyseSimpleExpressions(FILE *file, Node token, std::string expression) {
-    if (token.simbolo == "smais" || token.simbolo == "smenos") {
-        expression += token.lexema + ' ';
-        token = getToken(file);
+TokenExpression analyseSimpleExpressions(FILE *file, TokenExpression te) {
+    if (te.token.simbolo == "smais" || te.token.simbolo == "smenos") {
+        te.expression += te.token.lexema + ' ';
+        te.token = getToken(file);
     }
 
-    std::pair(token, expression) = analyseTerm(file, token, expression);
+    te = analyseTerm(file, te);
 
-    while (token.simbolo == "smais" || token.simbolo == "smenos" || token.simbolo == "sou" || token.simbolo == "se") {
-        expression += token.lexema + ' ';
-        token = getToken(file);
-        std::pair(token, expression) = analyseTerm(file, token, expression);
+    while (te.token.simbolo == "smais" || te.token.simbolo == "smenos" || te.token.simbolo == "sou" ||
+           te.token.simbolo == "se") {
+        te.expression += te.token.lexema + ' ';
+        te.token = getToken(file);
+        te = analyseTerm(file, te);
     }
 
-    return {token, expression};
+    return te;
 }
 
 Node analyseAttribution(FILE *file, Node token) {
+    TokenExpression te;
     token = getToken(file);
+    te.token = token;
 
-    std::string expression;
-    std::list<string> postfix;
+    std::list<std::string> postfix;
 
-    std::pair(token, expression) = analyseExpressions(file, token, expression);
-    postfix = createInfixListFromExpression(expression);
+    te = analyseExpressions(file, te);
+    postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
+//    for (const std::string &c: postfix)
+//        cout << c;
+//
+//    cout << " -> ";
 
-    return token;
+    return te.token;
 }
 
 Node analyseProcedureCall(FILE *file, Node token) {
     token = getToken(file);
 
     if (!searchDeclaratedProcedureTable(token.lexema)) {
-        cout << "Procedure has not been declared in the code" << endl;
+        std::cout << "Procedure has not been declared in the code" << std::endl;
         exit(1);
     }
 
@@ -398,47 +401,58 @@ Node analyseWrite(FILE *file, Node token) {
 }
 
 Node analyseWhile(FILE *file, Node token) {
+    TokenExpression te;
     token = getToken(file);
-    std::string expression;
-    std::list<string> postfix;
+    te.token = token;
 
-    std::pair(token, expression) = analyseExpressions(file, token, expression);
-    postfix = createInfixListFromExpression(expression);
-    postfix = toPostfix(postfix);
+    std::list<std::string> postfix;
 
-    if (token.simbolo == "sfaca") {
-        token = getToken(file);
-        token = analyseSimpleCommands(file, token);
+    te = analyseExpressions(file, te);
+
+
+    if (te.token.simbolo == "sfaca") {
+        te.token = getToken(file);
+        te.token = analyseSimpleCommands(file, te.token);
     } else {
         printf("Erro23");
     }
 
-    return token;
+    postfix = createInfixListFromExpression(te.expression);
+    postfix = toPostfix(postfix);
+//    for (const std::string &c: postfix)
+//        cout << c;
+//
+//    cout << " -> ";
+
+    return te.token;
 }
 
 Node analyseIf(FILE *file, Node token) {
+    TokenExpression te;
     token = getToken(file);
-    std::string expression;
-    std::list<string> postfix;
-    expression += token.lexema + " ";
+    te.token = token;
+    std::list<std::string> postfix;
 
-    std::pair(token, expression) = analyseExpressions(file, token, expression);
-    postfix = createInfixListFromExpression(expression);
-    postfix = toPostfix(postfix);
+    te = analyseExpressions(file, te);
 
-    for (const string &c: postfix)
-        cout << c;
-    cout << token.lexema;
-    if (token.simbolo == "sentao") {
-        token = getToken(file);
-        token = analyseSimpleCommands(file, token);
-        if (token.simbolo == "ssenao") {
-            token = getToken(file);
-            token = analyseSimpleCommands(file, token);
+
+    if (te.token.simbolo == "sentao") {
+        te.token = getToken(file);
+        te.token = analyseSimpleCommands(file, te.token);
+        if (te.token.simbolo == "ssenao") {
+            te.token = getToken(file);
+            te.token = analyseSimpleCommands(file, te.token);
         }
     } else {
         printf("Erro24");
     }
 
-    return token;
+    postfix = createInfixListFromExpression(te.expression);
+    postfix = toPostfix(postfix);
+//    for (const std::string &c: postfix)
+//        cout << c;
+//
+//    cout << " -> ";
+
+    return te.token;
 }
