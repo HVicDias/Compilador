@@ -2,6 +2,7 @@
 #define COMPILER_SEMANTICANALYSER_H
 
 #include <list>
+#include <stack>
 #include "linkedList.h"
 #include "symbolTable.h"
 
@@ -26,5 +27,7 @@ std::list<std::string> createInfixListFromExpression(std::string);
 int precedence(const std::string &);
 
 std::list<std::string> toPostfix(std::list<std::string> expressionList);
+
+std::list<std::string> analysePostfix(std::list<std::string>);
 
 #endif //COMPILER_SEMANTICANALYSER_H

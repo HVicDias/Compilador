@@ -28,6 +28,9 @@ public:
 class CodeGenerator {
 private:
     CodeSnippet *head;
+
+    std::string addSpaces(std::string, int);
+
 public:
     CodeGenerator();
 
@@ -36,6 +39,8 @@ public:
     void printList();
 
     void generateCodeList();
+
+    void generateCode();
 };
 
 

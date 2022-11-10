@@ -1,5 +1,8 @@
 #include "semanticAnalyser.h"
-#include "stack"
+#include <iostream>
+#include <iterator>
+#include <string.h>
+#include <ctype.h>
 
 int lineNo;
 
@@ -165,7 +168,7 @@ std::list<std::string> createInfixListFromExpression(std::string infixExpression
 }
 
 int precedence(const std::string &op) {
-    if (op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" || op == "==")
+    if (op == ">" || op == "<" || op == ">=" || op == "<=" || op == "!=" || op == "=")
         return 1;
     else if (op == "+" || op == "-")
         return 2;
@@ -180,7 +183,7 @@ std::list<std::string> toPostfix(std::list<std::string> expressionList) {
     std::stack<std::string> s;
 
     while (!expressionList.empty()) {
-        if (expressionList.front() >= "a" && expressionList.front() <= "z" ||
+        if (expressionList.front() >= "a" && expressionList.front() <= "z" && expressionList.front() != "e" ||
             expressionList.front() >= "A" && expressionList.front() <= "Z" ||
             expressionList.front() >= "0" && expressionList.front() <= "9") {
             result.push_back(expressionList.front());
@@ -212,4 +215,161 @@ std::list<std::string> toPostfix(std::list<std::string> expressionList) {
     }
 
     return result;
+}
+
+bool isIntOperation(const char *op) {
+    if (strcmp(op, "*") == 0 || strcmp(op, "div") == 0 || strcmp(op, "+") == 0 ||
+        strcmp(op, "-") == 0)
+        return true;
+    return false;
+}
+
+bool isBooleanOperaiton(const char *op) {
+    if (strcmp(op, ">") == 0 || strcmp(op, "<") == 0 ||
+        strcmp(op, ">=") == 0 || strcmp(op, "<=") == 0 ||
+        strcmp(op, "!=") == 0 || strcmp(op, "=") == 0 || strcmp(op, "e") == 0 ||
+        strcmp(op, "ou") == 0) {
+        return true;
+    }
+    return false;
+}
+
+std::list<std::string> analysePostfix(std::list<std::string> postfix) {
+    SymbolNode *op1Symbol = nullptr, *op2Symbol = nullptr;
+
+    for (auto &j: postfix) {
+        std::cout << j.c_str();
+    }
+    std::cout << std::endl;
+
+    for (auto i = postfix.begin(); i != postfix.end(); i++) {
+        if (i != postfix.begin() && i != std::next(postfix.begin())) {
+            if (isIntOperation(i->c_str()) || isBooleanOperaiton(i->c_str())) {
+                auto op2 = std::prev(i);
+
+                if (!isdigit(op2->c_str()[0]) && !isIntOperation(op2->c_str()) && !isBooleanOperaiton(op2->c_str()) &&
+                    strcmp(op2->c_str(), "!I") != 0 && strcmp(op2->c_str(), "!B") != 0) {
+                    if (symbolTable.searchSymbol(*op2) == nullptr) {
+                        std::cout << i->c_str();
+                        std::cout << op2->c_str();
+                        std::cout << "teste1";
+                        exit(1);
+                    }
+
+                    op2Symbol = symbolTable.searchSymbol(*op2);
+                }
+
+                auto op1 = std::prev(op2);
+
+                if (!isdigit(op1->c_str()[0]) && !isIntOperation(op1->c_str()) && !isBooleanOperaiton(op1->c_str()) &&
+                    strcmp(op1->c_str(), "!I") != 0 && strcmp(op1->c_str(), "!B") != 0) {
+                    if (symbolTable.searchSymbol(*op1) == nullptr) {
+                        std::cout << i->c_str();
+                        std::cout << "teste2";
+                        exit(1);
+                    }
+
+                    op1Symbol = symbolTable.searchSymbol(*op1);
+                }
+
+                if (op1Symbol == nullptr) {
+                    if (op2Symbol == nullptr) {
+                        if (isIntOperation(i->c_str())) {
+                            if (std::isdigit(op1->c_str()[0]) && std::isdigit(op2->c_str()[0]) ||
+                                strcmp(op1->c_str(), "!I") == 0 || strcmp(op2->c_str(), "!I") == 0) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!I");
+                            } else {
+                                exit(1);
+                            }
+                        }
+
+                        if (isBooleanOperaiton(i->c_str())) {
+                            if (std::isdigit(op1->c_str()[0]) && std::isdigit(op2->c_str()[0]) ||
+                                strcmp(op1->c_str(), "!B") == 0 || strcmp(op2->c_str(), "!B") == 0) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!B");
+                            } else {
+                                exit(1);
+                            }
+                        }
+                    } else {
+                        if (isIntOperation(i->c_str())) {
+                            if (op2Symbol->type == "inteiro" && std::isdigit(op1->c_str()[0]) ||
+                                strcmp(op1->c_str(), "!I") == 0 || strcmp(op2->c_str(), "!I") == 0) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!I");
+                            } else {
+                                exit(1);
+                            }
+                        }
+
+                        if (isBooleanOperaiton(i->c_str())) {
+                            if (op2Symbol->type == "inteiro" && std::isdigit(op1->c_str()[0]) ||
+                                strcmp(op1->c_str(), "!B") == 0 || strcmp(op2->c_str(), "!B") == 0) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!B");
+                            } else {
+                                exit(1);
+                            }
+                        }
+                    }
+                } else {
+                    if (op2Symbol == nullptr) {
+                        if (isIntOperation(i->c_str())) {
+                            if (op1Symbol->type == "inteiro" && std::isdigit(op2->c_str()[0]) ||
+                                strcmp(op1->c_str(), "!I") == 0 || strcmp(op2->c_str(), "!I") == 0) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!I");
+                            } else {
+                                exit(1);
+                            }
+                        }
+                        if (isBooleanOperaiton(i->c_str())) {
+                            if (op1Symbol->type == "inteiro" && std::isdigit(op2->c_str()[0]) ||
+                                strcmp(op1->c_str(), "!B") == 0 || strcmp(op2->c_str(), "!B") == 0) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!B");
+                            } else {
+                                exit(1);
+                            }
+                        }
+                    } else {
+                        if (isIntOperation(i->c_str())) {
+                            if (op1Symbol->type == op2Symbol->type) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!I");
+                            } else {
+                                exit(1);
+                            }
+                        }
+
+                        if (isBooleanOperaiton(i->c_str())) {
+                            if (op1Symbol->type == op2Symbol->type) {
+                                postfix.erase(op1);
+                                postfix.erase(op2);
+                                i->replace(i->begin(), i->end(), "!B");
+                            } else {
+                                exit(1);
+                            }
+                        }
+                    }
+                }
+
+                for (auto &j: postfix) {
+                    std::cout << j.c_str();
+                }
+                std::cout << std::endl;
+            }
+        }
+    }
+
+    return postfix;
 }

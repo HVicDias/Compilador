@@ -207,16 +207,17 @@ Node analyseFunctionDeclaration(FILE *file, Node token) {
     return token;
 }
 
-Node analyseFunctionCall(FILE *file, Node token) {
-    token = getToken(file);
-    if (!searchDeclaratedFunctionTable(token.lexema)) {
+TokenExpression analyseFunctionCall(FILE *file, TokenExpression te) {
+    te.token = getToken(file);
+    te.expression += te.token.lexema + " ";
+    if (!searchDeclaratedFunctionTable(te.token.lexema)) {
         std::cout << "Funtion has not been declared in the code" << std::endl;
         exit(1);
     }
 
-    token = getToken(file);
+    te.token = getToken(file);
 
-    return token;
+    return te;
 }
 
 TokenExpression analyseExpressions(FILE *file, TokenExpression te) {
@@ -239,7 +240,7 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te) {
     if (te.token.simbolo == "sidentificador") {
         if (currentNode != nullptr) {
             if (currentNode->type == "função inteiro" || currentNode->type == "função booleano") {
-                te.token = analyseFunctionCall(file, te.token);
+                te = analyseFunctionCall(file, te);
             } else {
                 te.expression += te.token.lexema + " ";
                 te.token = getToken(file);
@@ -315,10 +316,7 @@ Node analyseAttribution(FILE *file, Node token) {
     te = analyseExpressions(file, te);
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
-//    for (const std::string &c: postfix)
-//        cout << c;
-//
-//    cout << " -> ";
+    analysePostfix(postfix);
 
     return te.token;
 }
@@ -419,10 +417,7 @@ Node analyseWhile(FILE *file, Node token) {
 
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
-//    for (const std::string &c: postfix)
-//        cout << c;
-//
-//    cout << " -> ";
+    analysePostfix(postfix);
 
     return te.token;
 }
@@ -449,6 +444,7 @@ Node analyseIf(FILE *file, Node token) {
 
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
+    analysePostfix(postfix);
 //    for (const std::string &c: postfix)
 //        cout << c;
 //

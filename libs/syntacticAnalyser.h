@@ -10,44 +10,44 @@ public:
     std::string expression;
 };
 
-Node analyseType(FILE *file, Node token, std::queue<std::string>, std::queue<int>);
+Node analyseType(FILE *, Node, std::queue<std::string>, std::queue<int>);
 
-Node analyseVariables(FILE *file, Node token);
+Node analyseVariables(FILE *, Node);
 
-Node analyseEtVariables(FILE *file, Node token);
+Node analyseEtVariables(FILE *, Node);
 
-Node analyseProcedureDeclaration(FILE *file, Node token);
+Node analyseProcedureDeclaration(FILE *, Node);
 
-Node analyseFunctionDeclaration(FILE *file, Node token);
+Node analyseFunctionDeclaration(FILE *, Node);
 
-Node analyseSubroutine(FILE *file, Node token);
+Node analyseSubroutine(FILE *, Node);
 
-Node analyseCommands(FILE *file, Node token);
+Node analyseCommands(FILE *, Node);
 
-Node analyseBlock(FILE *file, Node token);
+Node analyseBlock(FILE *, Node);
 
-Node analyseFunctionCall(FILE *file, Node token);
+TokenExpression analyseFunctionCall(FILE *, TokenExpression);
 
-TokenExpression analyseFactor(FILE *file, TokenExpression);
+TokenExpression analyseFactor(FILE *, TokenExpression);
 
-TokenExpression analyseTerm(FILE *file, TokenExpression);
+TokenExpression analyseTerm(FILE *, TokenExpression);
 
-TokenExpression analyseExpressions(FILE *file, TokenExpression);
+TokenExpression analyseExpressions(FILE *, TokenExpression);
 
-TokenExpression analyseSimpleExpressions(FILE *file, TokenExpression);
+TokenExpression analyseSimpleExpressions(FILE *, TokenExpression);
 
-Node analyseAttribution(FILE *file, Node token);
+Node analyseAttribution(FILE *, Node);
 
-Node analyseProcedureCall(FILE *file, Node token);
+Node analyseProcedureCall(FILE *, Node);
 
-Node analyseAttributionAndProcedureCall(FILE *file, Node token);
+Node analyseAttributionAndProcedureCall(FILE *, Node);
 
-Node analyseRead(FILE *file, Node token);
+Node analyseRead(FILE *, Node);
 
-Node analyseWrite(FILE *file, Node token);
+Node analyseWrite(FILE *, Node);
 
-Node analyseWhile(FILE *file, Node token);
+Node analyseWhile(FILE *, Node);
 
-Node analyseIf(FILE *file, Node token);
+Node analyseIf(FILE *, Node);
 
 #endif //COMPILER_SYNTACTICANALYSER_H

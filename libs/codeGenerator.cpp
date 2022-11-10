@@ -1,5 +1,7 @@
 #include <string>
 #include <iostream>
+#include <iostream>
+#include <fstream>
 #include <utility>
 #include "codeGenerator.h"
 
@@ -14,7 +16,7 @@ CodeSnippet::CodeSnippet(std::string command) {
 
 CodeSnippet::CodeSnippet(int label, std::string command) {
     this->command = command;
-    this->label = label;
+    this->label = to_string(label);
     firstValue = "";
     secondValue = "";
 }
@@ -22,35 +24,35 @@ CodeSnippet::CodeSnippet(int label, std::string command) {
 CodeSnippet::CodeSnippet(std::string command, int firstValue) {
     this->command = command;
     label = "";
-    this->firstValue = firstValue;
+    this->firstValue = to_string(firstValue);
     secondValue = "";
 }
 
 CodeSnippet::CodeSnippet(int label, std::string command, int firstValue) {
     this->command = command;
-    this->label = label;
-    this->firstValue = firstValue;
+    this->label = to_string(label);
+    this->firstValue = to_string(firstValue);
     secondValue = "";
 }
 
 CodeSnippet::CodeSnippet(std::string command, int firstValue, int secondValue) {
     this->command = command;
     label = "";
-    this->firstValue = firstValue;
-    this->secondValue = secondValue;
+    this->firstValue = to_string(firstValue);
+    this->secondValue = to_string(secondValue);
 }
 
 CodeSnippet::CodeSnippet(int label, std::string command, int firstValue, int secondValue) {
     this->command = command;
-    this->label = label;
-    this->firstValue = firstValue;
-    this->secondValue = secondValue;
+    this->label = to_string(label);
+    this->firstValue = to_string(firstValue);
+    this->secondValue = to_string(secondValue);
 }
 
 CodeGenerator::CodeGenerator() { head = nullptr; }
 
 void CodeGenerator::insertNode(CodeSnippet *code) {
-
+    code->next = nullptr;
     if (head == nullptr) {
         head = code;
         return;
@@ -81,4 +83,38 @@ void CodeGenerator::printList() {
         auxNode = auxNode->next;
     }
     cout << endl;
+}
+
+void CodeGenerator::generateCode() {
+    ofstream MyFile("teste.obj");
+    string snippet = "";
+    CodeSnippet *auxNode = head;
+
+    // Check for empty list.
+    if (head == nullptr) {
+        MyFile << "" << endl;
+        return;
+    }
+
+    while (auxNode != nullptr) {
+        snippet.append(addSpaces(auxNode->label, 4));
+        snippet.append(addSpaces(auxNode->command, 8));
+        snippet.append(addSpaces(auxNode->firstValue, 4));
+        snippet.append(addSpaces(auxNode->secondValue, 4));
+        snippet.append("\n\0");
+        MyFile << snippet;
+        auxNode = auxNode->next;
+        snippet = "";
+    }
+    MyFile << endl;
+    MyFile.close();
+}
+
+std::string CodeGenerator::addSpaces(std::string myString, int expectedSize) {
+    std::string aux = "";
+    for (int i = myString.length(); i < expectedSize; i++) {
+        aux.append(" ");
+    }
+    myString.append(aux);
+    return myString;
 }

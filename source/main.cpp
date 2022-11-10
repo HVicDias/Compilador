@@ -2,17 +2,24 @@
 #include "../libs/lexicalAnalyser.h"
 #include "../libs/syntacticAnalyser.h"
 #include "../libs/semanticAnalyser.h"
+#include "../libs/codeGenerator.h"
+#include "../gui/compilerGUI.h"
 
 using namespace std;
 
-int main() {
+int main(int argc, char *argv[]) {
     Node token;
-    SymbolNode *aux;
     lineNo = 1;
     FILE *file = openFile((char *) "../testes/sintatico/sint19.txt");
     cout << lineNo << endl;
-
+    compilerGUI(argc, argv);
     character = (char) fgetc(file);
+
+    CodeGenerator codeGen;
+    auto *snippet = new CodeSnippet(10, "SUM", 2, 3);
+    codeGen.insertNode(snippet);
+    codeGen.printList();
+    codeGen.generateCode();
 
     do {
         token = getToken(file);
