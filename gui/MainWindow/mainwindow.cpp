@@ -62,7 +62,7 @@ void MainWindow::on_compilarButton_clicked() {
         symbolTable.deleteLayer();
     }
 
-    ui->plainTextEdit->clear();
+    ui->errorArea->clear();
 
     Node token;
     lineNo = 1;
@@ -77,7 +77,7 @@ void MainWindow::on_compilarButton_clicked() {
     codeGen.printList();
     codeGen.generateCode();
 
-//    ui->plainTextEdit->appendPlainText(QString::number(lineNo));
+//    ui->errorArea->appendPlainText(QString::number(lineNo));
     do {
         token = getToken(f);
 
@@ -94,7 +94,7 @@ void MainWindow::on_compilarButton_clicked() {
                         token = analyseBlock(f, token);
 
                         if (token.simbolo == "sponto") {
-                            ui->plainTextEdit->appendPlainText("Sucesso");
+                            ui->errorArea->appendPlainText("Sucesso");
                         } else {
                             cout << "Erro25" << endl;
                         }
