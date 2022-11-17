@@ -1,17 +1,20 @@
 #include "semanticAnalyser.h"
 #include <iostream>
-#include <iterator>
-#include <string.h>
-#include <ctype.h>
+#include <utility>
+#include <cstring>
+#include <cctype>
 
 int lineNo;
 
 SymbolTable symbolTable;
 
-bool searchDuplicatedVariableTable(Node token) {
+bool searchDuplicatedVariableTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    nodeToken = symbolTable.searchLocalSymbol(token.lexema);
+    nodeToken = symbolTable.searchLocalSymbol(std::move(lexema));
+
+    if (nodeToken != nullptr)
+        std::cout << nodeToken->identifier << " : " << nodeToken->scope << std::endl;
 
     if (nodeToken == nullptr) {
         return false;
@@ -23,15 +26,17 @@ bool searchDuplicatedVariableTable(Node token) {
 bool searchDeclaratedVariableTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    nodeToken = symbolTable.searchSymbol(lexema);
+    nodeToken = symbolTable.searchSymbol(std::move(lexema));
 
-    if (nodeToken == nullptr
-        //        || nodeToken->type == "booleano"
-        || nodeToken->type == "função inteiro"
-        || nodeToken->type == "função booleano"
-        || nodeToken->type == "procedimento") {
+    if (nodeToken == nullptr) {
         return false;
     } else {
+        if (nodeToken->type == "função inteiro"
+            || nodeToken->type == "função booleano"
+            || nodeToken->type == "procedimento"
+            // || nodeToken->type == "booleano"
+                )
+            exit(1);
         return true;
     }
 }
@@ -39,7 +44,7 @@ bool searchDeclaratedVariableTable(std::string lexema) {
 bool searchDeclaratedFunctionTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    nodeToken = symbolTable.searchSymbol(lexema);
+    nodeToken = symbolTable.searchSymbol(std::move(lexema));
 
     if (nodeToken == nullptr
         || nodeToken->type == "inteiro"
@@ -54,7 +59,7 @@ bool searchDeclaratedFunctionTable(std::string lexema) {
 bool searchDeclaratedVariableOrFunctionTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    nodeToken = symbolTable.searchSymbol(lexema);
+    nodeToken = symbolTable.searchSymbol(std::move(lexema));
 
     if (nodeToken == nullptr
         || nodeToken->type == "função booleano"
@@ -68,28 +73,27 @@ bool searchDeclaratedVariableOrFunctionTable(std::string lexema) {
 bool searchDeclaratedProcedureTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    nodeToken = symbolTable.searchSymbol(lexema);
+    nodeToken = symbolTable.searchSymbol(std::move(lexema));
 
-    if (nodeToken == nullptr
-        || nodeToken->type == "inteiro"
-        || nodeToken->type == "booleano"
-        || nodeToken->type == "função inteiro"
-        || nodeToken->type == "função booleano"
-            ) {
+    if (nodeToken == nullptr) {
         return false;
     } else {
+        if (nodeToken->type == "inteiro"
+            || nodeToken->type == "booleano"
+            || nodeToken->type == "função inteiro"
+            || nodeToken->type == "função booleano") {
+            exit(1);
+        }
         return true;
     }
 }
 
-bool searchDuplicatedProcedureTable(Node token) {
+bool searchDuplicatedProcedureTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    nodeToken = symbolTable.searchLocalSymbol(token.lexema);
+    nodeToken = symbolTable.searchSymbol(std::move(lexema));
 
-    if (nodeToken == nullptr
-        || nodeToken->type == "função booleano"
-            ) {
+    if (nodeToken == nullptr) {
         return false;
     } else {
         return true;

@@ -27,13 +27,14 @@ Node analyseVariables(FILE *file, Node token) {
 
     do {
         if (token.simbolo == "sidentificador") {
-            if (!searchDuplicatedVariableTable(token)) {
+            if (!searchDuplicatedVariableTable(token.lexema)) {
                 identifierQueue.push(token.lexema);
                 lineNumberQueue.push(lineNo);
             } else {
-                std::cout << "ERRO " << std::endl;
+                std::cout << "ERRO " << lineNo << std::endl;
                 exit(1);
             }
+
             token = getToken(file);
 
             if (token.simbolo == "svirgula" || token.simbolo == "sdoispontos") {
@@ -151,7 +152,7 @@ Node analyseProcedureDeclaration(FILE *file, Node token) {
     token = getToken(file);
 
     if (token.simbolo == "sidentificador") {
-        if (!searchDeclaratedProcedureTable(token.lexema)) {
+        if (!searchDuplicatedProcedureTable(token.lexema)) {
             symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo);
         }
 

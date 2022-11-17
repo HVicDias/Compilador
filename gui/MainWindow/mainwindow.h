@@ -26,9 +26,12 @@ private slots:
 
     void on_codeArea_textChanged();
 
+    void on_compilarButton_clicked();
+
 
 private:
     Ui::MainWindow *ui;
+
 };
 
 #endif //COMPILER_MAINWINDOW_H

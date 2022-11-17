@@ -1,9 +1,6 @@
 #include <string>
 #include <iostream>
 #include "lexicalAnalyser.h"
-#include <limits>
-
-using namespace std;
 
 char character;
 
@@ -42,7 +39,7 @@ bool isPunctuation() {
 void jumpSpaces(FILE *file) {
     while (character == ' ' || character == '\n') {
         if (character == '\n') {
-            cout << (int) character << "//" << lineNo << endl;
+            std::cout << (int) character << "//" << lineNo << std::endl;
             lineNo++;
         }
         character = (char) fgetc(file);
@@ -63,7 +60,7 @@ void jumpComentary(FILE *file) {
 }
 
 Node handleDigit(FILE *file) {
-    string lexema;
+    std::string lexema;
 
     while (isDigit()) {
         lexema += character;
@@ -74,8 +71,8 @@ Node handleDigit(FILE *file) {
 }
 
 Node handleIdAndSpecialWord(FILE *file) {
-    string lexema;
-    string simbolo;
+    std::string lexema;
+    std::string simbolo;
 
     while (isLetter() || isDigit() || isUnderscore()) {
         lexema += character;
@@ -132,7 +129,7 @@ Node handleIdAndSpecialWord(FILE *file) {
 }
 
 Node handleAttribution(FILE *file) {
-    string lexema;
+    std::string lexema;
 
     if (character == ':') {
         lexema += character;
@@ -153,8 +150,8 @@ Node handleAttribution(FILE *file) {
 }
 
 Node handleArithmeticOperator(FILE *file) {
-    string lexema;
-    string simbolo;
+    std::string lexema;
+    std::string simbolo;
 
     if (character == '+') {
         simbolo = "smais";
@@ -169,8 +166,8 @@ Node handleArithmeticOperator(FILE *file) {
 }
 
 Node handleRelationalOperator(FILE *file) {
-    string lexema;
-    string simbolo;
+    std::string lexema;
+    std::string simbolo;
     simbolo = "";
 
     if (character == '<') {
@@ -208,8 +205,8 @@ Node handleRelationalOperator(FILE *file) {
 }
 
 Node handlePunctuation(FILE *file) {
-    string lexema;
-    string simbolo;
+    std::string lexema;
+    std::string simbolo;
 
     if (character == ';') {
         simbolo = "sponto_virgula";
@@ -251,7 +248,7 @@ Node getToken(FILE *file) {
     } else if (isPunctuation()) {
         return handlePunctuation(file);
     } else {
-        string s_character;
+        std::string s_character;
         s_character += character;
         character = (char) fgetc(file);
 

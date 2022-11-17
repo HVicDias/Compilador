@@ -10,7 +10,7 @@ extern int lineNo;
 
 extern SymbolTable symbolTable;
 
-bool searchDuplicatedVariableTable(Node);
+bool searchDuplicatedVariableTable(std::string);
 
 bool searchDeclaratedVariableTable(std::string);
 
@@ -20,7 +20,7 @@ bool searchDeclaratedVariableOrFunctionTable(std::string);
 
 bool searchDeclaratedProcedureTable(std::string);
 
-bool searchDuplicatedProcedureTable(Node);
+bool searchDuplicatedProcedureTable(std::string);
 
 std::list<std::string> createInfixListFromExpression(std::string);
 
