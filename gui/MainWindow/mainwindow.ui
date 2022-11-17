@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>813</width>
+                <height>603</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>MainWindow</string>
+        </property>
+        <widget class="QWidget" name="centralwidget">
+            <widget class="QLabel" name="arquivoLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>40</x>
+                        <y>30</y>
+                        <width>71</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Arquivo:</string>
+                </property>
+            </widget>
+            <widget class="QPushButton" name="openFileButton">
+                <property name="geometry">
+                    <rect>
+                        <x>100</x>
+                        <y>30</y>
+                        <width>221</width>
+                        <height>29</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Open File</string>
+                </property>
+            </widget>
+            <widget class="CodeEditor" name="codeArea">
+                <property name="geometry">
+                    <rect>
+                        <x>40</x>
+                        <y>80</y>
+                        <width>661</width>
+                        <height>321</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QLabel" name="errosLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>40</x>
+                        <y>450</y>
+                        <width>63</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Erros:</string>
+                </property>
+            </widget>
+            <widget class="QPlainTextEdit" name="plainTextEdit">
+                <property name="geometry">
+                    <rect>
+                        <x>40</x>
+                        <y>470</y>
+                        <width>491</width>
+                        <height>61</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QPushButton" name="compilarButton">
+                <property name="geometry">
+                    <rect>
+                        <x>610</x>
+                        <y>430</y>
+                        <width>121</width>
+                        <height>41</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Compilar</string>
+                </property>
+            </widget>
+            <widget class="QProgressBar" name="progressBar">
+                <property name="geometry">
+                    <rect>
+                        <x>590</x>
+                        <y>500</y>
+                        <width>161</width>
+                        <height>31</height>
+                    </rect>
+                </property>
+                <property name="value">
+                    <number>24</number>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>813</width>
+                    <height>25</height>
+                </rect>
+            </property>
+            <widget class="QMenu" name="menuArquivo">
+                <property name="title">
+                    <string>Arquivo</string>
+                </property>
+            </widget>
+            <widget class="QMenu" name="menuSobre">
+                <property name="title">
+                    <string>Sobre</string>
+                </property>
+            </widget>
+            <addaction name="menuArquivo"/>
+            <addaction name="menuSobre"/>
+        </widget>
+        <widget class="QStatusBar" name="statusbar"/>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>CodeEditor</class>
+            <extends>QPlainTextEdit</extends>
+            <header location="global">codeeditor.h</header>
+        </customwidget>
+    </customwidgets>
+    <resources/>
+    <connections/>
+</ui>

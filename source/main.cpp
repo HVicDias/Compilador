@@ -10,9 +10,11 @@ using namespace std;
 int main(int argc, char *argv[]) {
     Node token;
     lineNo = 1;
+
     FILE *file = openFile((char *) "../testes/sintatico/sint19.txt");
-    cout << lineNo << endl;
+
     compilerGUI(argc, argv);
+
     character = (char) fgetc(file);
 
     CodeGenerator codeGen;
@@ -21,6 +23,7 @@ int main(int argc, char *argv[]) {
     codeGen.printList();
     codeGen.generateCode();
 
+    cout << lineNo << endl;
     do {
         token = getToken(file);
 
