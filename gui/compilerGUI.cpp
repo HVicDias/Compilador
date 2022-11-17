@@ -1,4 +1,4 @@
-#include "MainWindow/mainwindow.h"
+#include "../libs/mainwindow.h"
 #include <QApplication>
 
 int compilerGUI(int argc, char *argv[]) {

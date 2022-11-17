@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QPlainTextEdit>
 #include <QScrollBar>
+#include <QMessageBox>
+#include <QSaveFile>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,9 +18,9 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
 
-    ~MainWindow();
+    ~MainWindow() override;
 
 private slots:
 
@@ -28,10 +30,18 @@ private slots:
 
     void on_compilarButton_clicked();
 
+    void on_actionOpen_triggered();
+
+    void on_actionSave_as_triggered();
+
+    void on_actionSave_triggered();
+
+    void on_actionSobre_o_Compilador_triggered();
+
 
 private:
     Ui::MainWindow *ui;
-
+    QString currentFile = "";
 };
 
 #endif //COMPILER_MAINWINDOW_H

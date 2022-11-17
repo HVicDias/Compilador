@@ -3,6 +3,7 @@
 
 #include <queue>
 #include "linkedList.h"
+#include "ui_mainwindow.h"
 
 class TokenExpression {
 public:
@@ -10,44 +11,44 @@ public:
     std::string expression;
 };
 
-Node analyseType(FILE *, Node, std::queue<std::string>, std::queue<int>);
+Node analyseType(FILE *, Node, std::queue<std::string>, std::queue<int>, Ui::MainWindow *);
 
-Node analyseVariables(FILE *, Node);
+Node analyseVariables(FILE *, Node, Ui::MainWindow *);
 
-Node analyseEtVariables(FILE *, Node);
+Node analyseEtVariables(FILE *, Node, Ui::MainWindow *);
 
-Node analyseProcedureDeclaration(FILE *, Node);
+Node analyseProcedureDeclaration(FILE *, Node, Ui::MainWindow *);
 
-Node analyseFunctionDeclaration(FILE *, Node);
+Node analyseFunctionDeclaration(FILE *, Node, Ui::MainWindow *);
 
-Node analyseSubroutine(FILE *, Node);
+Node analyseSubroutine(FILE *, Node, Ui::MainWindow *);
 
-Node analyseCommands(FILE *, Node);
+Node analyseCommands(FILE *, Node, Ui::MainWindow *);
 
-Node analyseBlock(FILE *, Node);
+Node analyseBlock(FILE *, Node, Ui::MainWindow *);
 
-TokenExpression analyseFunctionCall(FILE *, TokenExpression);
+TokenExpression analyseFunctionCall(FILE *, TokenExpression, Ui::MainWindow *);
 
-TokenExpression analyseFactor(FILE *, TokenExpression);
+TokenExpression analyseFactor(FILE *, TokenExpression, Ui::MainWindow *);
 
-TokenExpression analyseTerm(FILE *, TokenExpression);
+TokenExpression analyseTerm(FILE *, TokenExpression, Ui::MainWindow *);
 
-TokenExpression analyseExpressions(FILE *, TokenExpression);
+TokenExpression analyseExpressions(FILE *, TokenExpression, Ui::MainWindow *);
 
-TokenExpression analyseSimpleExpressions(FILE *, TokenExpression);
+TokenExpression analyseSimpleExpressions(FILE *, TokenExpression, Ui::MainWindow *);
 
-Node analyseAttribution(FILE *, Node);
+Node analyseAttribution(FILE *, Node, Ui::MainWindow *);
 
-Node analyseProcedureCall(FILE *, Node);
+Node analyseProcedureCall(FILE *, Node, Ui::MainWindow *);
 
-Node analyseAttributionAndProcedureCall(FILE *, Node);
+Node analyseAttributionAndProcedureCall(FILE *, Node, Ui::MainWindow *);
 
-Node analyseRead(FILE *, Node);
+Node analyseRead(FILE *, Node, Ui::MainWindow *);
 
-Node analyseWrite(FILE *, Node);
+Node analyseWrite(FILE *, Node, Ui::MainWindow *);
 
-Node analyseWhile(FILE *, Node);
+Node analyseWhile(FILE *, Node, Ui::MainWindow *);
 
-Node analyseIf(FILE *, Node);
+Node analyseIf(FILE *, Node, Ui::MainWindow *);
 
 #endif //COMPILER_SYNTACTICANALYSER_H

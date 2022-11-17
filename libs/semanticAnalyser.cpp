@@ -1,4 +1,5 @@
 #include "semanticAnalyser.h"
+#include "mainwindow.h"
 #include <iostream>
 #include <utility>
 #include <cstring>
@@ -238,7 +239,7 @@ bool isBooleanOperaiton(const char *op) {
     return false;
 }
 
-std::list<std::string> analysePostfix(std::list<std::string> postfix) {
+std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWindow *ui) {
     SymbolNode *op1Symbol = nullptr, *op2Symbol = nullptr;
 
     for (auto &j: postfix) {
@@ -254,10 +255,8 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                 if (!isdigit(op2->c_str()[0]) && !isIntOperation(op2->c_str()) && !isBooleanOperaiton(op2->c_str()) &&
                     strcmp(op2->c_str(), "!I") != 0 && strcmp(op2->c_str(), "!B") != 0) {
                     if (symbolTable.searchSymbol(*op2) == nullptr) {
-                        std::cout << i->c_str();
-                        std::cout << op2->c_str();
-                        std::cout << "teste1";
-                        exit(1);
+//                        exit(1);
+                        ui->errorArea->appendPlainText("Invalid Expression.");
                     }
 
                     op2Symbol = symbolTable.searchSymbol(*op2);
@@ -268,9 +267,8 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                 if (!isdigit(op1->c_str()[0]) && !isIntOperation(op1->c_str()) && !isBooleanOperaiton(op1->c_str()) &&
                     strcmp(op1->c_str(), "!I") != 0 && strcmp(op1->c_str(), "!B") != 0) {
                     if (symbolTable.searchSymbol(*op1) == nullptr) {
-                        std::cout << i->c_str();
-                        std::cout << "teste2";
-                        exit(1);
+//                        exit(1);
+                        ui->errorArea->appendPlainText("Invalid Expression.");
                     }
 
                     op1Symbol = symbolTable.searchSymbol(*op1);
@@ -285,7 +283,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
 
@@ -296,7 +296,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
                     } else {
@@ -307,7 +309,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
 
@@ -318,7 +322,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
                     }
@@ -331,7 +337,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
                         if (isBooleanOperaiton(i->c_str())) {
@@ -341,7 +349,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
                     } else {
@@ -351,7 +361,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
 
@@ -361,7 +373,9 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix) {
                                 postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
-                                exit(1);
+//                                exit(1);
+                                ui->errorArea->appendPlainText("Invalid Expression.");
+
                             }
                         }
                     }

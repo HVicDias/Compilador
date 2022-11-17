@@ -5,6 +5,7 @@
 #include <stack>
 #include "linkedList.h"
 #include "symbolTable.h"
+#include "ui_mainwindow.h"
 
 extern int lineNo;
 
@@ -28,6 +29,6 @@ int precedence(const std::string &);
 
 std::list<std::string> toPostfix(std::list<std::string> expressionList);
 
-std::list<std::string> analysePostfix(std::list<std::string>);
+std::list<std::string> analysePostfix(std::list<std::string>, Ui::MainWindow *);
 
 #endif //COMPILER_SEMANTICANALYSER_H
