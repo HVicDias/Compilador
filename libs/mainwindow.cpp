@@ -5,12 +5,11 @@
 #include "syntacticAnalyser.h"
 #include "semanticAnalyser.h"
 #include "codeGenerator.h"
+#include <unistd.h>
 
 // ToDo descobrir um modo de quando algum erro que utiliza exit(1) não crashar o QT
 
 using namespace std;
-
-string filename;
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -31,16 +30,26 @@ void MainWindow::on_codeArea_textChanged() {
 }
 
 void MainWindow::on_compilarButton_clicked() {
+    if (currentFile == "") {
+        while (currentFile == "") {
+            on_actionSave_as_triggered();
+        }
+    } else {
+        on_actionSave_triggered();
+    }
+
     while (symbolTable.symbolListNode != nullptr) {
         symbolTable.deleteLayer();
     }
 
     ui->errorArea->clear();
 
+    sleep(1);
+
     Node token;
     lineNo = 1;
 
-    FILE * f = openFile((char *) filename.c_str());
+    FILE *f = openFile((char *) currentFile.toStdString().c_str());
 
     character = (char) fgetc(f);
 
@@ -50,7 +59,6 @@ void MainWindow::on_compilarButton_clicked() {
     codeGen.printList();
     codeGen.generateCode();
 
-//    ui->errorArea->appendPlainText(QString::number(lineNo));
     do {
         token = getToken(f);
 
@@ -82,7 +90,6 @@ void MainWindow::on_compilarButton_clicked() {
                     cout << "Erro28" << endl;
                 }
             }
-
         } else {
             cout << "Erro29" << endl;
         }

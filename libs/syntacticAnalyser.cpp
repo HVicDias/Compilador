@@ -1,6 +1,4 @@
-#include <iostream>
 #include <string>
-#include <unistd.h>
 #include "lexicalAnalyser.h"
 #include "syntacticAnalyser.h"
 #include "semanticAnalyser.h"
@@ -84,7 +82,7 @@ Node analyseEtVariables(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseSubroutine(FILE *file, Node token, Ui::MainWindow *ui) {
-    while (token.simbolo == "sprocedimento" || token.simbolo == "sfunção") {
+    while (token.simbolo == "sprocedimento" || token.simbolo == "sfuncao") {
         if (token.simbolo == "sprocedimento") {
             token = analyseProcedureDeclaration(file, token, ui);
         } else {
@@ -126,6 +124,7 @@ Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
         while (token.simbolo != "sfim") {
             if (token.simbolo == "sponto_virgula") {
                 token = getToken(file);
+
                 if (token.simbolo != "sfim") {
                     token = analyseSimpleCommands(file, token, ui);
                 }
@@ -187,16 +186,20 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
     token = getToken(file);
 
     if (token.simbolo == "sidentificador") {
-        token = getToken(file);
-        if (!searchDeclaratedVariableOrFunctionTable(token.lexema)) {
+        if (!searchDeclaratedFunctionTable(token.lexema)) {
             identifier = token.lexema;
+        } else {
+            ui->errorArea->appendPlainText(
+                    QString::fromStdString("Variable already defined at line ") +
+                    QString::number(lineNo) + ".");
         }
 
+        token = getToken(file);
         if (token.simbolo == "sdoispontos") {
             token = getToken(file);
 
             if (token.simbolo == "sinteiro" || token.simbolo == "sbooleano") {
-                symbolTable.insertSymbol(identifier, identifier, "função " + token.lexema, lineNo);
+                symbolTable.insertSymbol(identifier, identifier, "funcao " + token.lexema, lineNo);
 
                 token = getToken(file);
 
@@ -222,14 +225,12 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 TokenExpression analyseFunctionCall(FILE *file, TokenExpression te, Ui::MainWindow *ui) {
-    te.token = getToken(file);
-    te.expression += te.token.lexema + " ";
     if (!searchDeclaratedFunctionTable(te.token.lexema)) {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Function has not been declared in the code"));
 //        exit(1);
     }
-
+    te.expression += te.token.lexema + " ";
     te.token = getToken(file);
 
     return te;
@@ -251,10 +252,9 @@ TokenExpression analyseExpressions(FILE *file, TokenExpression te, Ui::MainWindo
 
 TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui) {
     SymbolNode *currentNode = symbolTable.searchSymbol(te.token.lexema);
-
     if (te.token.simbolo == "sidentificador") {
         if (currentNode != nullptr) {
-            if (currentNode->type == "função inteiro" || currentNode->type == "função booleano") {
+            if (currentNode->type == "funcao inteiro" || currentNode->type == "funcao booleano") {
                 te = analyseFunctionCall(file, te, ui);
             } else {
                 te.expression += te.token.lexema + " ";
