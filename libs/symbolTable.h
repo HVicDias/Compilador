@@ -9,7 +9,8 @@ public:
     std::string scope;
     std::string type;
     int lineNo;
-    int label; //ToDo Add Label HERE DO NOT FORGET TO CHANGE
+    int label;
+    int memoryAllocation;
     SymbolNode *next;
 
     SymbolNode(std::string, std::string, std::string, int);

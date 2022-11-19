@@ -14,8 +14,8 @@ bool searchDuplicatedVariableTable(std::string lexema) {
 
     nodeToken = symbolTable.searchLocalSymbol(std::move(lexema));
 
-    if (nodeToken != nullptr)
-        std::cout << nodeToken->identifier << " : " << nodeToken->scope << std::endl;
+//    if (nodeToken != nullptr)
+//        std::cout << nodeToken->identifier << " : " << nodeToken->scope << std::endl;
 
     if (nodeToken == nullptr) {
         return false;
@@ -32,14 +32,16 @@ bool searchDeclaratedVariableTable(std::string lexema) {
     if (nodeToken == nullptr) {
         return false;
     } else {
-        if (nodeToken->type == "funcao inteiro"
-            || nodeToken->type == "funcao booleano"
-            || nodeToken->type == "procedimento"
-            // || nodeToken->type == "booleano"
-                )
-            exit(1);
-        return true;
+        if (nodeToken->type != "funcao inteiro"
+            && nodeToken->type != "funcao booleano"
+            && nodeToken->type != "procedimento"
+                ) {
+            return true;
+        } else {
+            return false;
+        }
     }
+
 }
 
 bool searchDeclaratedFunctionTable(std::string lexema) {
@@ -50,12 +52,15 @@ bool searchDeclaratedFunctionTable(std::string lexema) {
     if (nodeToken == nullptr) {
         return false;
     } else {
-        if (nodeToken->type == "inteiro"
-            || nodeToken->type == "booleano"
-            || nodeToken->type == "procedimento")
-            exit(1);
-        return true;
+        if (nodeToken->type != "inteiro"
+            && nodeToken->type != "booleano"
+            && nodeToken->type != "procedimento") {
+            return true;
+        } else {
+            return false;
+        }
     }
+
 }
 
 bool searchDeclaratedVariableOrFunctionTable(std::string lexema) {
@@ -66,29 +71,35 @@ bool searchDeclaratedVariableOrFunctionTable(std::string lexema) {
     if (nodeToken == nullptr) {
         return false;
     } else {
-        if (nodeToken->type == "funcao booleano"
-            || nodeToken->type == "procedimento")
-            exit(1);
-        return true;
+        if (nodeToken->type != "funcao booleano"
+            && nodeToken->type != "procedimento") {
+            return true;
+        } else {
+            return false;
+        }
     }
+
 }
 
 bool searchDeclaratedProcedureTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    nodeToken = symbolTable.searchSymbol(std::move(lexema));
+    std::cout << "aqui " << lexema;
 
+    nodeToken = symbolTable.searchSymbol(std::move(lexema));
     if (nodeToken == nullptr) {
         return false;
     } else {
-        if (nodeToken->type == "inteiro"
-            || nodeToken->type == "booleano"
-            || nodeToken->type == "funcao inteiro"
-            || nodeToken->type == "funcao booleano") {
-            exit(1);
+        if (nodeToken->type != "inteiro"
+            && nodeToken->type != "booleano"
+            && nodeToken->type != "funcao inteiro"
+            && nodeToken->type != "funcao booleano") {
+            return true;
+        } else {
+            return false;
         }
-        return true;
     }
+
 }
 
 bool searchDuplicatedProcedureTable(std::string lexema) {
@@ -110,12 +121,12 @@ std::list<std::string> createInfixListFromExpression(std::string infixExpression
     std::string aux1, aux2;
 
     do {
-        if (infixExpression[i] >= 'a' && infixExpression[i] <= 'z' || infixExpression[i] >= 'A' &&
-                                                                      infixExpression[i] <= 'Z' ||
-            infixExpression[i] >= '0' && infixExpression[i] <= '9') {
-            while (infixExpression[i] >= 'a' && infixExpression[i] <= 'z' || infixExpression[i] >= 'A' &&
-                                                                             infixExpression[i] <= 'Z' ||
-                   infixExpression[i] >= '0' && infixExpression[i] <= '9') {
+        if (infixExpression[i] >= 65 && infixExpression[i] <= 90 || infixExpression[i] >= 97 &&
+                                                                    infixExpression[i] <= 122 ||
+            infixExpression[i] >= 48 && infixExpression[i] <= 57) {
+            while (infixExpression[i] >= 65 && infixExpression[i] <= 90 || infixExpression[i] >= 97 &&
+                                                                           infixExpression[i] <= 122 ||
+                   infixExpression[i] >= 48 && infixExpression[i] <= 57) {
 
                 result += infixExpression[i];
                 i++;
@@ -171,6 +182,7 @@ std::list<std::string> createInfixListFromExpression(std::string infixExpression
 
     resultList.reverse();
     resultList.remove("");
+
     return resultList;
 }
 
@@ -231,7 +243,7 @@ bool isIntOperation(const char *op) {
     return false;
 }
 
-bool isBooleanOperaiton(const char *op) {
+bool isBooleanOperation(const char *op) {
     if (strcmp(op, ">") == 0 || strcmp(op, "<") == 0 ||
         strcmp(op, ">=") == 0 || strcmp(op, "<=") == 0 ||
         strcmp(op, "!=") == 0 || strcmp(op, "=") == 0 || strcmp(op, "e") == 0 ||
@@ -239,6 +251,14 @@ bool isBooleanOperaiton(const char *op) {
         return true;
     }
     return false;
+}
+
+bool isNumber(const std::string &s) {
+    for (char const &ch: s) {
+        if (std::isdigit(ch) == 0)
+            return false;
+    }
+    return true;
 }
 
 std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWindow *ui) {
@@ -250,11 +270,11 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWi
     std::cout << std::endl;
 
     for (auto i = postfix.begin(); i != postfix.end(); i++) {
-        if (i != postfix.begin() && i != std::next(postfix.begin())) {
-            if (isIntOperation(i->c_str()) || isBooleanOperaiton(i->c_str())) {
+        if (i != postfix.begin() && postfix.size() != 1) {
+            if (isIntOperation(i->c_str()) || isBooleanOperation(i->c_str())) {
                 auto op2 = std::prev(i);
 
-                if (!isdigit(op2->c_str()[0]) && !isIntOperation(op2->c_str()) && !isBooleanOperaiton(op2->c_str()) &&
+                if (!isNumber(*op2) && !isIntOperation(op2->c_str()) && !isBooleanOperation(op2->c_str()) &&
                     strcmp(op2->c_str(), "!I") != 0 && strcmp(op2->c_str(), "!B") != 0) {
                     if (symbolTable.searchSymbol(*op2) == nullptr) {
 //                        exit(1);
@@ -266,11 +286,11 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWi
 
                 auto op1 = std::prev(op2);
 
-                if (!isdigit(op1->c_str()[0]) && !isIntOperation(op1->c_str()) && !isBooleanOperaiton(op1->c_str()) &&
+                if (!isNumber(*op1) && !isIntOperation(op1->c_str()) && !isBooleanOperation(op1->c_str()) &&
                     strcmp(op1->c_str(), "!I") != 0 && strcmp(op1->c_str(), "!B") != 0) {
                     if (symbolTable.searchSymbol(*op1) == nullptr) {
 //                        exit(1);
-                        QApplication::exit();
+//                        QApplication::exit();
                         ui->errorArea->appendPlainText("Invalid Expression.");
                     }
 
@@ -280,28 +300,27 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWi
                 if (op1Symbol == nullptr) {
                     if (op2Symbol == nullptr) {
                         if (isIntOperation(i->c_str())) {
-                            if (std::isdigit(op1->c_str()[0]) && std::isdigit(op2->c_str()[0]) ||
+                            if (isNumber(*op1) && isNumber(*op2) ||
                                 strcmp(op1->c_str(), "!I") == 0 || strcmp(op2->c_str(), "!I") == 0) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
                         }
 
-                        if (isBooleanOperaiton(i->c_str())) {
-                            if (std::isdigit(op1->c_str()[0]) && std::isdigit(op2->c_str()[0]) ||
-                                strcmp(op1->c_str(), "!B") == 0 || strcmp(op2->c_str(), "!B") == 0) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
+                        if (isBooleanOperation(i->c_str())) {
+                            if ((isNumber(*op1) && isNumber(*op2)) ||
+                                (strcmp(op1->c_str(), "!B") == 0 || strcmp(op1->c_str(), "verdadeiro") == 0 ||
+                                 strcmp(op1->c_str(), "falso") == 0 && strcmp(op2->c_str(), "!B") == 0 ||
+                                 strcmp(op2->c_str(), "verdadeiro") == 0 ||
+                                 strcmp(op2->c_str(), "falso") == 0)) {
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
@@ -309,29 +328,27 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWi
                     } else {
                         if (isIntOperation(i->c_str())) {
                             if (op2Symbol->type == "inteiro" ||
-                                op2Symbol->type == "funcao inteiro" && std::isdigit(op1->c_str()[0]) ||
-                                strcmp(op1->c_str(), "!I") == 0 || strcmp(op2->c_str(), "!I") == 0) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
+                                op2Symbol->type == "funcao inteiro" && isNumber(*op1) ||
+                                strcmp(op1->c_str(), "!I") == 0) {
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
-
                             }
                         }
 
-                        if (isBooleanOperaiton(i->c_str())) {
-                            if (op2Symbol->type == "inteiro" ||
-                                op2Symbol->type == "funcao inteiro" && std::isdigit(op1->c_str()[0]) ||
-                                strcmp(op1->c_str(), "!B") == 0 || strcmp(op2->c_str(), "!B") == 0) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
+                        if (isBooleanOperation(i->c_str())) {
+                            if ((op2Symbol->type == "inteiro" ||
+                                 op2Symbol->type == "funcao inteiro" && isNumber(*op1)) ||
+                                (op2Symbol->type == "booleano" ||
+                                 op2Symbol->type == "funcao booleano" ||
+                                 strcmp(op1->c_str(), "!B") == 0 || strcmp(op1->c_str(), "verdadeiro") == 0 ||
+                                 strcmp(op1->c_str(), "falso") == 0)) {
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
@@ -341,54 +358,56 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWi
                     if (op2Symbol == nullptr) {
                         if (isIntOperation(i->c_str())) {
                             if (op1Symbol->type == "inteiro" ||
-                                op1Symbol->type == "funcao inteiro" && std::isdigit(op2->c_str()[0]) ||
-                                strcmp(op1->c_str(), "!I") == 0 || strcmp(op2->c_str(), "!I") == 0) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
+                                op1Symbol->type == "funcao inteiro" && isNumber(*op2) ||
+                                strcmp(op2->c_str(), "!I") == 0) {
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
                         }
-                        if (isBooleanOperaiton(i->c_str())) {
-                            if (op1Symbol->type == "inteiro" ||
-                                op1Symbol->type == "funcao inteiro" && std::isdigit(op2->c_str()[0]) ||
-                                strcmp(op1->c_str(), "!B") == 0 || strcmp(op2->c_str(), "!B") == 0) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
+                        if (isBooleanOperation(i->c_str())) {
+                            if ((op1Symbol->type == "inteiro" ||
+                                 op1Symbol->type == "funcao inteiro" && isNumber(*op2)) ||
+                                (op1Symbol->type == "booleano" ||
+                                 op1Symbol->type == "funcao booleano" &&
+                                 strcmp(op2->c_str(), "!B") == 0) || strcmp(op2->c_str(), "verdadeiro") == 0 ||
+                                strcmp(op2->c_str(), "falso") == 0) {
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
                         }
                     } else {
                         if (isIntOperation(i->c_str())) {
-                            if (op1Symbol->type == op2Symbol->type) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
+                            if (op1Symbol->type == "inteiro" ||
+                                op1Symbol->type == "funcao inteiro" && op2Symbol->type == "inteiro" ||
+                                op2Symbol->type == "funcao inteiro") {
                                 i->replace(i->begin(), i->end(), "!I");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
                         }
 
-                        if (isBooleanOperaiton(i->c_str())) {
-                            if (op1Symbol->type == op2Symbol->type) {
-                                postfix.erase(op1);
-                                postfix.erase(op2);
+                        if (isBooleanOperation(i->c_str())) {
+                            if ((op1Symbol->type == "inteiro" ||
+                                 op1Symbol->type == "funcao inteiro" && op2Symbol->type == "inteiro" ||
+                                 op2Symbol->type == "funcao inteiro") ||
+                                (op1Symbol->type == "booleano" ||
+                                 op1Symbol->type == "funcao booleano" && op2Symbol->type == "booleano" ||
+                                 op2Symbol->type == "funcao booleano")) {
                                 i->replace(i->begin(), i->end(), "!B");
                             } else {
 //                                exit(1);
-                                QApplication::exit();
+//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
@@ -396,17 +415,27 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWi
                     }
                 }
 
+                postfix.erase(op1);
+                postfix.erase(op2);
+
                 for (auto &j: postfix) {
                     std::cout << j.c_str();
                 }
                 std::cout << std::endl;
             }
         } else if (i == postfix.begin() && postfix.size() == 1) {
-            op1Symbol = symbolTable.searchSymbol(*i);
-            if (op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+            if (isNumber(*i)) {
                 i->replace(i->begin(), i->end(), "!I");
-            if (op1Symbol->type == "booleano" || op1Symbol->type == "funcao booleano")
+            } else if (strcmp(i->c_str(), "verdadeiro") == 0 ||
+                       strcmp(i->c_str(), "falso") == 0) {
                 i->replace(i->begin(), i->end(), "!B");
+            } else {
+                op1Symbol = symbolTable.searchSymbol(*i);
+                if (op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+                    i->replace(i->begin(), i->end(), "!I");
+                if (op1Symbol->type == "booleano" || op1Symbol->type == "funcao booleano")
+                    i->replace(i->begin(), i->end(), "!B");
+            }
 
             for (auto &j: postfix) {
                 std::cout << j.c_str();

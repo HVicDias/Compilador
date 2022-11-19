@@ -8,6 +8,7 @@ SymbolNode::SymbolNode() {
     scope = "";
     type = "";
     lineNo = -1;
+    memoryAllocation = -1;
     next = nullptr;
 }
 
@@ -207,12 +208,10 @@ void SymbolTable::printList() {
     }
 
     std::cout << "\nCurrent Head: " << auxNode->layerName << std::endl;
-    std::cout << "\nHead Info:  " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
-              << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << std::endl;
     while (auxNode != nullptr) {
-        auxNode->printList();
         std::cout << "\nHead Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
                   << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << std::endl;
+        auxNode->printList();
         auxNode = auxNode->previous;
         leafs++;
     }

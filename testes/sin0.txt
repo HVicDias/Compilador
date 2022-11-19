@@ -1,4 +1,3 @@
-
 {Teste procedimento aninhado - OK}
 programa test1;
 
@@ -23,7 +22,7 @@ inicio
   faca inicio
            a:= x+a;
        fim;
-  escreva(a)
+  escreva(a);
 fim;
 
 inicio
@@ -34,4 +33,4 @@ inicio
     senao escreva(c);
 fim.
 
-{fim}   
+{fim}

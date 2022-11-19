@@ -96,6 +96,7 @@ void MainWindow::on_compilarButton_clicked() {
 
     } while (character != EOF);
 
+    symbolTable.printList();
     fclose(f);
     cout << lineNo << endl;
 }
@@ -154,7 +155,6 @@ void MainWindow::on_actionSave_triggered() {
         file.commit();
     }
 }
-
 
 void MainWindow::on_actionSave_as_triggered() {
     QString filename = QFileDialog::getSaveFileName(this, "Save as",

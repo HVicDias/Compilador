@@ -52,7 +52,7 @@ void jumpComentary(FILE *file) {
 
         if (character == EOF) {
             printf("erro falta de }");
-            exit(1);
+//            exit(1);
         }
     } while (character != '}');
 

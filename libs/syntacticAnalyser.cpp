@@ -2,6 +2,7 @@
 #include "lexicalAnalyser.h"
 #include "syntacticAnalyser.h"
 #include "semanticAnalyser.h"
+#include <iostream>
 
 Node analyseType(FILE *file, Node token, std::queue<std::string> identifierQueue, std::queue<int> lineNumberQueue,
                  Ui::MainWindow *ui) {
@@ -49,7 +50,7 @@ Node analyseVariables(FILE *file, Node token, Ui::MainWindow *ui) {
                         "Invalid expression, virgula ou doispontos is expected after identificador."));
             }
         } else {
-            ui->errorArea->appendPlainText(QString::fromStdString("Invalid expression, expected identificador."));
+            ui->errorArea->appendPlainText(QString::fromStdString("Invalid expression, expected identificador  1."));
         }
     } while (token.simbolo != "sdoispontos");
 
@@ -70,11 +71,11 @@ Node analyseEtVariables(FILE *file, Node token, Ui::MainWindow *ui) {
                     token = getToken(file);
                 } else {
                     ui->errorArea->appendPlainText(
-                            QString::fromStdString("Expected , at line ") + QString::number(lineNo) + ".");
+                            QString::fromStdString("Expected ; 1 at line ") + QString::number(lineNo) + ".");
                 }
             }
         } else {
-            ui->errorArea->appendPlainText(QString::fromStdString("Invalid expression, expected identificador."));
+            ui->errorArea->appendPlainText(QString::fromStdString("Invalid expression, expected identificador 2."));
         }
     }
 
@@ -88,11 +89,12 @@ Node analyseSubroutine(FILE *file, Node token, Ui::MainWindow *ui) {
         } else {
             token = analyseFunctionDeclaration(file, token, ui);
         }
+
         if (token.simbolo == "sponto_virgula") {
             token = getToken(file);
         } else {
             ui->errorArea->appendPlainText(
-                    QString::fromStdString("Expected , at line ") + QString::number(lineNo) + ".");
+                    QString::fromStdString("Expected ; 2 at line ") + QString::number(lineNo) + ".");
         }
     }
 
@@ -121,24 +123,18 @@ Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
     if (token.simbolo == "sinicio") {
         token = getToken(file);
         token = analyseSimpleCommands(file, token, ui);
-        while (token.simbolo != "sfim") {
-            if (token.simbolo == "sponto_virgula") {
-                token = getToken(file);
 
-                if (token.simbolo != "sfim") {
-                    token = analyseSimpleCommands(file, token, ui);
-                }
-            } else {
-                ui->errorArea->appendPlainText(
-                        QString::fromStdString("Invalid expression, expected identificador.") +
-                        QString::number(lineNo) + ".");
-//                exit(1);
+
+        while (token.simbolo != "sfim") {
+            if (token.simbolo != "sfim") {
+                token = analyseSimpleCommands(file, token, ui);
             }
         }
+
         token = getToken(file);
     } else {
         ui->errorArea->appendPlainText(
-                QString::fromStdString("Invalid expression, expected identificador."));
+                QString::fromStdString("Invalid expression, expected identificador 3.") + QString::number(lineNo));
     }
 
     return token;
@@ -159,6 +155,8 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
 
     if (token.simbolo == "sidentificador") {
         if (!searchDuplicatedProcedureTable(token.lexema)) {
+
+            symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName, "procedimento", lineNo);
             symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo);
         }
 
@@ -168,15 +166,16 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
             token = analyseBlock(file, token, ui);
         } else {
             ui->errorArea->appendPlainText(
-                    QString::fromStdString("Expected , at line ") +
+                    QString::fromStdString("Expected ; 5 at line ") +
                     QString::number(lineNo) + ".");
         }
     } else {
         ui->errorArea->appendPlainText(
-                QString::fromStdString("Invalid expression, expected identificador."));
+                QString::fromStdString("Invalid expression, expected identificador 4."));
     }
 
-//    symbolTable.deleteLayer();
+    symbolTable.printList();
+    symbolTable.deleteLayer();
 
     return token;
 }
@@ -194,20 +193,21 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
                     QString::number(lineNo) + ".");
         }
 
+
         token = getToken(file);
         if (token.simbolo == "sdoispontos") {
             token = getToken(file);
 
             if (token.simbolo == "sinteiro" || token.simbolo == "sbooleano") {
-                symbolTable.insertSymbol(identifier, identifier, "funcao " + token.lexema, lineNo);
-
+                symbolTable.insertSymbol(identifier, symbolTable.symbolListNode->layerName, "funcao " + token.lexema,
+                                         lineNo);
+                symbolTable.downLayer(identifier, identifier, identifier, "funcao " + token.lexema, lineNo);
                 token = getToken(file);
-
                 if (token.simbolo == "sponto_virgula") {
                     token = analyseBlock(file, token, ui);
                 } else {
                     ui->errorArea->appendPlainText(
-                            QString::fromStdString("Expected , at line ") +
+                            QString::fromStdString("Expected ; 6 at line ") +
                             QString::number(lineNo) + ".");
                 }
             } else {
@@ -216,10 +216,11 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
         }
     } else {
         ui->errorArea->appendPlainText(
-                QString::fromStdString("Invalid expression, expected identificador."));
+                QString::fromStdString("Invalid expression, expected identificador 5."));
     }
 
-//    symbolTable.deleteLayer();
+    symbolTable.printList();
+    symbolTable.deleteLayer();
 
     return token;
 }
@@ -252,6 +253,7 @@ TokenExpression analyseExpressions(FILE *file, TokenExpression te, Ui::MainWindo
 
 TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui) {
     SymbolNode *currentNode = symbolTable.searchSymbol(te.token.lexema);
+
     if (te.token.simbolo == "sidentificador") {
         if (currentNode != nullptr) {
             if (currentNode->type == "funcao inteiro" || currentNode->type == "funcao booleano") {
@@ -283,7 +285,7 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
 
         }
     } else if (te.token.lexema == "verdadeiro" || te.token.lexema == "falso") {
-//        expression += token.lexema + " ";
+        te.expression += te.token.lexema + " ";
         te.token = getToken(file);
     } else {
         ui->errorArea->appendPlainText(
@@ -297,7 +299,7 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
 TokenExpression analyseTerm(FILE *file, TokenExpression te, Ui::MainWindow *ui) {
     te = analyseFactor(file, te, ui);
 
-    while (te.token.simbolo == "smult" || te.token.simbolo == "sdiv" || te.token.simbolo == "sse") {
+    while (te.token.simbolo == "smult" || te.token.simbolo == "sdiv" || te.token.simbolo == "se") {
         te.expression += te.token.lexema + " ";
         te.token = getToken(file);
         te = analyseFactor(file, te, ui);
@@ -332,6 +334,7 @@ Node analyseAttribution(FILE *file, Node token, Ui::MainWindow *ui) {
     std::list<std::string> postfix;
 
     te = analyseExpressions(file, te, ui);
+
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
     analysePostfix(postfix, ui);
@@ -340,8 +343,6 @@ Node analyseAttribution(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
-    token = getToken(file);
-
     if (!searchDeclaratedProcedureTable(token.lexema)) {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Procedure has not been declared in the code"));
@@ -354,12 +355,20 @@ Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseAttributionAndProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
-    token = getToken(file);
+    if (!searchDeclaratedProcedureTable(token.lexema))
+        token = getToken(file);
 
     if (token.simbolo == "satribuicao") {
         token = analyseAttribution(file, token, ui);
     } else {
         token = analyseProcedureCall(file, token, ui);
+    }
+
+    if (token.simbolo == "sponto_virgula") {
+        token = getToken(file);
+    } else {
+        ui->errorArea->appendPlainText(
+                QString::fromStdString("Expected ;"));
     }
 
     return token;
@@ -370,11 +379,20 @@ Node analyseRead(FILE *file, Node token, Ui::MainWindow *ui) {
 
     if (token.simbolo == "sabre_parenteses") {
         token = getToken(file);
+
         if (token.simbolo == "sidentificador") {
             if (searchDeclaratedVariableTable(token.lexema)) {
                 token = getToken(file);
+
                 if (token.simbolo == "sfecha_parenteses") {
                     token = getToken(file);
+
+                    if (token.simbolo == "sponto_virgula") {
+                        token = getToken(file);
+                    } else {
+                        ui->errorArea->appendPlainText(
+                                QString::fromStdString("Expected ponto virgula"));
+                    }
                 } else {
                     ui->errorArea->appendPlainText(
                             QString::fromStdString("Expected ) at the end of the expression"));
@@ -385,7 +403,7 @@ Node analyseRead(FILE *file, Node token, Ui::MainWindow *ui) {
             }
         } else {
             ui->errorArea->appendPlainText(
-                    QString::fromStdString("Invalid expression, expected identificador."));
+                    QString::fromStdString("Invalid expression, expected identificador 6."));
         }
     } else {
         ui->errorArea->appendPlainText(
@@ -400,11 +418,20 @@ Node analyseWrite(FILE *file, Node token, Ui::MainWindow *ui) {
 
     if (token.simbolo == "sabre_parenteses") {
         token = getToken(file);
+
         if (token.simbolo == "sidentificador") {
             if (searchDeclaratedVariableOrFunctionTable(token.lexema)) {
                 token = getToken(file);
+
                 if (token.simbolo == "sfecha_parenteses") {
                     token = getToken(file);
+
+                    if (token.simbolo == "sponto_virgula") {
+                        token = getToken(file);
+                    } else {
+                        ui->errorArea->appendPlainText(
+                                QString::fromStdString("Expected ponto virgula"));
+                    }
                 } else {
                     ui->errorArea->appendPlainText(
                             QString::fromStdString("Expected ) at the end of the expression"));
@@ -415,7 +442,7 @@ Node analyseWrite(FILE *file, Node token, Ui::MainWindow *ui) {
             }
         } else {
             ui->errorArea->appendPlainText(
-                    QString::fromStdString("Invalid expression, expected identificador."));
+                    QString::fromStdString("Invalid expression, expected identificador 7."));
         }
     } else {
         ui->errorArea->appendPlainText(
@@ -434,7 +461,6 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
 
     te = analyseExpressions(file, te, ui);
 
-
     if (te.token.simbolo == "sfaca") {
         te.token = getToken(file);
         te.token = analyseSimpleCommands(file, te.token, ui);
@@ -447,21 +473,24 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
     postfix = toPostfix(postfix);
     analysePostfix(postfix, ui);
 
+    te.token = getToken(file);
+
     return te.token;
 }
 
 Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
     TokenExpression te;
     token = getToken(file);
+
     te.token = token;
     std::list<std::string> postfix;
 
     te = analyseExpressions(file, te, ui);
 
-
     if (te.token.simbolo == "sentao") {
         te.token = getToken(file);
         te.token = analyseSimpleCommands(file, te.token, ui);
+
         if (te.token.simbolo == "ssenao") {
             te.token = getToken(file);
             te.token = analyseSimpleCommands(file, te.token, ui);
