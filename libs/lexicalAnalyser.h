@@ -2,8 +2,7 @@
 #define COMPILER_LEXICALANALYSER_H
 
 #include "linkedList.h"
-
-extern int lineNo;
+#include "semanticAnalyser.h"
 
 extern char character;
 

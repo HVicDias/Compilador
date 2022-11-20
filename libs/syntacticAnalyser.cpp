@@ -343,14 +343,15 @@ Node analyseAttribution(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
+    std::cout << "token q entra no procedure call " << token.lexema << " : " << token.simbolo << std::endl;
     if (!searchDeclaratedProcedureTable(token.lexema)) {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Procedure has not been declared in the code"));
 //        exit(1);
     }
-
+    std::cout << "durante proccall " << token.lexema << " : " << token.simbolo << std::endl;
     token = getToken(file);
-
+    std::cout << "fim do durante proccall " << token.lexema << " : " << token.simbolo << std::endl;
     return token;
 }
 
@@ -364,8 +365,13 @@ Node analyseAttributionAndProcedureCall(FILE *file, Node token, Ui::MainWindow *
         token = analyseProcedureCall(file, token, ui);
     }
 
+
+    std::cout << "dps proccall " << token.lexema << " : " << token.simbolo << std::endl;
+
     if (token.simbolo == "sponto_virgula") {
         token = getToken(file);
+
+        std::cout << "dps do ;  " << token.lexema << " : " << token.simbolo << std::endl;
     } else {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Expected ;"));

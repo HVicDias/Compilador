@@ -84,9 +84,8 @@ bool searchDeclaratedVariableOrFunctionTable(std::string lexema) {
 bool searchDeclaratedProcedureTable(std::string lexema) {
     SymbolNode *nodeToken;
 
-    std::cout << "aqui " << lexema;
-
     nodeToken = symbolTable.searchSymbol(std::move(lexema));
+
     if (nodeToken == nullptr) {
         return false;
     } else {

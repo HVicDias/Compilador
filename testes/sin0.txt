@@ -8,11 +8,11 @@ procedimento analisa1;
 var a, x: inteiro;
        z: booleano;
 
-procedimento analisa2;
-inicio
-  leia(a);
-  b:= a*a+(c div b);
-fim;
+    procedimento analisa2;
+    inicio
+      leia(a);
+      b:= a*a+(c div b);
+    fim;
 
 inicio
   se x>1  entao
@@ -27,7 +27,7 @@ fim;
 
 inicio
     analisa1;
-    analisa2;
+    {analisa2;}
     se b > (c+ a*a)
     entao escreva(b);
     senao escreva(c);
