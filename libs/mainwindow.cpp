@@ -4,12 +4,12 @@
 #include "lexicalAnalyser.h"
 #include "syntacticAnalyser.h"
 #include "semanticAnalyser.h"
-#include "codeGenerator.h"
 #include <unistd.h>
 
 // ToDo descobrir um modo de quando algum erro que utiliza exit(1) não crashar o QT
 
 using namespace std;
+CodeGenerator codeGen;
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -41,7 +41,7 @@ void MainWindow::on_compilarButton_clicked() {
     while (symbolTable.symbolListNode != nullptr) {
         symbolTable.deleteLayer();
     }
-
+    currentMemoryAllocation = 1;
     ui->errorArea->clear();
 
     sleep(1);
@@ -52,12 +52,7 @@ void MainWindow::on_compilarButton_clicked() {
     FILE *f = openFile((char *) currentFile.toStdString().c_str());
 
     character = (char) fgetc(f);
-
-    CodeGenerator codeGen;
-    auto *snippet = new CodeSnippet(10, "SUM", 2, 3);
-    codeGen.insertNode(snippet);
-    codeGen.printList();
-    codeGen.generateCode();
+    auto *snippet = new CodeSnippet("START");
 
     do {
         token = getToken(f);
@@ -67,11 +62,15 @@ void MainWindow::on_compilarButton_clicked() {
                 token = getToken(f);
 
                 if (token.simbolo == "sidentificador") {
-                    symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa", lineNo);
+                    symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa",
+                                          lineNo == 1 ? lineNo : lineNo + 1, -1, -1);
 
                     token = getToken(f);
 
                     if (token.simbolo == "sponto_virgula") {
+                        codeGen.insertNode(snippet);
+                        snippet = new CodeSnippet("ALLOC", 0, 1);
+                        codeGen.insertNode(snippet);
                         token = analyseBlock(f, token, this->ui);
 
                         if (token.simbolo == "sponto") {
@@ -96,7 +95,21 @@ void MainWindow::on_compilarButton_clicked() {
 
     } while (character != EOF);
 
+    int numberDeletion = symbolTable.deleteLayer();
+    if (numberDeletion != 0) {
+        snippet = new CodeSnippet("DALLOC", currentMemoryAllocation - numberDeletion, numberDeletion);
+        currentMemoryAllocation -= numberDeletion;
+        codeGen.insertNode(snippet);
+    }
+    snippet = new CodeSnippet("DALLOC", currentMemoryAllocation - 1, 1);
+    codeGen.insertNode(snippet);
+    snippet = new CodeSnippet("HLT");
+    codeGen.insertNode(snippet);
+
     symbolTable.printList();
+    codeGen.printList();
+    codeGen.generateCode();
+    codeGen.deleteCode();
     fclose(f);
     cout << lineNo << endl;
 }

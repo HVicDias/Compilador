@@ -5,6 +5,8 @@
 #include "linkedList.h"
 #include "ui_mainwindow.h"
 
+extern int currentMemoryAllocation;
+
 class TokenExpression {
 public:
     Node token;

@@ -7,17 +7,21 @@ SymbolNode::SymbolNode() {
     identifier = "";
     scope = "";
     type = "";
+    label = -1;
     lineNo = -1;
     memoryAllocation = -1;
     next = nullptr;
 }
 
 // Parameterised Constructor
-SymbolNode::SymbolNode(std::string identifier, std::string scope, std::string type, int lineNo) {
+SymbolNode::SymbolNode(std::string identifier, std::string scope, std::string type, int lineNo, int label,
+                       int memoryAllocation) {
     this->identifier = std::move(identifier);
     this->scope = std::move(scope);
     this->type = std::move(type);
     this->lineNo = lineNo;
+    this->memoryAllocation = memoryAllocation;
+    this->label = label;
     this->next = nullptr;
 }
 
@@ -60,8 +64,10 @@ void SymbolList::deleteNode(int nodeIndex) {
     delete currentNode;
 }
 
-void SymbolList::insertNode(std::string identifier, std::string scope, std::string type, int lineNo) {
-    auto *newNode = new SymbolNode(std::move(identifier), std::move(scope), std::move(type), lineNo);
+void SymbolList::insertNode(std::string identifier, std::string scope, std::string type, int lineNo, int label,
+                            int memoryAllocation) {
+    auto *newNode = new SymbolNode(std::move(identifier), std::move(scope), std::move(type), lineNo, label,
+                                   memoryAllocation);
 
     if (symbolNode == nullptr) {
         symbolNode = newNode;
@@ -86,30 +92,32 @@ void SymbolList::printList() {
         return;
     }
 
-    std::cout << "Identifier" << "\tScope" << "\tType" << "\tLineNumber" << std::endl;
+    std::cout << "Identifier" << "\tScope" << "\tType" << "\tLineNumber" << "\tLabel" << "\tMemory Allocation"
+              << std::endl;
     while (auxNode != nullptr) {
         std::cout << auxNode->identifier << " : " << auxNode->scope << " : " << auxNode->type << " : "
-                  << auxNode->lineNo
-                  << std::endl;
+                  << auxNode->lineNo << " : " << auxNode->label << " : " << auxNode->memoryAllocation << std::endl;
         auxNode = auxNode->next;
     }
 }
 
 SymbolListNode::SymbolListNode(std::string layerName, std::string identifier, std::string scope, std::string type,
-                               int lineNo)
+                               int lineNo, int label, int memoryAllocation)
         : SymbolList() {
     previous = nullptr;
     this->layerName = layerName;
-    symbolNode = new SymbolNode(identifier, scope, type, lineNo);
+    symbolNode = new SymbolNode(identifier, scope, type, lineNo, label,
+                                memoryAllocation);
 }
 
 SymbolTable::SymbolTable() {
     symbolListNode = nullptr;
 }
 
-void SymbolTable::insertSymbol(std::string identifier, std::string scope, std::string type, int lineNo) {
+void SymbolTable::insertSymbol(std::string identifier, std::string scope, std::string type, int lineNo, int label,
+                               int memoryAllocation) {
     if (symbolListNode != nullptr) {
-        symbolListNode->insertNode(identifier, scope, type, lineNo);
+        symbolListNode->insertNode(identifier, scope, type, lineNo, label, memoryAllocation);
     } else {
         std::cout << "SymbolTable Head is null" << std::endl;
         exit(1);
@@ -117,8 +125,9 @@ void SymbolTable::insertSymbol(std::string identifier, std::string scope, std::s
 }
 
 void
-SymbolTable::downLayer(std::string layerName, std::string identifier, std::string scope, std::string type, int lineNo) {
-    SymbolListNode *newNode = new SymbolListNode(layerName, identifier, scope, type, lineNo);
+SymbolTable::downLayer(std::string layerName, std::string identifier, std::string scope, std::string type, int lineNo,
+                       int label, int memoryAllocation) {
+    SymbolListNode *newNode = new SymbolListNode(layerName, identifier, scope, type, lineNo, label, memoryAllocation);
     newNode->previous = symbolListNode;
     symbolListNode = newNode;
 }
@@ -217,14 +226,29 @@ void SymbolTable::printList() {
     }
 }
 
-void SymbolTable::deleteLayer() {
+int SymbolTable::deleteLayer() {
     SymbolListNode *currentNode = symbolListNode;
+    SymbolNode *currentSymbol;
+    int desalocation = 0;
 
     if (currentNode == nullptr) {
         std::cout << "List empty." << std::endl;
-        return;
+        return desalocation;
     }
+
+    currentSymbol = currentNode->symbolNode;
+
+
+    while (currentSymbol != 0) {
+        if (currentSymbol->memoryAllocation != -1) {
+            desalocation++;
+        }
+        currentSymbol = currentSymbol->next;
+    }
+
 
     symbolListNode = symbolListNode->previous;
     delete currentNode;
+    return desalocation;
 }
+

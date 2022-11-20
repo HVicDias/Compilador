@@ -41,6 +41,8 @@ public:
     void generateCodeList();
 
     void generateCode();
+
+    void deleteCode();
 };
 
 

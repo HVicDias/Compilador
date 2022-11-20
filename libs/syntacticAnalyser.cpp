@@ -3,20 +3,28 @@
 #include "syntacticAnalyser.h"
 #include "semanticAnalyser.h"
 #include <iostream>
+#include "codeGenerator.h"
+#include "mainwindow.h"
+
+
+int currentMemoryAllocation = 1;
+int currentLabel = 0;
 
 Node analyseType(FILE *file, Node token, std::queue<std::string> identifierQueue, std::queue<int> lineNumberQueue,
                  Ui::MainWindow *ui) {
     if (token.simbolo != "sinteiro" && token.simbolo != "sbooleano") {
         ui->errorArea->appendPlainText("This type is invalid, are you trying to say inteiro or booleano.");
     }
+    auto *snippet = new CodeSnippet("ALLOC", currentMemoryAllocation, identifierQueue.size());
+    codeGen.insertNode(snippet);
     while (!identifierQueue.empty()) {
         symbolTable.insertSymbol(identifierQueue.front(), symbolTable.symbolListNode->layerName, token.lexema,
-                                 lineNumberQueue.front());
+                                 lineNumberQueue.front(), -1, currentMemoryAllocation++);
         identifierQueue.pop();
         lineNumberQueue.pop();
     }
-
     token = getToken(file);
+
     return token;
 }
 
@@ -28,7 +36,7 @@ Node analyseVariables(FILE *file, Node token, Ui::MainWindow *ui) {
         if (token.simbolo == "sidentificador") {
             if (!searchDuplicatedVariableTable(token.lexema)) {
                 identifierQueue.push(token.lexema);
-                lineNumberQueue.push(lineNo);
+                lineNumberQueue.push(lineNo + 1);
             } else {
                 ui->errorArea->appendPlainText(QString::fromStdString(token.lexema + " has a previous declaration."));
 //                std::cout << "ERRO " << lineNo << std::endl;
@@ -156,8 +164,10 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
     if (token.simbolo == "sidentificador") {
         if (!searchDuplicatedProcedureTable(token.lexema)) {
 
-            symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName, "procedimento", lineNo);
-            symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo);
+            symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName, "procedimento", lineNo + 1,
+                                     -1,
+                                     -1);
+            symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo + 1, -1, -1);
         }
 
         token = getToken(file);
@@ -175,7 +185,12 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
     }
 
     symbolTable.printList();
-    symbolTable.deleteLayer();
+    int numberDeletion = symbolTable.deleteLayer();
+    if (numberDeletion != 0) {
+        auto *snippet = new CodeSnippet("DALLOC", currentMemoryAllocation - numberDeletion, numberDeletion);
+        currentMemoryAllocation -= numberDeletion;
+        codeGen.insertNode(snippet);
+    }
 
     return token;
 }
@@ -200,8 +215,8 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
 
             if (token.simbolo == "sinteiro" || token.simbolo == "sbooleano") {
                 symbolTable.insertSymbol(identifier, symbolTable.symbolListNode->layerName, "funcao " + token.lexema,
-                                         lineNo);
-                symbolTable.downLayer(identifier, identifier, identifier, "funcao " + token.lexema, lineNo);
+                                         lineNo + 1, -1, -1);
+                symbolTable.downLayer(identifier, identifier, identifier, "funcao " + token.lexema, lineNo + 1, -1, -1);
                 token = getToken(file);
                 if (token.simbolo == "sponto_virgula") {
                     token = analyseBlock(file, token, ui);
@@ -220,8 +235,12 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
     }
 
     symbolTable.printList();
-    symbolTable.deleteLayer();
-
+    int numberDeletion = symbolTable.deleteLayer();
+    if (numberDeletion != 0) {
+        auto *snippet = new CodeSnippet("DALLOC", currentMemoryAllocation - numberDeletion, numberDeletion);
+        currentMemoryAllocation -= numberDeletion;
+        codeGen.insertNode(snippet);
+    }
     return token;
 }
 
@@ -252,9 +271,9 @@ TokenExpression analyseExpressions(FILE *file, TokenExpression te, Ui::MainWindo
 }
 
 TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui) {
-    SymbolNode *currentNode = symbolTable.searchSymbol(te.token.lexema);
-
     if (te.token.simbolo == "sidentificador") {
+        SymbolNode *currentNode = symbolTable.searchSymbol(te.token.lexema);
+
         if (currentNode != nullptr) {
             if (currentNode->type == "funcao inteiro" || currentNode->type == "funcao booleano") {
                 te = analyseFunctionCall(file, te, ui);
@@ -343,15 +362,13 @@ Node analyseAttribution(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
-    std::cout << "token q entra no procedure call " << token.lexema << " : " << token.simbolo << std::endl;
     if (!searchDeclaratedProcedureTable(token.lexema)) {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Procedure has not been declared in the code"));
 //        exit(1);
     }
-    std::cout << "durante proccall " << token.lexema << " : " << token.simbolo << std::endl;
     token = getToken(file);
-    std::cout << "fim do durante proccall " << token.lexema << " : " << token.simbolo << std::endl;
+
     return token;
 }
 
@@ -365,13 +382,8 @@ Node analyseAttributionAndProcedureCall(FILE *file, Node token, Ui::MainWindow *
         token = analyseProcedureCall(file, token, ui);
     }
 
-
-    std::cout << "dps proccall " << token.lexema << " : " << token.simbolo << std::endl;
-
     if (token.simbolo == "sponto_virgula") {
         token = getToken(file);
-
-        std::cout << "dps do ;  " << token.lexema << " : " << token.simbolo << std::endl;
     } else {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Expected ;"));
@@ -388,6 +400,11 @@ Node analyseRead(FILE *file, Node token, Ui::MainWindow *ui) {
 
         if (token.simbolo == "sidentificador") {
             if (searchDeclaratedVariableTable(token.lexema)) {
+                auto auxToken = symbolTable.searchSymbol(token.lexema);
+                auto *snippet = new CodeSnippet("RD");
+                codeGen.insertNode(snippet);
+                snippet = new CodeSnippet("STR", auxToken->memoryAllocation);
+                codeGen.insertNode(snippet);
                 token = getToken(file);
 
                 if (token.simbolo == "sfecha_parenteses") {
@@ -427,6 +444,11 @@ Node analyseWrite(FILE *file, Node token, Ui::MainWindow *ui) {
 
         if (token.simbolo == "sidentificador") {
             if (searchDeclaratedVariableOrFunctionTable(token.lexema)) {
+                auto auxToken = symbolTable.searchSymbol(token.lexema);
+                auto *snippet = new CodeSnippet("LDV", auxToken->memoryAllocation);
+                codeGen.insertNode(snippet);
+                snippet = new CodeSnippet("PRN");
+                codeGen.insertNode(snippet);
                 token = getToken(file);
 
                 if (token.simbolo == "sfecha_parenteses") {

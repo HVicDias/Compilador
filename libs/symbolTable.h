@@ -13,7 +13,7 @@ public:
     int memoryAllocation;
     SymbolNode *next;
 
-    SymbolNode(std::string, std::string, std::string, int);
+    SymbolNode(std::string, std::string, std::string, int, int, int);
 
     SymbolNode();
 };
@@ -24,7 +24,7 @@ public:
 
     SymbolList();
 
-    void insertNode(std::string, std::string, std::string, int);
+    void insertNode(std::string, std::string, std::string, int, int, int);
 
     void printList();
 
@@ -39,7 +39,7 @@ public:
 
     SymbolNode headNode;
 
-    explicit SymbolListNode(std::string, std::string, std::string, std::string, int);
+    explicit SymbolListNode(std::string, std::string, std::string, std::string, int, int, int);
 };
 
 class SymbolTable {
@@ -48,9 +48,9 @@ public:
 
     SymbolTable();
 
-    void insertSymbol(std::string, std::string, std::string, int);
+    void insertSymbol(std::string, std::string, std::string, int, int, int);
 
-    void downLayer(std::string, std::string, std::string, std::string, int);
+    void downLayer(std::string, std::string, std::string, std::string, int, int, int);
 
     SymbolNode *searchSymbol(std::string);
 
@@ -58,9 +58,11 @@ public:
 
     SymbolNode *searchScopeSymbol(std::string, std::string);
 
+    SymbolNode changeHeadNodeLabel(int, std::string);
+
     void printList();
 
-    void deleteLayer();
+    int deleteLayer();
 };
 
 #endif //COMPILER_SYMBOLTABLE_H

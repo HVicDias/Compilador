@@ -9,6 +9,9 @@
 #include <QScrollBar>
 #include <QMessageBox>
 #include <QSaveFile>
+#include "codeGenerator.h"
+
+extern CodeGenerator codeGen;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

@@ -118,3 +118,14 @@ std::string CodeGenerator::addSpaces(std::string myString, int expectedSize) {
     myString.append(aux);
     return myString;
 }
+
+
+void CodeGenerator::deleteCode() {
+    CodeSnippet *auxNode;
+
+    while (head != nullptr) {
+        auxNode = head;
+        head = head->next;
+        delete auxNode;
+    }
+}
