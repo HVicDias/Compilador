@@ -3,17 +3,19 @@
 
 #include <string>
 
+
 class SymbolNode {
 public:
     std::string identifier;
     std::string scope;
     std::string type;
     int lineNo;
-    int label;
+    int labelJump;
+    int labelStart;
     int memoryAllocation;
     SymbolNode *next;
 
-    SymbolNode(std::string, std::string, std::string, int, int, int);
+    SymbolNode(std::string, std::string, std::string, int, int, int, int);
 
     SymbolNode();
 };
@@ -24,7 +26,7 @@ public:
 
     SymbolList();
 
-    void insertNode(std::string, std::string, std::string, int, int, int);
+    SymbolNode *insertNode(std::string, std::string, std::string, int, int, int, int);
 
     void printList();
 
@@ -39,7 +41,7 @@ public:
 
     SymbolNode headNode;
 
-    explicit SymbolListNode(std::string, std::string, std::string, std::string, int, int, int);
+    explicit SymbolListNode(std::string, std::string, std::string, std::string, int, int, int, int);
 };
 
 class SymbolTable {
@@ -48,17 +50,15 @@ public:
 
     SymbolTable();
 
-    void insertSymbol(std::string, std::string, std::string, int, int, int);
+    SymbolNode *insertSymbol(std::string, std::string, std::string, int, int, int, int);
 
-    void downLayer(std::string, std::string, std::string, std::string, int, int, int);
+    void downLayer(std::string, std::string, std::string, std::string, int, int, int, int);
 
     SymbolNode *searchSymbol(std::string);
 
     SymbolNode *searchLocalSymbol(std::string);
 
     SymbolNode *searchScopeSymbol(std::string, std::string);
-
-    SymbolNode changeHeadNodeLabel(int, std::string);
 
     void printList();
 

@@ -12,6 +12,7 @@
 #include "codeGenerator.h"
 
 extern CodeGenerator codeGen;
+extern std::string mainProgramIndentifier;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

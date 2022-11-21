@@ -6,6 +6,7 @@
 #include "ui_mainwindow.h"
 
 extern int currentMemoryAllocation;
+extern std::stack<SymbolNode *> headerStack;
 
 class TokenExpression {
 public:

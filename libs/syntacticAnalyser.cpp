@@ -3,12 +3,16 @@
 #include "syntacticAnalyser.h"
 #include "semanticAnalyser.h"
 #include <iostream>
+#include <stack>
 #include "codeGenerator.h"
 #include "mainwindow.h"
 
 
 int currentMemoryAllocation = 1;
 int currentLabel = 0;
+bool lastReturn = false;
+bool hadPop = false;
+std::stack<SymbolNode *> headerStack;
 
 Node analyseType(FILE *file, Node token, std::queue<std::string> identifierQueue, std::queue<int> lineNumberQueue,
                  Ui::MainWindow *ui) {
@@ -19,7 +23,7 @@ Node analyseType(FILE *file, Node token, std::queue<std::string> identifierQueue
     codeGen.insertNode(snippet);
     while (!identifierQueue.empty()) {
         symbolTable.insertSymbol(identifierQueue.front(), symbolTable.symbolListNode->layerName, token.lexema,
-                                 lineNumberQueue.front(), -1, currentMemoryAllocation++);
+                                 lineNumberQueue.front(), -1, -1, currentMemoryAllocation++);
         identifierQueue.pop();
         lineNumberQueue.pop();
     }
@@ -129,6 +133,13 @@ Node analyseSimpleCommands(FILE *file, Node token, Ui::MainWindow *ui) {
 
 Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
     if (token.simbolo == "sinicio") {
+        SymbolNode *auxSymbol = headerStack.top();
+        if (hadPop) {
+
+            codeGen.insertNode(new CodeSnippet(auxSymbol->labelJump, "NULL"));
+            hadPop = false;
+        }
+
         token = getToken(file);
         token = analyseSimpleCommands(file, token, ui);
 
@@ -138,7 +149,6 @@ Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
                 token = analyseSimpleCommands(file, token, ui);
             }
         }
-
         token = getToken(file);
     } else {
         ui->errorArea->appendPlainText(
@@ -164,10 +174,24 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
     if (token.simbolo == "sidentificador") {
         if (!searchDuplicatedProcedureTable(token.lexema)) {
 
-            symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName, "procedimento", lineNo + 1,
-                                     -1,
-                                     -1);
-            symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo + 1, -1, -1);
+            SymbolNode *auxSymbol = headerStack.top();
+            if (!hadPop) {
+                auxSymbol->labelStart = ++currentLabel;
+                auxSymbol->labelJump = currentLabel;
+            }
+            if (!lastReturn) {
+                codeGen.insertNode(new CodeSnippet("JMP", currentLabel));
+                auxSymbol->labelStart = currentLabel - 1;
+                auxSymbol->labelJump = currentLabel;
+            } else {
+                lastReturn = false;
+            }
+            codeGen.insertNode(new CodeSnippet(++currentLabel, "NULL"));
+            hadPop = false;
+            headerStack.push(symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName,
+                                                      "procedimento", lineNo + 1, currentLabel, currentLabel, -1));
+            symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo + 1, currentLabel,
+                                  currentLabel, -1);
         }
 
         token = getToken(file);
@@ -191,7 +215,10 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
         currentMemoryAllocation -= numberDeletion;
         codeGen.insertNode(snippet);
     }
-
+    headerStack.pop();
+    hadPop = true;
+    codeGen.insertNode(new CodeSnippet("RETURN"));
+    lastReturn = true;
     return token;
 }
 
@@ -214,9 +241,25 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
             token = getToken(file);
 
             if (token.simbolo == "sinteiro" || token.simbolo == "sbooleano") {
-                symbolTable.insertSymbol(identifier, symbolTable.symbolListNode->layerName, "funcao " + token.lexema,
-                                         lineNo + 1, -1, -1);
-                symbolTable.downLayer(identifier, identifier, identifier, "funcao " + token.lexema, lineNo + 1, -1, -1);
+                SymbolNode *auxSymbol = headerStack.top();
+                if (!hadPop) {
+                    auxSymbol->labelStart = ++currentLabel;
+                    auxSymbol->labelJump = currentLabel;
+                }
+                if (!lastReturn) {
+                    codeGen.insertNode(new CodeSnippet("JMP", currentLabel));
+                    auxSymbol->labelStart = currentLabel - 1;
+                    auxSymbol->labelJump = currentLabel;
+                } else {
+                    lastReturn = false;
+                }
+                codeGen.insertNode(new CodeSnippet(++currentLabel, "NULL"));
+                hadPop = false;
+                headerStack.push(symbolTable.insertSymbol(identifier, symbolTable.symbolListNode->layerName,
+                                                          "funcao " + token.lexema, lineNo + 1, currentLabel,
+                                                          currentLabel, -1));
+                symbolTable.downLayer(identifier, identifier, identifier, "funcao " + token.lexema, lineNo + 1,
+                                      currentLabel, currentLabel, -1);
                 token = getToken(file);
                 if (token.simbolo == "sponto_virgula") {
                     token = analyseBlock(file, token, ui);
@@ -241,6 +284,10 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
         currentMemoryAllocation -= numberDeletion;
         codeGen.insertNode(snippet);
     }
+    headerStack.pop();
+    hadPop = true;
+    codeGen.insertNode(new CodeSnippet("RETURN"));
+    lastReturn = true;
     return token;
 }
 
@@ -249,6 +296,9 @@ TokenExpression analyseFunctionCall(FILE *file, TokenExpression te, Ui::MainWind
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Function has not been declared in the code"));
 //        exit(1);
+    } else {
+        SymbolNode *node = symbolTable.searchSymbol(te.token.lexema);
+        codeGen.insertNode(new CodeSnippet("CALL", node->labelStart));
     }
     te.expression += te.token.lexema + " ";
     te.token = getToken(file);
@@ -366,6 +416,9 @@ Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Procedure has not been declared in the code"));
 //        exit(1);
+    } else {
+        SymbolNode *node = symbolTable.searchSymbol(token.lexema);
+        codeGen.insertNode(new CodeSnippet("CALL", node->labelStart));
     }
     token = getToken(file);
 

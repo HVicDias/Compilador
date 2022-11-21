@@ -10,6 +10,7 @@
 
 using namespace std;
 CodeGenerator codeGen;
+string mainProgramIndentifier;
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -62,8 +63,12 @@ void MainWindow::on_compilarButton_clicked() {
                 token = getToken(f);
 
                 if (token.simbolo == "sidentificador") {
+                    mainProgramIndentifier = token.lexema;
                     symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa",
-                                          lineNo == 1 ? lineNo : lineNo + 1, -1, -1);
+                                          lineNo == 1 ? lineNo : lineNo + 1, -1, -1, -1);
+                    headerStack.push(symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName,
+                                                              "programa", lineNo == 1 ? lineNo : lineNo + 1, -1, -1,
+                                                              -1));
 
                     token = getToken(f);
 
@@ -71,6 +76,7 @@ void MainWindow::on_compilarButton_clicked() {
                         codeGen.insertNode(snippet);
                         snippet = new CodeSnippet("ALLOC", 0, 1);
                         codeGen.insertNode(snippet);
+
                         token = analyseBlock(f, token, this->ui);
 
                         if (token.simbolo == "sponto") {
