@@ -17,6 +17,8 @@ public:
 
     CodeSnippet(std::string, int);
 
+    CodeSnippet(std::string, std::string);
+
     CodeSnippet(int, std::string, int);
 
     CodeSnippet(std::string, int, int);

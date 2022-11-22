@@ -28,6 +28,13 @@ CodeSnippet::CodeSnippet(std::string command, int firstValue) {
     secondValue = "";
 }
 
+CodeSnippet::CodeSnippet(std::string command, std::string firstValue) {
+    this->command = command;
+    label = "";
+    this->firstValue = firstValue;
+    secondValue = "";
+}
+
 CodeSnippet::CodeSnippet(int label, std::string command, int firstValue) {
     this->command = command;
     this->label = to_string(label);

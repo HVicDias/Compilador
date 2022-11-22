@@ -542,6 +542,10 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
 
     te = analyseExpressions(file, te, ui);
 
+    postfix = createInfixListFromExpression(te.expression);
+    postfix = toPostfix(postfix);
+    analysePostfix(postfix, ui);
+
     if (te.token.simbolo == "sfaca") {
         te.token = getToken(file);
         te.token = analyseSimpleCommands(file, te.token, ui);
@@ -549,10 +553,6 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Expected faca at the start of the expression"));
     }
-
-    postfix = createInfixListFromExpression(te.expression);
-    postfix = toPostfix(postfix);
-    analysePostfix(postfix, ui);
 
     te.token = getToken(file);
 
@@ -567,6 +567,9 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
     std::list<std::string> postfix;
 
     te = analyseExpressions(file, te, ui);
+    postfix = createInfixListFromExpression(te.expression);
+    postfix = toPostfix(postfix);
+    analysePostfix(postfix, ui);
 
     if (te.token.simbolo == "sentao") {
         te.token = getToken(file);
@@ -580,10 +583,6 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Expected entao at the start of the expression"));
     }
-
-    postfix = createInfixListFromExpression(te.expression);
-    postfix = toPostfix(postfix);
-    analysePostfix(postfix, ui);
 
     return te.token;
 }
