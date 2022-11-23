@@ -18,13 +18,14 @@ var a,b,s: inteiro;
   var x: inteiro;
   inicio
     leia (x);   {para parar digite um valor maior que 9 }
-    se x < 10
+    {abs*4div32*+111+2*+>}
+    se a+b*s div 4 * 32 > 1 + (1+1) * 2
     entao ler;
   fim;
 
  inicio  {corpo da funcao soma}
   loop;
-  soma:= c+a;
+  soma:= -c+a;
  fim;
 
 
@@ -32,5 +33,3 @@ inicio      {corpo principal}
   s:= soma;
   escreva(s);
 fim.
-
-

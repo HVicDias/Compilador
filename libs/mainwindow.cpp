@@ -43,7 +43,9 @@ void MainWindow::on_compilarButton_clicked() {
         symbolTable.deleteLayer();
     }
     currentMemoryAllocation = 1;
+    currentLabel = 0;
     ui->errorArea->clear();
+    ui->errorArea->setPlainText("");
 
     sleep(1);
 
@@ -122,6 +124,8 @@ void MainWindow::on_compilarButton_clicked() {
 
 void MainWindow::on_openFileButton_clicked() {
     ui->codeArea->clear();
+    ui->errorArea->clear();
+
     QString filename = QFileDialog::getOpenFileName(this, "Open File",
                                                     "C://Users//renat//CLionProjects//Compiler//testes",
                                                     "Text File (*.txt);");
@@ -141,6 +145,7 @@ void MainWindow::on_openFileButton_clicked() {
 
 void MainWindow::on_actionOpen_triggered() {
     ui->codeArea->clear();
+
     QString filename = QFileDialog::getOpenFileName(this, "Open File",
                                                     "C://Users//renat//CLionProjects//Compiler//testes",
                                                     "Text File (*.txt);");
@@ -157,6 +162,7 @@ void MainWindow::on_actionOpen_triggered() {
     QString text = stream.readAll();
     ui->codeArea->appendPlainText(text);
     ui->codeArea->verticalScrollBar()->setValue(0);
+    ui->errorArea->clear();
     file.close();
 }
 
@@ -170,6 +176,7 @@ void MainWindow::on_actionSave_triggered() {
         QByteArray outputByteArray;
         outputByteArray.append(ui->codeArea->toPlainText().toUtf8());
 
+        ui->errorArea->clear();
         file.write(outputByteArray);
         file.commit();
     }
@@ -192,7 +199,8 @@ void MainWindow::on_actionSave_as_triggered() {
     stream << text;
     file.close();
 
-    ui->errorArea->setPlainText(currentFile);
+    ui->errorArea->clear();
+    ui->errorArea->setPlainText("");
 }
 
 void MainWindow::on_actionSobre_o_Compilador_triggered() {

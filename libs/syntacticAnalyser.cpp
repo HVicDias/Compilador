@@ -10,6 +10,7 @@
 
 int currentMemoryAllocation = 1;
 int currentLabel = 0;
+
 bool lastReturn = false;
 bool hadPop = false;
 std::stack<SymbolNode *> headerStack;
@@ -379,7 +380,10 @@ TokenExpression analyseTerm(FILE *file, TokenExpression te, Ui::MainWindow *ui) 
 
 TokenExpression analyseSimpleExpressions(FILE *file, TokenExpression te, Ui::MainWindow *ui) {
     if (te.token.simbolo == "smais" || te.token.simbolo == "smenos") {
-        te.expression += te.token.lexema + ' ';
+        if (te.token.simbolo == "smais")
+            te.expression += "+u ";
+        if (te.token.simbolo == "smenos")
+            te.expression += "-u ";
         te.token = getToken(file);
     }
 
@@ -395,19 +399,22 @@ TokenExpression analyseSimpleExpressions(FILE *file, TokenExpression te, Ui::Mai
     return te;
 }
 
-Node analyseAttribution(FILE *file, Node token, Ui::MainWindow *ui) {
+Node analyseAttribution(FILE *file, Node token, Node attributionToken, Ui::MainWindow *ui) {
     TokenExpression te;
     token = getToken(file);
     te.token = token;
 
     std::list<std::string> postfix;
 
+    auto tableToken = symbolTable.searchSymbol(attributionToken.lexema);
     te = analyseExpressions(file, te, ui);
 
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
-    analysePostfix(postfix, ui);
-
+    analysePostfix(postfix, tableToken->memoryAllocation, ui);
+    if (tableToken->type == "funcao inteiro" || tableToken->type == "funcao booleano") {
+        codeGen.insertNode(new CodeSnippet("STR", 0));
+    }
     return te.token;
 }
 
@@ -426,11 +433,13 @@ Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseAttributionAndProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
+    Node auxAttributionToken = token;
+
     if (!searchDeclaratedProcedureTable(token.lexema))
         token = getToken(file);
 
     if (token.simbolo == "satribuicao") {
-        token = analyseAttribution(file, token, ui);
+        token = analyseAttribution(file, token, auxAttributionToken, ui);
     } else {
         token = analyseProcedureCall(file, token, ui);
     }
@@ -541,14 +550,18 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
     std::list<std::string> postfix;
 
     te = analyseExpressions(file, te, ui);
+    codeGen.insertNode(new CodeSnippet(++currentLabel, "NULL"));
 
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
     analysePostfix(postfix, ui);
 
     if (te.token.simbolo == "sfaca") {
+        codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
         te.token = getToken(file);
         te.token = analyseSimpleCommands(file, te.token, ui);
+        codeGen.insertNode(new CodeSnippet("JMP", currentLabel - 1));
+        codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
     } else {
         ui->errorArea->appendPlainText(
                 QString::fromStdString("Expected faca at the start of the expression"));
@@ -572,12 +585,18 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
     analysePostfix(postfix, ui);
 
     if (te.token.simbolo == "sentao") {
+        codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
         te.token = getToken(file);
         te.token = analyseSimpleCommands(file, te.token, ui);
 
         if (te.token.simbolo == "ssenao") {
+            codeGen.insertNode(new CodeSnippet("JMP", ++currentLabel));
+            codeGen.insertNode(new CodeSnippet(currentLabel - 1, "NULL"));
             te.token = getToken(file);
             te.token = analyseSimpleCommands(file, te.token, ui);
+            codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
+        } else {
+            codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
         }
     } else {
         ui->errorArea->appendPlainText(

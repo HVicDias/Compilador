@@ -6,6 +6,8 @@
 #include "ui_mainwindow.h"
 
 extern int currentMemoryAllocation;
+extern int currentLabel;
+
 extern std::stack<SymbolNode *> headerStack;
 
 class TokenExpression {
@@ -40,7 +42,7 @@ TokenExpression analyseExpressions(FILE *, TokenExpression, Ui::MainWindow *);
 
 TokenExpression analyseSimpleExpressions(FILE *, TokenExpression, Ui::MainWindow *);
 
-Node analyseAttribution(FILE *, Node, Ui::MainWindow *);
+Node analyseAttribution(FILE *, Node, Node, Ui::MainWindow *);
 
 Node analyseProcedureCall(FILE *, Node, Ui::MainWindow *);
 

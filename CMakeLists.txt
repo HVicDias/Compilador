@@ -15,7 +15,7 @@ find_package(Qt6 COMPONENTS
 
 add_executable(Compiler source/main.cpp libs/lexicalAnalyser.cpp libs/lexicalAnalyser.h libs/utils.cpp libs/utils.h
         libs/linkedList.cpp libs/linkedList.h libs/syntacticAnalyser.cpp libs/syntacticAnalyser.h
-        libs/symbolTable.cpp libs/symbolTable.h libs/semanticAnalyser.cpp libs/semanticAnalyser.h libs/codeGenerator.cpp libs/codeGenerator.h gui/compilerGUI.cpp gui/compilerGUI.h gui/CodeEditor/codeeditor.cpp gui/CodeEditor/codeeditor.h libs/mainwindow.cpp libs/mainwindow.h)
+        libs/symbolTable.cpp libs/symbolTable.h libs/semanticAnalyser.cpp libs/semanticAnalyser.h libs/codeGenerator.cpp libs/codeGenerator.h gui/compilerGUI.cpp gui/compilerGUI.h gui/CodeEditor/codeeditor.cpp gui/CodeEditor/codeeditor.h libs/mainwindow.cpp libs/mainwindow.h libs/virtualMachine.cpp libs/virtualMachine.h)
 
 target_link_libraries(Compiler
         Qt::Core

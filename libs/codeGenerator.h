@@ -2,6 +2,7 @@
 #define COMPILER_CODEGENERATOR_H
 
 #include <string>
+#include <list>
 
 class CodeSnippet {
 public:
@@ -9,6 +10,7 @@ public:
     std::string label;
     std::string firstValue;
     std::string secondValue;
+    std::string commentary;
     CodeSnippet *next;
 
     CodeSnippet(std::string);
@@ -24,7 +26,6 @@ public:
     CodeSnippet(std::string, int, int);
 
     CodeSnippet(int, std::string, int, int);
-
 };
 
 class CodeGenerator {
@@ -44,7 +45,7 @@ public:
 
     void generateCode();
 
-    void deleteCode();
+    std::list<CodeSnippet> deleteCode();
 };
 
 

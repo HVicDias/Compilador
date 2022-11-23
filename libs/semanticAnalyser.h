@@ -39,4 +39,6 @@ std::list<std::string> toPostfix(std::list<std::string> expressionList);
 
 std::list<std::string> analysePostfix(std::list<std::string>, Ui::MainWindow *);
 
+std::list<std::string> analysePostfix(std::list<std::string>, int, Ui::MainWindow *);
+
 #endif //COMPILER_SEMANTICANALYSER_H
