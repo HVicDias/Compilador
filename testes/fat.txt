@@ -1,0 +1,26 @@
+{ teste procedimentos e funcoes aninhados recursivos OK
+}
+
+programa test;
+var a: inteiro;
+
+    funcao fat: inteiro;
+    var a,b,c: inteiro;
+
+    inicio
+        leia(c);
+        b:=1;
+        fat:=1;
+        enquanto b < c
+        faca inicio
+            fat:= fat*b;
+            b:= b+1;
+        fim;
+        escreva(fat);
+    fim;
+
+
+inicio      {corpo principal}
+ a:= fat;
+ escreva(a);
+fim.

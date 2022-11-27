@@ -14,7 +14,7 @@ bool searchDuplicatedVariableTable(std::string lexema) {
     SymbolNode *nodeToken;
 
     nodeToken = symbolTable.searchLocalSymbol(std::move(lexema));
-
+    std::cout << lexema;
 //    if (nodeToken != nullptr)
 //        std::cout << nodeToken->identifier << " : " << nodeToken->scope << std::endl;
 
@@ -115,44 +115,16 @@ bool searchDuplicatedProcedureTable(std::string lexema) {
 }
 
 bool isNumber(const std::string &s) {
-    for (char const &ch: s) {
-        if (std::isdigit(ch) == 0)
-            return false;
-    }
-    return true;
+    return std::ranges::all_of(s, [](char ch) {
+        return std::isdigit(ch) != 0;
+    });
+//    for (char const &ch: s) {
+//        if (std::isdigit(ch) == 0)
+//            return false;
+//    }
+//    return true;
 }
 
-//bool isArithmeticOperator(const std::string &s) {
-//    if (s == "+" || s == "-" || s == "*" || s == "div")
-//        return true;
-//    return false;
-//}
-//
-//bool isRelationalOperator(const std::string &s) {
-//    if (s == ">" || s == "<" || s == ">=" || s == "<=" || s == "=" || s == "!=")
-//        return true;
-//    return false;
-//}
-//
-//bool isPositiveOrNegative(const std::string &s) {
-//    if (s == "+u" || s == "-u")
-//        return true;
-//    return false;
-//}
-//
-//bool isOpenParenthesis(const std::string &s) {
-//    if (s == "(")
-//        return true;
-//    return false;
-//}
-//
-//bool isCloseParenthesis(const std::string &s) {
-//    if (s == ")")
-//        return true;
-//    return false;
-//}
-
-// - a + b
 std::list<std::string> createInfixListFromExpression(std::string infixExpression) {
     int i = 0;
     std::list<std::string> resultList;
@@ -161,8 +133,8 @@ std::list<std::string> createInfixListFromExpression(std::string infixExpression
     do {
         result = "";
         while (infixExpression[i] != ' ') {
-            result += infixExpression[i];
-            i++;
+
+            result += infixExpression[i++];
         }
         resultList.push_back(result);
         i++;
@@ -245,48 +217,116 @@ bool isBooleanOperation(const char *op) {
     return false;
 }
 
-void analyseLogicOperator(const char *op) {
+bool isUnaryOperator(const char *op) {
+    if (strcmpi(op, "+u") == 0 || strcmpi(op, "-u") == 0)
+        return true;
+    return false;
+}
+
+bool isNegateOperator(const char *op) {
+    if (strcmpi(op, "nao") == 0)
+        return true;
+    return false;
+}
+
+bool analyseLogicOperator(const char *op) {
     if (strcmpi(op, "+") == 0) {
         codeGen.insertNode(new CodeSnippet("ADD"));
+        return true;
     } else if (strcmpi(op, "-") == 0) {
         codeGen.insertNode(new CodeSnippet("SUB"));
     } else if (strcmpi(op, "*") == 0) {
         codeGen.insertNode(new CodeSnippet("MULT"));
+        return true;
     } else if (strcmpi(op, "div") == 0) {
         codeGen.insertNode(new CodeSnippet("DIVI"));
+        return true;
     }
+
+    return false;
 }
 
-void analyseRelationalOperator(const char *op) {
+bool analyseRelationalOperator(const char *op) {
     if (strcmpi(op, "e") == 0) {
         codeGen.insertNode(new CodeSnippet("AND"));
+        return true;
     } else if (strcmpi(op, "ou") == 0) {
         codeGen.insertNode(new CodeSnippet("OR"));
+        return true;
     } else if (strcmpi(op, "nao") == 0) {
         codeGen.insertNode(new CodeSnippet("NEG"));
+        return true;
     } else if (strcmpi(op, ">") == 0) {
         codeGen.insertNode(new CodeSnippet("CMA"));
+        return true;
     } else if (strcmpi(op, "<") == 0) {
         codeGen.insertNode(new CodeSnippet("CME"));
+        return true;
     } else if (strcmpi(op, ">=") == 0) {
         codeGen.insertNode(new CodeSnippet("CMAQ"));
+        return true;
     } else if (strcmpi(op, "<=") == 0) {
         codeGen.insertNode(new CodeSnippet("CMEQ"));
+        return true;
     } else if (strcmpi(op, "!=") == 0) {
         codeGen.insertNode(new CodeSnippet("CDIF"));
+        return true;
     } else if (strcmpi(op, "=") == 0) {
         codeGen.insertNode(new CodeSnippet("CEQ"));
+        return true;
     }
+    return false;
 }
 
-std::list<std::string> analysePostfix(std::list<std::string> postfix, Ui::MainWindow *ui) {
-    return analysePostfix(std::move(postfix), 0, ui);
+std::list<std::string>
+analysePostfix(std::list<std::string> postfix, Ui::MainWindow *ui) {
+    return analysePostfix(std::move(postfix), -2, ui);
 }
 
-std::list<std::string> analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *ui) {
+std::list<std::string>
+analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *ui) {
     SymbolNode *op1Symbol = nullptr, *op2Symbol = nullptr;
 
+    bool hasInv = false;
     for (auto &j: postfix) {
+        if (hasInv) {
+            if (isNumber(j)) {
+                codeGen.insertNode(new CodeSnippet("LDC", j.c_str()));
+            } else if (symbolTable.searchSymbol(j) != nullptr) {
+                int memory = symbolTable.searchSymbol(j)->memoryAllocation;
+                if (memory != -1) {
+                    codeGen.insertNode(new CodeSnippet("LDV", memory));
+                } else {
+                    codeGen.insertNode(new CodeSnippet("LDV", 0));
+                }
+            } else {
+                break;
+            }
+            hasInv = false;
+        } else if (strcmpi(j.c_str(), "-u") == 0) {
+            hasInv = true;
+        } else if (analyseRelationalOperator(j.c_str())) {
+
+        } else if (analyseLogicOperator(j.c_str())) {
+
+        } else if (isNumber(j)) {
+            codeGen.insertNode(new CodeSnippet("LDC", j.c_str()));
+        } else if (symbolTable.searchSymbol(j) != nullptr) {
+            int memory = symbolTable.searchSymbol(j)->memoryAllocation;
+            if (memory > 0) {
+                codeGen.insertNode(new CodeSnippet("LDV", memory));
+            } else {
+                codeGen.insertNode(new CodeSnippet("LDV", 0));
+            }
+        } else if (strcmpi(j.c_str(), "verdadeiro") == 0) {
+            codeGen.insertNode(new CodeSnippet("LDC", 1));
+        } else if (strcmpi(j.c_str(), "falso") == 0) {
+            codeGen.insertNode(new CodeSnippet("LDC", 0));
+        } else if (strcmpi(j.c_str(), "+u") == 0) {
+            hasInv = true;
+        } else {
+            break;
+        }
         std::cout << j.c_str();
     }
     std::cout << std::endl;
@@ -306,13 +346,12 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
                     op2Symbol = symbolTable.searchSymbol(*op2);
                 }
 
+
                 auto op1 = std::prev(op2);
 
                 if (!isNumber(*op1) && !isIntOperation(op1->c_str()) && !isBooleanOperation(op1->c_str()) &&
                     strcmpi(op1->c_str(), "#I") != 0 && strcmpi(op1->c_str(), "#B") != 0) {
                     if (symbolTable.searchSymbol(*op1) == nullptr) {
-//                        exit(1);
-//                        QApplication::exit();
                         ui->errorArea->appendPlainText("Invalid Expression.");
                     }
 
@@ -331,8 +370,6 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
                                 // op1 é varivel ou constante
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
@@ -348,8 +385,6 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
 
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
 
                             }
@@ -362,8 +397,6 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
 
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
                             }
                         }
@@ -377,10 +410,7 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
                                  strcmpi(op1->c_str(), "falso") == 0)) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
-
                             }
                         }
                     }
@@ -393,10 +423,7 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
 
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
-
                             }
                         }
                         if (isBooleanOperation(i->c_str())) {
@@ -409,10 +436,7 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
 
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
-
                             }
                         }
                     } else {
@@ -423,10 +447,7 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
 
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
-
                             }
                         }
 
@@ -440,10 +461,7 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
 
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-//                                exit(1);
-//                                QApplication::exit();
                                 ui->errorArea->appendPlainText("Invalid Expression.");
-
                             }
                         }
                     }
@@ -459,44 +477,82 @@ std::list<std::string> analysePostfix(std::list<std::string> postfix, int attrib
                     std::cout << j.c_str();
                 }
                 std::cout << std::endl;
+            } else if (isUnaryOperator(i->c_str())) {
+                auto op1 = std::prev(i);
+                op1Symbol = symbolTable.searchSymbol(*op1);
+
+                if (op1Symbol != nullptr) {
+                    if (op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+                        i->replace(i->begin(), i->end(), "#I");
+                    else {
+//                    exit(1);
+                    }
+                } else if (isNumber(*op1)) {
+                    i->replace(i->begin(), i->end(), "#I");
+                } else {
+//                    exit(1);
+                }
+
+                postfix.erase(op1);
+
+                for (auto &j: postfix) {
+                    std::cout << j.c_str();
+                }
+                std::cout << std::endl;
+            } else if (isNegateOperator(i->c_str())) {
+                auto op1 = std::prev(i);
+                op1Symbol = symbolTable.searchSymbol(*op1);
+
+                // ToDo adicionar CodeGen
+
+                if (op1Symbol != nullptr) {
+                    if ((op1Symbol->type == "verdadeiro" || op1Symbol->type == "falso" ||
+                         op1Symbol->type == "funcao booleano"))
+                        i->replace(i->begin(), i->end(), "#B");
+                    else {
+//                        exit(1);
+                    }
+                } else if (isNumber(*op1)) {
+                    i->replace(i->begin(), i->end(), "#B");
+                } else {
+//                    exit(1);
+                }
+
+                postfix.erase(op1);
+
+                for (auto &j: postfix) {
+                    std::cout << j.c_str();
+                }
+                std::cout << std::endl;
             }
         } else if (i == postfix.begin() && postfix.size() == 1) {
             if (isNumber(*i)) {
-                codeGen.insertNode(new CodeSnippet("LDC", *i));
-                codeGen.insertNode(new CodeSnippet("STR", attribution));
                 i->replace(i->begin(), i->end(), "#I");
             } else if (strcmpi(i->c_str(), "verdadeiro") == 0 ||
                        strcmpi(i->c_str(), "falso") == 0) {
-                if (strcmpi(i->c_str(), "falso") == 0) {
-                    codeGen.insertNode(new CodeSnippet("LDC", 0));
-                } else if (strcmpi(i->c_str(), "verdadeiro") == 0) {
-                    codeGen.insertNode(new CodeSnippet("LDC", 1));
-                }
 
-                codeGen.insertNode(new CodeSnippet("STR", attribution));
 
                 i->replace(i->begin(), i->end(), "#B");
             } else {
                 op1Symbol = symbolTable.searchSymbol(*i);
-                if (op1Symbol->memoryAllocation != -1) {
-                    codeGen.insertNode(new CodeSnippet("LDV", op1Symbol->memoryAllocation));
-                } else {
-                    codeGen.insertNode(new CodeSnippet("LDV", 0));
-                }
                 if (op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
                     i->replace(i->begin(), i->end(), "#I");
                 if (op1Symbol->type == "booleano" || op1Symbol->type == "funcao booleano")
                     i->replace(i->begin(), i->end(), "#B");
-                codeGen.insertNode(new CodeSnippet("STR", attribution));
+                for (auto &j: postfix) {
+                    std::cout << j.c_str();
+                }
+                std::cout << std::endl;
             }
-
-            for (auto &j: postfix) {
-                std::cout << j.c_str();
-            }
-            std::cout << std::endl;
         }
     }
-
+    if (attribution != -2) {
+        if (attribution != -1) {
+            codeGen.insertNode(new CodeSnippet("STR", attribution));
+        } else {
+            codeGen.insertNode(new CodeSnippet("STR", 0));
+        }
+    }
 //    if (postfix.size() != 1) {
 //        for (auto i = postfix.begin(); i != postfix.end(); i++) {
 //            if (strcmpi(i->c_str(), "nao") == 0) {

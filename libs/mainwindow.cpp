@@ -44,6 +44,8 @@ void MainWindow::on_compilarButton_clicked() {
     }
     currentMemoryAllocation = 1;
     currentLabel = 0;
+    lastReturn = false;
+    hadPop = false;
     ui->errorArea->clear();
     ui->errorArea->setPlainText("");
 

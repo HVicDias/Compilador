@@ -10,9 +10,9 @@
 
 int currentMemoryAllocation = 1;
 int currentLabel = 0;
-
 bool lastReturn = false;
 bool hadPop = false;
+
 std::stack<SymbolNode *> headerStack;
 
 Node analyseType(FILE *file, Node token, std::queue<std::string> identifierQueue, std::queue<int> lineNumberQueue,
@@ -135,8 +135,8 @@ Node analyseSimpleCommands(FILE *file, Node token, Ui::MainWindow *ui) {
 Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
     if (token.simbolo == "sinicio") {
         SymbolNode *auxSymbol = headerStack.top();
-        if (hadPop) {
 
+        if (hadPop) {
             codeGen.insertNode(new CodeSnippet(auxSymbol->labelJump, "NULL"));
             hadPop = false;
         }
@@ -146,9 +146,7 @@ Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
 
 
         while (token.simbolo != "sfim") {
-            if (token.simbolo != "sfim") {
-                token = analyseSimpleCommands(file, token, ui);
-            }
+            token = analyseSimpleCommands(file, token, ui);
         }
         token = getToken(file);
     } else {
@@ -401,20 +399,23 @@ TokenExpression analyseSimpleExpressions(FILE *file, TokenExpression te, Ui::Mai
 
 Node analyseAttribution(FILE *file, Node token, Node attributionToken, Ui::MainWindow *ui) {
     TokenExpression te;
+    SymbolNode *tableToken = symbolTable.searchSymbol(attributionToken.lexema);
+
     token = getToken(file);
     te.token = token;
 
     std::list<std::string> postfix;
 
-    auto tableToken = symbolTable.searchSymbol(attributionToken.lexema);
     te = analyseExpressions(file, te, ui);
 
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
     analysePostfix(postfix, tableToken->memoryAllocation, ui);
+
     if (tableToken->type == "funcao inteiro" || tableToken->type == "funcao booleano") {
-        codeGen.insertNode(new CodeSnippet("STR", 0));
+
     }
+
     return te.token;
 }
 
@@ -507,7 +508,12 @@ Node analyseWrite(FILE *file, Node token, Ui::MainWindow *ui) {
         if (token.simbolo == "sidentificador") {
             if (searchDeclaratedVariableOrFunctionTable(token.lexema)) {
                 auto auxToken = symbolTable.searchSymbol(token.lexema);
-                auto *snippet = new CodeSnippet("LDV", auxToken->memoryAllocation);
+                CodeSnippet *snippet = nullptr;
+                if (auxToken->memoryAllocation != -1) {
+                    snippet = new CodeSnippet("LDV", auxToken->memoryAllocation);
+                } else {
+                    snippet = new CodeSnippet("LDV", 0);
+                }
                 codeGen.insertNode(snippet);
                 snippet = new CodeSnippet("PRN");
                 codeGen.insertNode(snippet);

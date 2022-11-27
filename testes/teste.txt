@@ -9,23 +9,23 @@ var a,b,s: inteiro;
      z: booleano;
   procedimento ler;
   inicio
-     leia (c);
-     leia (a);
+     leia(c);
+     leia(a);
      s:= soma;
-     escreva (s);
+     escreva(s);
   fim;
   procedimento loop;
   var x: inteiro;
   inicio
-    leia (x);   {para parar digite um valor maior que 9 }
+    leia(x);   {para parar digite um valor maior que 9 }
     {abs*4div32*+111+2*+>}
-    se a+b*s div 4 * 32 > 1 + (1+1) * 2
+    se x < 10
     entao ler;
   fim;
 
  inicio  {corpo da funcao soma}
   loop;
-  soma:= -c+a;
+  soma:= c+a;
  fim;
 
 

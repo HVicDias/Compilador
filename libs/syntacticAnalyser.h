@@ -7,7 +7,8 @@
 
 extern int currentMemoryAllocation;
 extern int currentLabel;
-
+extern bool lastReturn;
+extern bool hadPop;
 extern std::stack<SymbolNode *> headerStack;
 
 class TokenExpression {
