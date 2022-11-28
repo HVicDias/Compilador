@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>VirtualMachine</class>
+    <widget class="QMainWindow" name="VirtualMachine">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1280</width>
+                <height>720</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>MainWindow</string>
+        </property>
+        <widget class="QWidget" name="centralwidget">
+            <widget class="QLabel" name="CodigoDaMaquinaLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>30</y>
+                        <width>131</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Còdigo da Máquina</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="MemoriaLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>950</x>
+                        <y>30</y>
+                        <width>131</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Memória (Pilha)</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="SaidaDeDadosLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>450</y>
+                        <width>131</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Saída de Dados</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="ModoDeExecucaoLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>640</x>
+                        <y>490</y>
+                        <width>131</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Modo de Execução</string>
+                </property>
+            </widget>
+            <widget class="QRadioButton" name="NormalRadioButton">
+                <property name="geometry">
+                    <rect>
+                        <x>650</x>
+                        <y>520</y>
+                        <width>112</width>
+                        <height>26</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Normal</string>
+                </property>
+            </widget>
+            <widget class="QRadioButton" name="PassoAPassoRadioButton">
+                <property name="geometry">
+                    <rect>
+                        <x>650</x>
+                        <y>550</y>
+                        <width>112</width>
+                        <height>26</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Passo a Passo</string>
+                </property>
+            </widget>
+            <widget class="QPlainTextEdit" name="SaidaDeDadosArea">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>480</y>
+                        <width>421</width>
+                        <height>171</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QTableWidget" name="CodigoDaMaquinaTable">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>60</y>
+                        <width>501</width>
+                        <height>341</height>
+                    </rect>
+                </property>
+                <column>
+                    <property name="text">
+                        <string>Linha</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Instrução</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Atributo 1</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Atributo 2</string>
+                    </property>
+                </column>
+            </widget>
+            <widget class="QTableWidget" name="MemoriaTable">
+                <property name="geometry">
+                    <rect>
+                        <x>940</x>
+                        <y>60</y>
+                        <width>251</width>
+                        <height>341</height>
+                    </rect>
+                </property>
+                <column>
+                    <property name="text">
+                        <string>Endereço</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Valor</string>
+                    </property>
+                </column>
+            </widget>
+            <widget class="QPushButton" name="ExecutarButton">
+                <property name="geometry">
+                    <rect>
+                        <x>910</x>
+                        <y>510</y>
+                        <width>83</width>
+                        <height>29</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Executar</string>
+                </property>
+            </widget>
+            <widget class="QPushButton" name="PararButton">
+                <property name="geometry">
+                    <rect>
+                        <x>1010</x>
+                        <y>510</y>
+                        <width>83</width>
+                        <height>29</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Parar</string>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>1280</width>
+                    <height>25</height>
+                </rect>
+            </property>
+            <widget class="QMenu" name="menuArquivo">
+                <property name="title">
+                    <string>Arquivo</string>
+                </property>
+                <addaction name="actionOpen"/>
+            </widget>
+            <widget class="QMenu" name="menuSobre">
+                <property name="title">
+                    <string>Sobre</string>
+                </property>
+            </widget>
+            <addaction name="menuArquivo"/>
+            <addaction name="menuSobre"/>
+        </widget>
+        <widget class="QStatusBar" name="statusbar"/>
+        <action name="actionOpen">
+            <property name="text">
+                <string>Open</string>
+            </property>
+        </action>
+    </widget>
+    <resources/>
+    <connections/>
+</ui>

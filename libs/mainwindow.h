@@ -9,6 +9,7 @@
 #include <QScrollBar>
 #include <QMessageBox>
 #include <QSaveFile>
+#include "virtualmachine.h"
 #include "codeGenerator.h"
 
 extern CodeGenerator codeGen;
@@ -46,6 +47,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString currentFile = "";
+    VirtualMachine *vm;
 };
 
 #endif //COMPILER_MAINWINDOW_H

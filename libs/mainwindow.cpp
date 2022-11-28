@@ -84,7 +84,8 @@ void MainWindow::on_compilarButton_clicked() {
                         token = analyseBlock(f, token, this->ui);
 
                         if (token.simbolo == "sponto") {
-                            ui->errorArea->appendPlainText("Sucesso");
+                            vm = new VirtualMachine(this);
+                            vm->show();
                         } else {
                             cout << "Erro25" << endl;
                         }
