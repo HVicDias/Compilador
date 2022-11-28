@@ -62,7 +62,7 @@ private slots:
 
     void addRowMemoriaTable(QString, QString);
 
-    void removeRowMemoriaTable();
+    void removeRowMemoriaTable(int row);
 
     void on_actionOpen_triggered();
 
