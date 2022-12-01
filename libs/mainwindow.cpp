@@ -60,11 +60,12 @@ void MainWindow::on_compilarButton_clicked() {
     auto *snippet = new CodeSnippet("START");
 
     do {
-        token = getToken(f);
+        token = getToken(f, ui);
 
         if (!token.lexema.empty() && !token.simbolo.empty()) {
+            std::cout << "aqui " << token.lexema;
             if (token.simbolo == "sprograma") {
-                token = getToken(f);
+                token = getToken(f, ui);
 
                 if (token.simbolo == "sidentificador") {
                     mainProgramIndentifier = token.lexema;
@@ -74,7 +75,7 @@ void MainWindow::on_compilarButton_clicked() {
                                                               "programa", lineNo == 1 ? lineNo : lineNo + 1, -1, -1,
                                                               -1));
 
-                    token = getToken(f);
+                    token = getToken(f, ui);
 
                     if (token.simbolo == "sponto_virgula") {
                         codeGen.insertNode(snippet);
@@ -87,17 +88,21 @@ void MainWindow::on_compilarButton_clicked() {
                             vm = new VirtualMachine(this);
                             vm->show();
                         } else {
-                            cout << "Erro25" << endl;
+                            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                            ": Erro Sintático -> Esperado \".\"."));
                         }
                     } else {
-                        cout << "Erro26" << endl;
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                        ": Erro Sintático -> Esperado \";\"."));
                     }
                 } else {
-                    cout << "Erro27" << endl;
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                    ": Erro Sintático -> Esperado um identificador."));
                 }
             } else {
                 if (character != EOF) {
-                    cout << "Erro28" << endl;
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                    ": Erro Sintático -> Esperado \"programa\"."));
                 }
             }
         } else {

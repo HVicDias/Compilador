@@ -1,5 +1,3 @@
-#include <string>
-#include <iostream>
 #include "lexicalAnalyser.h"
 
 char character;
@@ -39,20 +37,25 @@ bool isPunctuation() {
 void jumpSpaces(FILE *file) {
     while (character == ' ' || character == '\n') {
         if (character == '\n') {
-            std::cout << (int) character << "//" << lineNo << std::endl;
+//            std::cout << (int) character << "//" << lineNo << std::endl;
             lineNo++;
         }
         character = (char) fgetc(file);
     }
 }
 
-void jumpComentary(FILE *file) {
+void jumpComentary(FILE *file, Ui::MainWindow *ui) {
     do {
         character = (char) fgetc(file);
 
         if (character == EOF) {
-            printf("erro falta de }");
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                            ": Erro Léxico -> Comentário sem \"}\"."));
 //            exit(1);
+        }
+        if (character == '{') {
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                            ": Erro Léxico -> Comentário sem \"}\"."));
         }
     } while (character != '}');
 
@@ -224,12 +227,11 @@ Node handlePunctuation(FILE *file) {
     return {lexema, simbolo};
 }
 
-Node getToken(FILE *file) {
+Node getToken(FILE *file, Ui::MainWindow *ui) {
     while (isSpace() || isCommentary()) {
         if (isCommentary()) {
-            jumpComentary(file);
+            jumpComentary(file, ui);
         }
-
         if (isSpace()) {
             jumpSpaces(file);
         }

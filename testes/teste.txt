@@ -3,7 +3,7 @@
 
 programa test;
 var a,b,s: inteiro;                 
-                              
+             
  funcao soma: inteiro;
  var c,a,s: inteiro;
      z: booleano;
@@ -16,10 +16,11 @@ var a,b,s: inteiro;
   fim;
   procedimento loop;
   var x: inteiro;
+  var y: inteiro;
   inicio
     leia(x);   {para parar digite um valor maior que 9 }
     {abs*4div32*+111+2*+>}
-    se x < 10
+    se (x < 10) e (y < 10)
     entao ler;
   fim;
 
@@ -27,7 +28,6 @@ var a,b,s: inteiro;
   loop;
   soma:= c+a;
  fim;
-
 
 inicio      {corpo principal}
   s:= soma;

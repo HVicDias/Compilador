@@ -6,7 +6,7 @@
 #include <tuple>
 
 std::stack<int> returnStack; // PC return values
-std::list<std::tuple<int, int>> memoryStack; // {memoryAlocation, value}
+std::list<std::tuple<int, int, int>> memoryStack; // {memoryAlocation, value, memoryReference}
 std::list<std::tuple<int, std::string>> labelJmp; // {PC, label}
 int compilerMemoryAllocation = -1;
 
@@ -131,7 +131,7 @@ bool VirtualMachine::operationalAnalyser() {
         memoryStack.pop_back();
         compilerMemoryAllocation--;
         result = value1 + value2;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         removeRowMemoriaTable();
         ui->MemoriaTable->item(0, 1)->setText(QString::number(result));
         return true;
@@ -143,8 +143,9 @@ bool VirtualMachine::operationalAnalyser() {
         memoryStack.pop_back();
         compilerMemoryAllocation--;
         result = value2 - value1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
-
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
+        removeRowMemoriaTable();
+        ui->MemoriaTable->item(0, 1)->setText(QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "MULT") {
         value1 = get<1>(memoryStack.back());
@@ -154,7 +155,9 @@ bool VirtualMachine::operationalAnalyser() {
         memoryStack.pop_back();
         compilerMemoryAllocation--;
         result = value1 * value2;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
+        removeRowMemoriaTable();
+        ui->MemoriaTable->item(0, 1)->setText(QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "DIVI") {
         value1 = get<1>(memoryStack.back());
@@ -164,7 +167,9 @@ bool VirtualMachine::operationalAnalyser() {
         memoryStack.pop_back();
         compilerMemoryAllocation--;
         result = value2 / value1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
+        removeRowMemoriaTable();
+        ui->MemoriaTable->item(0, 1)->setText(QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "AND") {
         value1 = get<1>(memoryStack.back());
@@ -176,7 +181,7 @@ bool VirtualMachine::operationalAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         result = value1 * value2;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "OR") {
@@ -191,7 +196,7 @@ bool VirtualMachine::operationalAnalyser() {
         result = value1 + value2;
         if (result == 2)
             result = 1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "CME") {
@@ -204,7 +209,7 @@ bool VirtualMachine::operationalAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         result = value2 < value1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "CMA") {
@@ -217,7 +222,7 @@ bool VirtualMachine::operationalAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         result = value2 > value1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "CEQ") {
@@ -230,7 +235,7 @@ bool VirtualMachine::operationalAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         result = value1 == value2;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "CDIF") {
@@ -243,7 +248,7 @@ bool VirtualMachine::operationalAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         result = value1 != value2;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "CMEQ") {
@@ -256,7 +261,7 @@ bool VirtualMachine::operationalAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         result = value2 <= value1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "CMAQ") {
@@ -269,7 +274,7 @@ bool VirtualMachine::operationalAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         result = value2 >= value1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     }
@@ -284,7 +289,8 @@ bool VirtualMachine::inverterAnalyser() {
         memoryStack.pop_back();
         compilerMemoryAllocation--;
         result = value1 * -1;
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
+        ui->MemoriaTable->item(0, 1)->setText(QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "NEG") {
         value1 = get<1>(memoryStack.back());
@@ -295,7 +301,8 @@ bool VirtualMachine::inverterAnalyser() {
         } else {
             result = 1;
         }
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
+        ui->MemoriaTable->item(0, 1)->setText(QString::number(result));
         return true;
     }
 
@@ -306,15 +313,17 @@ bool VirtualMachine::loaderAnalyser() {
     int value1, result;
     if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "LDC") {
         result = (ui->CodigoDaMaquinaTable->item(programCounter, 2)->text().toInt());
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "LDV") {
         value1 = (ui->CodigoDaMaquinaTable->item(programCounter, 2)->text().toInt());
-        auto l_front = memoryStack.begin();
-        std::advance(l_front, value1);
-        result = get<1>(*l_front);
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        auto l_back = memoryStack.end();
+        while (get<0>(*l_back) != value1 && get<2>(*l_back) != value1) {
+            l_back = std::prev(l_back);
+        }
+        result = get<1>(*l_back);
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     }
@@ -331,11 +340,13 @@ bool VirtualMachine::storageAnalyser() {
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
         value2 = (ui->CodigoDaMaquinaTable->item(programCounter, 2)->text().toInt());
-        auto l_front = memoryStack.begin();
-        std::advance(l_front, value2);
-        get<1>(*l_front) = value1;
+        auto l_back = memoryStack.end();
+        while (get<0>(*l_back) != value2 && get<2>(*l_back) != value2) {
+            l_back = std::prev(l_back);
+        }
+        get<1>(*l_back) = value1;
         ui->MemoriaTable->item(ui->MemoriaTable->rowCount() - value2 - 1, 1)->setText(
-                QString::number(get<1>(*l_front)));
+                QString::number(get<1>(*l_back)));
         return true;
     }
 
@@ -404,13 +415,26 @@ bool VirtualMachine::labelAnalyser() {
 
 // ToDo colocar condição para não alocar ou desalocar desnecessariamente
 bool VirtualMachine::allocDallocAnalyser() {
-    int value1;
+    int value1, value2, currentStackTop, result;
     if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "ALLOC") {
         value1 = (ui->CodigoDaMaquinaTable->item(programCounter, 3)->text().toInt());
-
-        for (int i = 0; i < value1; i++) {
-            memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, 0));
-            addRowMemoriaTable(QString::number(compilerMemoryAllocation), "0");
+        currentStackTop = (ui->CodigoDaMaquinaTable->item(programCounter, 2)->text().toInt());
+        if (compilerMemoryAllocation < currentStackTop) {
+            for (int i = 0; i < value1; i++) {
+                memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, 0, 0));
+                addRowMemoriaTable(QString::number(compilerMemoryAllocation), "0");
+            }
+        } else {
+            for (int i = 0; i < value1; i++) {
+                value2 = i + currentStackTop;
+                auto l_back = memoryStack.end();
+                while (get<0>(*l_back) != value2 && get<2>(*l_back) != value2) {
+                    l_back = std::prev(l_back);
+                }
+                result = get<1>(*l_back);
+                memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, i));
+                addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
+            }
         }
 
         return true;
@@ -428,20 +452,30 @@ bool VirtualMachine::allocDallocAnalyser() {
     return false;
 }
 
+bool isNumber(QString s) {
+    for (int i = 0; i < s.size(); i++) {
+        if (!s[i].isDigit())
+            return false;
+    }
+
+    return true;
+}
+
 bool VirtualMachine::uiInteractionsAnalyser() {
     int value1, result;
     QString text;
-    std::string t;
+    bool ok, ok2;
+
     if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "RD") {
-        bool ok;
 
         do {
-            text = QInputDialog::getText(this, "Read",
-                                         "Digite o valor da variavel", QLineEdit::Normal,
-                                         "", &ok);
-
-            t = text.toStdString();
-        } while (text.isEmpty());
+            do {
+                text = QInputDialog::getText(this, "Read",
+                                             "Digite o valor da variavel", QLineEdit::Normal,
+                                             "", &ok);
+            } while (text.isEmpty());
+            ui->SaidaDeDadosArea->appendPlainText(text);
+        } while (!isNumber(text));
 
         if (text == "verdadeiro") {
             text = "1";
@@ -450,7 +484,7 @@ bool VirtualMachine::uiInteractionsAnalyser() {
         }
 
         result = text.toInt();
-        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result));
+        memoryStack.push_back(std::make_tuple(++compilerMemoryAllocation, result, 0));
         addRowMemoriaTable(QString::number(compilerMemoryAllocation), QString::number(result));
         return true;
     } else if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "PRN") {
