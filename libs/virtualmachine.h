@@ -16,6 +16,7 @@
 #include <QInputDialog>
 #include <QTableWidgetItem>
 #include "semanticAnalyser.h"
+#include <QFont>
 #include <cstring>
 
 namespace Ui {

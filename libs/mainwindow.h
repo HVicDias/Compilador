@@ -11,6 +11,9 @@
 #include <QSaveFile>
 #include "virtualmachine.h"
 #include "codeGenerator.h"
+#include <QThread>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 extern CodeGenerator codeGen;
 extern std::string mainProgramIndentifier;
@@ -47,6 +50,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString currentFile = "";
+
 
     VirtualMachine *vm;
 };

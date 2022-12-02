@@ -63,7 +63,6 @@ void MainWindow::on_compilarButton_clicked() {
         token = getToken(f, ui);
 
         if (!token.lexema.empty() && !token.simbolo.empty()) {
-            std::cout << "aqui " << token.lexema;
             if (token.simbolo == "sprograma") {
                 token = getToken(f, ui);
 
@@ -85,8 +84,10 @@ void MainWindow::on_compilarButton_clicked() {
                         token = analyseBlock(f, token, this->ui);
 
                         if (token.simbolo == "sponto") {
-                            vm = new VirtualMachine(this);
-                            vm->show();
+                            if (ui->errorArea->toPlainText().isEmpty()) {
+                                vm = new VirtualMachine(this);
+                                vm->show();
+                            }
                         } else {
                             ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                                             ": Erro Sintático -> Esperado \".\"."));
@@ -122,10 +123,13 @@ void MainWindow::on_compilarButton_clicked() {
     snippet = new CodeSnippet("HLT");
     codeGen.insertNode(snippet);
 
-    symbolTable.printList();
-    codeGen.printList();
-    codeGen.generateCode();
-    codeGen.deleteCode();
+
+    if (ui->errorArea->toPlainText().isEmpty()) {
+        codeGen.printList();
+        codeGen.generateCode();
+        codeGen.deleteCode();
+    }
+
     fclose(f);
     cout << lineNo << endl;
 }
@@ -146,8 +150,10 @@ void MainWindow::on_openFileButton_clicked() {
 
     QTextStream stream(&file);
     QString text = stream.readAll();
+
     ui->codeArea->appendPlainText(text);
     ui->codeArea->verticalScrollBar()->setValue(0);
+
     file.close();
 }
 

@@ -127,8 +127,6 @@ std::list<std::string> createInfixListFromExpression(std::string infixExpression
     std::list<std::string> resultList;
     std::string result;
 
-    std::cout << infixExpression;
-
     do {
         result = "";
         while (infixExpression[i] != ' ') {
@@ -322,6 +320,11 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
         } else {
             break;
         }
+
+
+    }
+
+    for (auto &j: postfix) {
         std::cout << j.c_str();
     }
     std::cout << std::endl;
@@ -502,8 +505,6 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                 auto op1 = std::prev(i);
                 op1Symbol = symbolTable.searchSymbol(*op1);
 
-                // ToDo adicionar CodeGen
-
                 if (op1Symbol != nullptr) {
                     if ((op1Symbol->type == "verdadeiro" || op1Symbol->type == "falso" ||
                          op1Symbol->type == "funcao booleano"))
@@ -529,8 +530,6 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                 i->replace(i->begin(), i->end(), "#I");
             } else if (strcmpi(i->c_str(), "verdadeiro") == 0 ||
                        strcmpi(i->c_str(), "falso") == 0) {
-
-
                 i->replace(i->begin(), i->end(), "#B");
             } else {
                 op1Symbol = symbolTable.searchSymbol(*i);
@@ -538,11 +537,12 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                     i->replace(i->begin(), i->end(), "#I");
                 if (op1Symbol->type == "booleano" || op1Symbol->type == "funcao booleano")
                     i->replace(i->begin(), i->end(), "#B");
-                for (auto &j: postfix) {
-                    std::cout << j.c_str();
-                }
-                std::cout << std::endl;
             }
+
+            for (auto &j: postfix) {
+                std::cout << j.c_str();
+            }
+            std::cout << std::endl;
         }
     }
     if (attribution != -2) {

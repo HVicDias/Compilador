@@ -6,7 +6,6 @@
 #include "codeGenerator.h"
 #include "mainwindow.h"
 
-
 int currentMemoryAllocation = 1;
 int currentLabel = 0;
 bool lastReturn = false;
@@ -17,7 +16,7 @@ std::stack<SymbolNode *> headerStack;
 Node analyseType(FILE *file, Node token, std::queue<std::string> identifierQueue, std::queue<int> lineNumberQueue,
                  Ui::MainWindow *ui) {
     if (token.simbolo != "sinteiro" && token.simbolo != "sbooleano") {
-        ui->errorArea->appendPlainText("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText("Linha " + QString::number(lineNo) +
                                        ": Erro Sintático -> Tipo inválido, esperado inteiro ou booleano.");
     }
     auto *snippet = new CodeSnippet("ALLOC", currentMemoryAllocation, identifierQueue.size());
@@ -41,9 +40,9 @@ Node analyseVariables(FILE *file, Node token, Ui::MainWindow *ui) {
         if (token.simbolo == "sidentificador") {
             if (!searchDuplicatedVariableTable(token.lexema)) {
                 identifierQueue.push(token.lexema);
-                lineNumberQueue.push(lineNo + 1);
+                lineNumberQueue.push(lineNo);
             } else {
-                ui->errorArea->appendPlainText("Linha " + QString::number(lineNo + 1) +
+                ui->errorArea->appendPlainText("Linha " + QString::number(lineNo) +
                                                ": Erro Semântico -> Identificador \"" +
                                                QString::fromStdString(token.lexema) + "\" já declarado.");
 //                std::cout << "ERRO " << lineNo << std::endl;
@@ -56,16 +55,16 @@ Node analyseVariables(FILE *file, Node token, Ui::MainWindow *ui) {
                 if (token.simbolo == "svirgula") {
                     token = getToken(file, ui);
                     if (token.simbolo == "sdoispontos") {
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Sintático -> \":\" não esperado."));
                     }
                 }
             } else {
-                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                 ": Erro Sintático -> Esperado \",\" ou \":\" após um identificador."));
             }
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Sintático -> Esperado um identificador."));
         }
     } while (token.simbolo != "sdoispontos");
@@ -75,7 +74,7 @@ Node analyseVariables(FILE *file, Node token, Ui::MainWindow *ui) {
     return token;
 }
 
-Node analyseEtVariables(FILE *file, Node token, Ui::MainWindow *ui) {
+Node analyseVariablesStep(FILE *file, Node token, Ui::MainWindow *ui) {
     if (token.simbolo == "svar") {
         token = getToken(file, ui);
 
@@ -86,12 +85,12 @@ Node analyseEtVariables(FILE *file, Node token, Ui::MainWindow *ui) {
                 if (token.simbolo == "sponto_virgula") {
                     token = getToken(file, ui);
                 } else {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                     ": Erro Sintático -> Esperado \";\"."));
                 }
             }
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Sintático -> Esperado um identificador."));
         }
     }
@@ -110,7 +109,7 @@ Node analyseSubroutine(FILE *file, Node token, Ui::MainWindow *ui) {
         if (token.simbolo == "sponto_virgula") {
             token = getToken(file, ui);
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Sintático -> Esperado \";\"."));
         }
     }
@@ -148,13 +147,17 @@ Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
         token = getToken(file, ui);
         token = analyseSimpleCommands(file, token, ui);
 
-
         while (token.simbolo != "sfim") {
             token = analyseSimpleCommands(file, token, ui);
         }
+
+
         token = getToken(file, ui);
+//        if (token.simbolo == "sponto_virgula") {
+//            token = getToken(file, ui);
+//        }
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado inicio."));
     }
 
@@ -164,7 +167,7 @@ Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
 Node analyseBlock(FILE *file, Node token, Ui::MainWindow *ui) {
     token = getToken(file, ui);
 
-    token = analyseEtVariables(file, token, ui);
+    token = analyseVariablesStep(file, token, ui);
     token = analyseSubroutine(file, token, ui);
     token = analyseCommands(file, token, ui);
 
@@ -192,8 +195,8 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
             codeGen.insertNode(new CodeSnippet(++currentLabel, "NULL"));
             hadPop = false;
             headerStack.push(symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName,
-                                                      "procedimento", lineNo + 1, currentLabel, currentLabel, -1));
-            symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo + 1, currentLabel,
+                                                      "procedimento", lineNo, currentLabel, currentLabel, -1));
+            symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "procedimento", lineNo, currentLabel,
                                   currentLabel, -1);
         }
 
@@ -202,15 +205,14 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
         if (token.simbolo == "sponto_virgula") {
             token = analyseBlock(file, token, ui);
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Sintático -> Esperado \";\"."));
         }
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado um identificador."));
     }
 
-    symbolTable.printList();
     int numberDeletion = symbolTable.deleteLayer();
     if (numberDeletion != 0) {
         auto *snippet = new CodeSnippet("DALLOC", currentMemoryAllocation - numberDeletion, numberDeletion);
@@ -232,7 +234,7 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
         if (!searchDeclaratedFunctionTable(token.lexema)) {
             identifier = token.lexema;
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Semântico -> Identificador já declarado."));
         }
 
@@ -257,28 +259,27 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
                 codeGen.insertNode(new CodeSnippet(++currentLabel, "NULL"));
                 hadPop = false;
                 headerStack.push(symbolTable.insertSymbol(identifier, symbolTable.symbolListNode->layerName,
-                                                          "funcao " + token.lexema, lineNo + 1, currentLabel,
+                                                          "funcao " + token.lexema, lineNo, currentLabel,
                                                           currentLabel, -1));
-                symbolTable.downLayer(identifier, identifier, identifier, "funcao " + token.lexema, lineNo + 1,
+                symbolTable.downLayer(identifier, identifier, identifier, "funcao " + token.lexema, lineNo,
                                       currentLabel, currentLabel, -1);
                 token = getToken(file, ui);
                 if (token.simbolo == "sponto_virgula") {
                     token = analyseBlock(file, token, ui);
                 } else {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                     ": Erro Sintático -> Esperado \";\"."));
                 }
             } else {
-                ui->errorArea->appendPlainText("Linha " + QString::number(lineNo + 1) +
+                ui->errorArea->appendPlainText("Linha " + QString::number(lineNo) +
                                                ": Erro Sintático -> Tipo inválido, esperado inteiro ou booleano.");
             }
         }
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado um identificador."));
     }
 
-    symbolTable.printList();
     int numberDeletion = symbolTable.deleteLayer();
     if (numberDeletion != 0) {
         auto *snippet = new CodeSnippet("DALLOC", currentMemoryAllocation - numberDeletion, numberDeletion);
@@ -294,7 +295,7 @@ Node analyseFunctionDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
 
 TokenExpression analyseFunctionCall(FILE *file, TokenExpression te, Ui::MainWindow *ui) {
     if (!searchDeclaratedFunctionTable(te.token.lexema)) {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Semântico -> Função não declarada."));
 //        exit(1);
     } else {
@@ -329,12 +330,13 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
         if (currentNode != nullptr) {
             if (currentNode->type == "funcao inteiro" || currentNode->type == "funcao booleano") {
                 te = analyseFunctionCall(file, te, ui);
+                std::cout << te.token.lexema;
             } else {
                 te.expression += te.token.lexema + " ";
                 te.token = getToken(file, ui);
             }
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Semântico -> \"" + QString::fromStdString(te.token.lexema) +
                                             "\" não declarado."));
         }
@@ -360,7 +362,7 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
         te.expression += te.token.lexema + " ";
         te.token = getToken(file, ui);
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Símbolo \"" + QString::fromStdString(te.token.lexema) +
                                         "\" inválido."));
     }
@@ -414,13 +416,14 @@ Node analyseAttribution(FILE *file, Node token, Node attributionToken, Ui::MainW
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
     analysePostfix(postfix, tableToken->memoryAllocation, ui);
+    postfix.clear();
 
     return te.token;
 }
 
 Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
     if (!searchDeclaratedProcedureTable(token.lexema)) {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Semântico -> Procedimento não declarado."));
 //        exit(1);
     } else {
@@ -447,7 +450,7 @@ Node analyseAttributionAndProcedureCall(FILE *file, Node token, Ui::MainWindow *
     if (token.simbolo == "sponto_virgula") {
         token = getToken(file, ui);
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado \";\"."));
     }
 
@@ -475,23 +478,23 @@ Node analyseRead(FILE *file, Node token, Ui::MainWindow *ui) {
                     if (token.simbolo == "sponto_virgula") {
                         token = getToken(file, ui);
                     } else {
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Sintático -> Esperado \";\"."));
                     }
                 } else {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                     ": Erro Sintático -> Esperado \")\" no final da expressão."));
                 }
             } else {
-                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                 ": Erro Sintático -> Identificador não declarado."));
             }
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Sintático -> Esperado um identificador."));
         }
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado \"(\" no começo da expressão."));
     }
 
@@ -522,23 +525,23 @@ Node analyseWrite(FILE *file, Node token, Ui::MainWindow *ui) {
                     if (token.simbolo == "sponto_virgula") {
                         token = getToken(file, ui);
                     } else {
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Sintático -> Esperado \";\"."));
                     }
                 } else {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                     ": Erro Sintático -> Esperado \")\" no final da expressão."));
                 }
             } else {
-                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                 ": Erro Sintático -> Identificador não declarado."));
             }
         } else {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Sintático -> Esperado um identificador."));
         }
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado \"(\" no começo da expressão."));
     }
 
@@ -558,15 +561,17 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
     analysePostfix(postfix, ui);
+    postfix.clear();
 
     if (te.token.simbolo == "sfaca") {
         codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
         te.token = getToken(file, ui);
         te.token = analyseSimpleCommands(file, te.token, ui);
+        std::cout << te.token.lexema;
         codeGen.insertNode(new CodeSnippet("JMP", currentLabel - 1));
         codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado \"faca\" no começo da expressão."));
     }
 
@@ -586,11 +591,20 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
     postfix = createInfixListFromExpression(te.expression);
     postfix = toPostfix(postfix);
     analysePostfix(postfix, ui);
+    postfix.clear();
 
     if (te.token.simbolo == "sentao") {
         codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
         te.token = getToken(file, ui);
         te.token = analyseSimpleCommands(file, te.token, ui);
+
+        if (te.token.simbolo == "sponto_virgula") {
+            te.token = getToken(file, ui);
+        }
+//        else {
+//            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+//                                            ": Erro Sintático -> Esperado \";\"."));
+//        }
 
         if (te.token.simbolo == "ssenao") {
             codeGen.insertNode(new CodeSnippet("JMP", ++currentLabel));
@@ -602,7 +616,7 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
             codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
         }
     } else {
-        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado \"entao\" no começo da expressão."));
     }
 

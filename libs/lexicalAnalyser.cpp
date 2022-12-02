@@ -37,7 +37,7 @@ bool isPunctuation() {
 void jumpSpaces(FILE *file) {
     while (character == ' ' || character == '\n') {
         if (character == '\n') {
-//            std::cout << (int) character << "//" << lineNo << std::endl;
+            std::cout << (int) character << "//" << lineNo << std::endl;
             lineNo++;
         }
         character = (char) fgetc(file);

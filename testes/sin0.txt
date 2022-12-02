@@ -17,8 +17,8 @@ var a, x: inteiro;
 inicio
   se x>1  entao
       x:= 0;
-  leia(z);
-  enquanto (a != 89) e (a<= 1000)  {condicao de parada}
+  leia(a);
+  enquanto (z != 89) e (a<= 1000)  {condicao de parada}
   faca inicio
            a:= x+a;
        fim;

@@ -21,7 +21,7 @@ Node analyseType(FILE *, Node, std::queue<std::string>, std::queue<int>, Ui::Mai
 
 Node analyseVariables(FILE *, Node, Ui::MainWindow *);
 
-Node analyseEtVariables(FILE *, Node, Ui::MainWindow *);
+Node analyseVariablesStep(FILE *, Node, Ui::MainWindow *);
 
 Node analyseProcedureDeclaration(FILE *, Node, Ui::MainWindow *);
 
