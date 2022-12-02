@@ -14,9 +14,6 @@ bool searchDuplicatedVariableTable(std::string lexema) {
     SymbolNode *nodeToken;
 
     nodeToken = symbolTable.searchLocalSymbol(std::move(lexema));
-    std::cout << lexema;
-//    if (nodeToken != nullptr)
-//        std::cout << nodeToken->identifier << " : " << nodeToken->scope << std::endl;
 
     if (nodeToken == nullptr) {
         return false;
@@ -81,7 +78,6 @@ bool searchDeclaratedVariableOrFunctionTable(std::string lexema) {
             return false;
         }
     }
-
 }
 
 bool searchDeclaratedProcedureTable(std::string lexema) {
@@ -116,6 +112,23 @@ bool searchDuplicatedProcedureTable(std::string lexema) {
     }
 }
 
+
+bool searchVariableAndFunctionTable(std::string lexema) {
+    SymbolNode *nodeToken;
+
+    nodeToken = symbolTable.searchSymbol(std::move(lexema));
+
+    if (nodeToken == nullptr) {
+        return false;
+    } else {
+        if (nodeToken->type != "procedimento") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
 bool isNumber(const std::string &s) {
     return std::ranges::all_of(s, [](char ch) {
         return std::isdigit(ch) != 0;
@@ -130,7 +143,6 @@ std::list<std::string> createInfixListFromExpression(std::string infixExpression
     do {
         result = "";
         while (infixExpression[i] != ' ') {
-
             result += infixExpression[i++];
         }
         resultList.push_back(result);
@@ -161,11 +173,10 @@ int precedence(const std::string &op) {
 
 std::list<std::string> toPostfix(std::list<std::string> expressionList) {
     std::list<std::string> result;
-    std::stack<std::string> s;;
+    std::stack<std::string> s;
 
     while (!expressionList.empty()) {
-        if (searchDeclaratedVariableOrFunctionTable(expressionList.front()) ||
-            isNumber(expressionList.front())) {
+        if (searchVariableAndFunctionTable(expressionList.front()) || isNumber(expressionList.front())) {
             result.push_back(expressionList.front());
             expressionList.pop_front();
         } else if (expressionList.front() == "(") {
@@ -188,6 +199,7 @@ std::list<std::string> toPostfix(std::list<std::string> expressionList) {
             expressionList.pop_front();
         }
     }
+
 
     while (!s.empty()) {
         result.push_back(s.top());
@@ -362,8 +374,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                     if (op2Symbol == nullptr) {
                         if (isIntOperation(i->c_str())) {
                             if ((isNumber(*op1) || strcmpi(op1->c_str(), "#I") == 0) &&
-                                (isNumber(*op2) ||
-                                 strcmpi(op2->c_str(), "#I") == 0)) {
+                                (isNumber(*op2) || strcmpi(op2->c_str(), "#I") == 0)) {
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
                                 ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
@@ -372,13 +383,12 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                         }
                         if (isBooleanOperation(i->c_str())) {
                             if (((isNumber(*op1) || strcmpi(op1->c_str(), "#I") == 0) &&
-                                 (isNumber(*op2) ||
-                                  strcmpi(op2->c_str(), "#I") == 0)) ||
-                                (strcmpi(op1->c_str(), "#B") == 0 || strcmpi(op1->c_str(), "verdadeiro") == 0 ||
-                                 strcmpi(op1->c_str(), "falso") == 0 && strcmpi(op2->c_str(), "#B") == 0 ||
-                                 strcmpi(op2->c_str(), "verdadeiro") == 0 ||
-                                 strcmpi(op2->c_str(), "falso") == 0)) {
-
+                                 (isNumber(*op2) || strcmpi(op2->c_str(), "#I") == 0))
+                                || ((strcmpi(op1->c_str(), "#B") == 0 || strcmpi(op1->c_str(), "verdadeiro") == 0 ||
+                                     strcmpi(op1->c_str(), "falso") == 0)
+                                    && (strcmpi(op2->c_str(), "#B") == 0 ||
+                                        strcmpi(op2->c_str(), "verdadeiro") == 0 ||
+                                        strcmpi(op2->c_str(), "falso") == 0))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
                                 ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
@@ -387,9 +397,8 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                         }
                     } else {
                         if (isIntOperation(i->c_str())) {
-                            if (op2Symbol->type == "inteiro" ||
-                                op2Symbol->type == "funcao inteiro" && isNumber(*op1) ||
-                                strcmpi(op1->c_str(), "#I") == 0) {
+                            if ((op2Symbol->type == "inteiro" || op2Symbol->type == "funcao inteiro")
+                                && ((isNumber(*op1)) || strcmpi(op1->c_str(), "#I") == 0)) {
 
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
@@ -399,12 +408,12 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                         }
 
                         if (isBooleanOperation(i->c_str())) {
-                            if ((op2Symbol->type == "inteiro" ||
-                                 op2Symbol->type == "funcao inteiro" && isNumber(*op1)) ||
-                                (op2Symbol->type == "booleano" ||
-                                 op2Symbol->type == "funcao booleano" ||
-                                 strcmpi(op1->c_str(), "#B") == 0 || strcmpi(op1->c_str(), "verdadeiro") == 0 ||
-                                 strcmpi(op1->c_str(), "falso") == 0)) {
+                            if ((op2Symbol->type == "inteiro" || op2Symbol->type == "funcao inteiro")
+                                && ((isNumber(*op1)) || strcmpi(op1->c_str(), "#I") == 0)
+                                || ((op2Symbol->type == "booleano" || op2Symbol->type == "funcao booleano")
+                                    && (strcmpi(op1->c_str(), "#B") == 0
+                                        || strcmpi(op1->c_str(), "verdadeiro") == 0
+                                        || strcmpi(op1->c_str(), "falso") == 0))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
                                 ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
@@ -415,10 +424,8 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                 } else {
                     if (op2Symbol == nullptr) {
                         if (isIntOperation(i->c_str())) {
-                            if (op1Symbol->type == "inteiro" ||
-                                op1Symbol->type == "funcao inteiro" && isNumber(*op2) ||
-                                strcmpi(op2->c_str(), "#I") == 0) {
-
+                            if ((op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+                                && (isNumber(*op2) || strcmpi(op2->c_str(), "#I") == 0)) {
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
                                 ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
@@ -426,13 +433,13 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                             }
                         }
                         if (isBooleanOperation(i->c_str())) {
-                            if ((op1Symbol->type == "inteiro" ||
-                                 op1Symbol->type == "funcao inteiro" && isNumber(*op2)) ||
-                                (op1Symbol->type == "booleano" ||
-                                 op1Symbol->type == "funcao booleano" &&
-                                 strcmpi(op2->c_str(), "#B") == 0) || strcmpi(op2->c_str(), "verdadeiro") == 0 ||
-                                strcmpi(op2->c_str(), "falso") == 0) {
-
+                            if (((op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+                                 && (isNumber(*op2) || strcmpi(op2->c_str(), "#I") == 0))
+                                || ((op1Symbol->type == "booleano" ||
+                                     op1Symbol->type == "funcao booleano")
+                                    && (strcmpi(op2->c_str(), "#B") == 0
+                                        || strcmpi(op2->c_str(), "verdadeiro") == 0
+                                        || strcmpi(op2->c_str(), "falso") == 0))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
                                 ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
@@ -441,10 +448,8 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                         }
                     } else {
                         if (isIntOperation(i->c_str())) {
-                            if (op1Symbol->type == "inteiro" ||
-                                op1Symbol->type == "funcao inteiro" && op2Symbol->type == "inteiro" ||
-                                op2Symbol->type == "funcao inteiro") {
-
+                            if ((op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+                                && (op2Symbol->type == "inteiro" || op2Symbol->type == "funcao inteiro")) {
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
                                 ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
@@ -453,13 +458,10 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                         }
 
                         if (isBooleanOperation(i->c_str())) {
-                            if ((op1Symbol->type == "inteiro" ||
-                                 op1Symbol->type == "funcao inteiro" && op2Symbol->type == "inteiro" ||
-                                 op2Symbol->type == "funcao inteiro") ||
-                                (op1Symbol->type == "booleano" ||
-                                 op1Symbol->type == "funcao booleano" && op2Symbol->type == "booleano" ||
-                                 op2Symbol->type == "funcao booleano")) {
-
+                            if (((op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+                                 && (op2Symbol->type == "inteiro" || op2Symbol->type == "funcao inteiro"))
+                                || ((op1Symbol->type == "booleano" || op1Symbol->type == "funcao booleano")
+                                    && (op2Symbol->type == "booleano" || op2Symbol->type == "funcao booleano"))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
                                 ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
@@ -487,12 +489,14 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                     if (op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
                         i->replace(i->begin(), i->end(), "#I");
                     else {
-//                    exit(1);
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                        ": Erro Semântico -> Expressão inválida."));
                     }
                 } else if (isNumber(*op1)) {
                     i->replace(i->begin(), i->end(), "#I");
                 } else {
-//                    exit(1);
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                    ": Erro Semântico -> Expressão inválida."));
                 }
 
                 postfix.erase(op1);
@@ -510,12 +514,14 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                          op1Symbol->type == "funcao booleano"))
                         i->replace(i->begin(), i->end(), "#B");
                     else {
-//                        exit(1);
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                        ": Erro Semântico -> Expressão inválida."));
                     }
                 } else if (isNumber(*op1)) {
                     i->replace(i->begin(), i->end(), "#B");
                 } else {
-//                    exit(1);
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                    ": Erro Semântico -> Expressão inválida."));
                 }
 
                 postfix.erase(op1);

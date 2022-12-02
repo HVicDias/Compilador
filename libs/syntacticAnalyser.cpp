@@ -45,8 +45,6 @@ Node analyseVariables(FILE *file, Node token, Ui::MainWindow *ui) {
                 ui->errorArea->appendPlainText("Linha " + QString::number(lineNo) +
                                                ": Erro Semântico -> Identificador \"" +
                                                QString::fromStdString(token.lexema) + "\" já declarado.");
-//                std::cout << "ERRO " << lineNo << std::endl;
-//                exit(1);
             }
 
             token = getToken(file, ui);
@@ -179,7 +177,6 @@ Node analyseProcedureDeclaration(FILE *file, Node token, Ui::MainWindow *ui) {
 
     if (token.simbolo == "sidentificador") {
         if (!searchDuplicatedProcedureTable(token.lexema)) {
-
             SymbolNode *auxSymbol = headerStack.top();
             if (!hadPop) {
                 auxSymbol->labelStart = ++currentLabel;
@@ -329,8 +326,7 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
 
         if (currentNode != nullptr) {
             if (currentNode->type == "funcao inteiro" || currentNode->type == "funcao booleano") {
-                te = analyseFunctionCall(file, te, ui);
-                std::cout << te.token.lexema;
+                te = analyseFunctionCall(file, te, ui);;
             } else {
                 te.expression += te.token.lexema + " ";
                 te.token = getToken(file, ui);
@@ -339,8 +335,8 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
             ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Semântico -> \"" + QString::fromStdString(te.token.lexema) +
                                             "\" não declarado."));
+            te.token = getToken(file, ui);
         }
-
     } else if (te.token.simbolo == "snumero") {
         te.expression += te.token.lexema + " ";
         te.token = getToken(file, ui);
@@ -356,7 +352,8 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
             te.expression += te.token.lexema + " ";
             te.token = getToken(file, ui);
         } else {
-
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Sintático -> Esperado \")\"."));
         }
     } else if (te.token.lexema == "verdadeiro" || te.token.lexema == "falso") {
         te.expression += te.token.lexema + " ";
@@ -413,10 +410,12 @@ Node analyseAttribution(FILE *file, Node token, Node attributionToken, Ui::MainW
 
     te = analyseExpressions(file, te, ui);
 
-    postfix = createInfixListFromExpression(te.expression);
-    postfix = toPostfix(postfix);
-    analysePostfix(postfix, tableToken->memoryAllocation, ui);
-    postfix.clear();
+    if (ui->errorArea->toPlainText().isEmpty()) {
+        postfix = createInfixListFromExpression(te.expression);
+        postfix = toPostfix(postfix);
+        analysePostfix(postfix, tableToken->memoryAllocation, ui);
+        postfix.clear();
+    }
 
     return te.token;
 }
@@ -425,12 +424,12 @@ Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
     if (!searchDeclaratedProcedureTable(token.lexema)) {
         ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Semântico -> Procedimento não declarado."));
-//        exit(1);
+
     } else {
         SymbolNode *node = symbolTable.searchSymbol(token.lexema);
         codeGen.insertNode(new CodeSnippet("CALL", node->labelStart));
+        token = getToken(file, ui);
     }
-    token = getToken(file, ui);
 
     return token;
 }
@@ -558,16 +557,18 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
     te = analyseExpressions(file, te, ui);
     codeGen.insertNode(new CodeSnippet(++currentLabel, "NULL"));
 
-    postfix = createInfixListFromExpression(te.expression);
-    postfix = toPostfix(postfix);
-    analysePostfix(postfix, ui);
-    postfix.clear();
+    if (ui->errorArea->toPlainText().isEmpty()) {
+        postfix = createInfixListFromExpression(te.expression);
+        postfix = toPostfix(postfix);
+        analysePostfix(postfix, ui);
+        postfix.clear();
+    }
 
     if (te.token.simbolo == "sfaca") {
         codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
         te.token = getToken(file, ui);
         te.token = analyseSimpleCommands(file, te.token, ui);
-        std::cout << te.token.lexema;
+
         codeGen.insertNode(new CodeSnippet("JMP", currentLabel - 1));
         codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
     } else {
@@ -588,10 +589,13 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
     std::list<std::string> postfix;
 
     te = analyseExpressions(file, te, ui);
-    postfix = createInfixListFromExpression(te.expression);
-    postfix = toPostfix(postfix);
-    analysePostfix(postfix, ui);
-    postfix.clear();
+
+    if (ui->errorArea->toPlainText().isEmpty()) {
+        postfix = createInfixListFromExpression(te.expression);
+        postfix = toPostfix(postfix);
+        analysePostfix(postfix, ui);
+        postfix.clear();
+    }
 
     if (te.token.simbolo == "sentao") {
         codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
@@ -601,10 +605,6 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
         if (te.token.simbolo == "sponto_virgula") {
             te.token = getToken(file, ui);
         }
-//        else {
-//            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
-//                                            ": Erro Sintático -> Esperado \";\"."));
-//        }
 
         if (te.token.simbolo == "ssenao") {
             codeGen.insertNode(new CodeSnippet("JMP", ++currentLabel));
