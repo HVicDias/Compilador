@@ -35,7 +35,7 @@ bool isPunctuation() {
 }
 
 void jumpSpaces(FILE *file) {
-    while (character == ' ' || character == '\n') {
+    while (character == ' ' || character == '\n' || character == '\t') {
         if (character == '\n') {
             std::cout << (int) character << "//" << lineNo << std::endl;
             lineNo++;
@@ -259,6 +259,7 @@ Node getToken(FILE *file, Ui::MainWindow *ui) {
         s_character += character;
         character = (char) fgetc(file);
 
+        ui->errorArea->appendPlainText("Linha: " + QString::number(lineNo) + ": Erro Léxico -> Símbolo inválido.");
         return {s_character, "invalid symbol"};
     }
 }
