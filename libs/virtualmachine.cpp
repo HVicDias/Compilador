@@ -24,6 +24,7 @@ VirtualMachine::VirtualMachine(QWidget *parent) :
     ui->MemoriaTable->setSelectionMode(QAbstractItemView::NoSelection);
     ui->MemoriaTable->setFocusPolicy(Qt::NoFocus);
     ui->SaidaDeDadosArea->setReadOnly(true);
+    ui->ExecutarButton->setDisabled(true);
 }
 
 void VirtualMachine::addRowCodigoDaMaquinaTable(QString line, QString command, QString attr1, QString attr2) {
@@ -92,6 +93,8 @@ void VirtualMachine::on_actionOpen_triggered() {
                                                 ui->CodigoDaMaquinaTable->item(i, 0)->text().toStdString()));
     }
     programCounter = 0;
+
+    ui->ExecutarButton->setEnabled(true);
 
     file.close();
 }
@@ -543,7 +546,7 @@ bool VirtualMachine::executeLine() {
 }
 
 void VirtualMachine::on_ExecutarButton_clicked() {
-    if (programCounter == ui->CodigoDaMaquinaTable->rowCount() - 1) {
+    if (programCounter == ui->CodigoDaMaquinaTable->rowCount()) {
         programCounter = 0;
         compilerMemoryAllocation = -1;
         while (!returnStack.empty()) {
@@ -556,7 +559,7 @@ void VirtualMachine::on_ExecutarButton_clicked() {
     }
 
     if (mode == "normal") {
-        while (programCounter < ui->CodigoDaMaquinaTable->rowCount() - 1) {
+        while (programCounter < ui->CodigoDaMaquinaTable->rowCount()) {
             ui->CodigoDaMaquinaTable->selectRow(programCounter);
 
             executeLine();

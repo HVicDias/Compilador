@@ -48,6 +48,11 @@ void jumpComentary(FILE *file, Ui::MainWindow *ui) {
     do {
         character = (char) fgetc(file);
 
+        if (character == '\n') {
+            std::cout << (int) character << "//" << lineNo << std::endl;
+            lineNo++;
+        }
+
         if (character == EOF) {
             ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                             ": Erro Léxico -> Comentário sem \"}\"."));

@@ -1,4 +1,4 @@
-{Teste OK}
+{Teste errado excedendo ponto e virgula}
 programa test1;
 var a,b,c,x: inteiro;
 {proc 1}
@@ -24,24 +24,24 @@ procedimento analisa1;
     inicio
       leia(x);
       z:= verdadeiro;
-      se x > 10  entao
+      se (x>1) ou (+x * (-100) > (-func1)) e (nao z)  entao
           inicio
               x:= 3;
-              z:= falso;
+              z:= falso;;
               escreva(x);
           fim;
-      enquanto a > 10  {condicao de parada}
+      enquanto nao ((-a*(-b) = 1064) ou (a<= (-1000)) ou z e (nao z))
       faca inicio
         a:= x+b;
         z:= falso;
       fim;
-      escreva(a);
+      escreva(a);;
     fim;
 
 inicio
     leia(c);
     analisa1;
     se b > (c+ a*a)
-    entao escreva(b);
+    entao escreva(b);;
     senao escreva(c);
 fim.

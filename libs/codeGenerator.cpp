@@ -115,7 +115,8 @@ void CodeGenerator::generateCode() {
         snippet.append(addSpaces(auxNode->command, 8));
         snippet.append(addSpaces(auxNode->firstValue, 4));
         snippet.append(addSpaces(auxNode->secondValue, 4));
-        snippet.append("\n\0");
+        if (auxNode->command != "HLT")
+            snippet.append("\n\0");
         MyFile << snippet;
         auxNode = auxNode->next;
         snippet = "";

@@ -25,6 +25,8 @@ bool searchDeclaratedProcedureTable(std::string);
 
 bool searchDuplicatedProcedureTable(std::string);
 
+bool searchVariableAndFunctionTable(std::string);
+
 std::list<std::string> createInfixListFromExpression(std::string);
 
 int precedence(const std::string &);

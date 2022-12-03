@@ -176,7 +176,8 @@ std::list<std::string> toPostfix(std::list<std::string> expressionList) {
     std::stack<std::string> s;
 
     while (!expressionList.empty()) {
-        if (searchVariableAndFunctionTable(expressionList.front()) || isNumber(expressionList.front())) {
+        if (searchVariableAndFunctionTable(expressionList.front()) || isNumber(expressionList.front()) ||
+            expressionList.front() == "verdadeiro" || expressionList.front() == "falso") {
             result.push_back(expressionList.front());
             expressionList.pop_front();
         } else if (expressionList.front() == "(") {
@@ -283,6 +284,11 @@ bool analyseRelationalOperator(const char *op) {
     } else if (strcmpi(op, "=") == 0) {
         codeGen.insertNode(new CodeSnippet("CEQ"));
         return true;
+    } else if (strcmpi(op, "-u") == 0) {
+        codeGen.insertNode(new CodeSnippet("INV"));
+        return true;
+    } else if (strcmpi(op, "+u") == 0) {
+        return true;
     }
     return false;
 }
@@ -298,42 +304,27 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
 
     bool hasInv = false;
     for (auto &j: postfix) {
-        if (hasInv) {
-            if (isNumber(j)) {
-                codeGen.insertNode(new CodeSnippet("LDC", j.c_str()));
-            } else if (symbolTable.searchSymbol(j) != nullptr) {
-                int memory = symbolTable.searchSymbol(j)->memoryAllocation;
-                if (memory != -1) {
-                    codeGen.insertNode(new CodeSnippet("LDV", memory));
-                }
-            } else {
-                break;
-            }
-            hasInv = false;
-        } else if (strcmpi(j.c_str(), "-u") == 0) {
-            hasInv = true;
-        } else if (analyseRelationalOperator(j.c_str())) {
+        if (analyseRelationalOperator(j.c_str())) {
 
         } else if (analyseLogicOperator(j.c_str())) {
 
         } else if (isNumber(j)) {
             codeGen.insertNode(new CodeSnippet("LDC", j.c_str()));
         } else if (symbolTable.searchSymbol(j) != nullptr) {
-            int memory = symbolTable.searchSymbol(j)->memoryAllocation;
-            if (memory > 0) {
-                codeGen.insertNode(new CodeSnippet("LDV", memory));
+            auto node = symbolTable.searchSymbol(j);
+            if (node->memoryAllocation > 0) {
+                codeGen.insertNode(new CodeSnippet("LDV", node->memoryAllocation));
+            } else {
+                codeGen.insertNode(new CodeSnippet("CALL", node->labelStart));
+                codeGen.insertNode(new CodeSnippet("LDV", 0));
             }
         } else if (strcmpi(j.c_str(), "verdadeiro") == 0) {
             codeGen.insertNode(new CodeSnippet("LDC", 1));
         } else if (strcmpi(j.c_str(), "falso") == 0) {
             codeGen.insertNode(new CodeSnippet("LDC", 0));
-        } else if (strcmpi(j.c_str(), "+u") == 0) {
-            hasInv = true;
         } else {
             break;
         }
-
-
     }
 
     for (auto &j: postfix) {
@@ -347,10 +338,11 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                 auto op2 = std::prev(i);
 
                 if (!isNumber(*op2) && !isIntOperation(op2->c_str()) && !isBooleanOperation(op2->c_str()) &&
-                    strcmpi(op2->c_str(), "#I") != 0 && strcmpi(op2->c_str(), "#B") != 0) {
+                    strcmpi(op2->c_str(), "#I") != 0 && strcmpi(op2->c_str(), "#B") != 0 &&
+                    strcmpi(op2->c_str(), "verdadeiro") != 0 && strcmpi(op2->c_str(), "falso") != 0) {
                     if (symbolTable.searchSymbol(*op2) == nullptr) {
 //                        exit(1);
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Semântico -> Expressão inválida."));
                     }
 
@@ -361,12 +353,12 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                 auto op1 = std::prev(op2);
 
                 if (!isNumber(*op1) && !isIntOperation(op1->c_str()) && !isBooleanOperation(op1->c_str()) &&
-                    strcmpi(op1->c_str(), "#I") != 0 && strcmpi(op1->c_str(), "#B") != 0) {
+                    strcmpi(op1->c_str(), "#I") != 0 && strcmpi(op1->c_str(), "#B") != 0
+                    && strcmpi(op1->c_str(), "verdadeiro") != 0 && strcmpi(op1->c_str(), "falso") != 0) {
                     if (symbolTable.searchSymbol(*op1) == nullptr) {
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Semântico -> Expressão inválida."));
                     }
-
                     op1Symbol = symbolTable.searchSymbol(*op1);
                 }
 
@@ -377,21 +369,22 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                                 (isNumber(*op2) || strcmpi(op2->c_str(), "#I") == 0)) {
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
                         if (isBooleanOperation(i->c_str())) {
                             if (((isNumber(*op1) || strcmpi(op1->c_str(), "#I") == 0) &&
                                  (isNumber(*op2) || strcmpi(op2->c_str(), "#I") == 0))
-                                || ((strcmpi(op1->c_str(), "#B") == 0 || strcmpi(op1->c_str(), "verdadeiro") == 0 ||
-                                     strcmpi(op1->c_str(), "falso") == 0)
+                                || ((strcmpi(op1->c_str(), "#B") == 0
+                                     || strcmpi(op1->c_str(), "verdadeiro") == 0
+                                     || strcmpi(op1->c_str(), "falso") == 0)
                                     && (strcmpi(op2->c_str(), "#B") == 0 ||
                                         strcmpi(op2->c_str(), "verdadeiro") == 0 ||
                                         strcmpi(op2->c_str(), "falso") == 0))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
@@ -402,7 +395,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
 
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
@@ -416,7 +409,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                                         || strcmpi(op1->c_str(), "falso") == 0))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
@@ -428,7 +421,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                                 && (isNumber(*op2) || strcmpi(op2->c_str(), "#I") == 0)) {
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
@@ -442,7 +435,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                                         || strcmpi(op2->c_str(), "falso") == 0))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
@@ -452,7 +445,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                                 && (op2Symbol->type == "inteiro" || op2Symbol->type == "funcao inteiro")) {
                                 i->replace(i->begin(), i->end(), "#I");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
@@ -464,7 +457,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                                     && (op2Symbol->type == "booleano" || op2Symbol->type == "funcao booleano"))) {
                                 i->replace(i->begin(), i->end(), "#B");
                             } else {
-                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                                 ": Erro Semântico -> Expressão inválida."));
                             }
                         }
@@ -476,51 +469,42 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
 
                 postfix.erase(op1);
                 postfix.erase(op2);
-
-                for (auto &j: postfix) {
-                    std::cout << j.c_str();
-                }
-                std::cout << std::endl;
             } else if (isUnaryOperator(i->c_str())) {
                 auto op1 = std::prev(i);
                 op1Symbol = symbolTable.searchSymbol(*op1);
 
                 if (op1Symbol != nullptr) {
-                    if (op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro")
+                    if (op1Symbol->type == "inteiro" || op1Symbol->type == "funcao inteiro"
+                        || strcmpi(op1->c_str(), "#I") == 0)
                         i->replace(i->begin(), i->end(), "#I");
                     else {
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Semântico -> Expressão inválida."));
                     }
                 } else if (isNumber(*op1)) {
                     i->replace(i->begin(), i->end(), "#I");
                 } else {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                     ": Erro Semântico -> Expressão inválida."));
                 }
 
                 postfix.erase(op1);
-
-                for (auto &j: postfix) {
-                    std::cout << j.c_str();
-                }
-                std::cout << std::endl;
             } else if (isNegateOperator(i->c_str())) {
                 auto op1 = std::prev(i);
                 op1Symbol = symbolTable.searchSymbol(*op1);
 
                 if (op1Symbol != nullptr) {
-                    if ((op1Symbol->type == "verdadeiro" || op1Symbol->type == "falso" ||
-                         op1Symbol->type == "funcao booleano"))
+                    if (op1Symbol->type == "booleano" || op1Symbol->type == "funcao booleano")
                         i->replace(i->begin(), i->end(), "#B");
                     else {
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Semântico -> Expressão inválida."));
                     }
-                } else if (isNumber(*op1)) {
+                } else if (strcmpi(op1->c_str(), "verdadeiro") == 0 || strcmpi(op1->c_str(), "falso") == 0
+                           || strcmpi(op1->c_str(), "#B") == 0) {
                     i->replace(i->begin(), i->end(), "#B");
                 } else {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                     ": Erro Semântico -> Expressão inválida."));
                 }
 
@@ -544,11 +528,6 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                 if (op1Symbol->type == "booleano" || op1Symbol->type == "funcao booleano")
                     i->replace(i->begin(), i->end(), "#B");
             }
-
-            for (auto &j: postfix) {
-                std::cout << j.c_str();
-            }
-            std::cout << std::endl;
         }
     }
     if (attribution != -2) {
@@ -558,6 +537,11 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
             codeGen.insertNode(new CodeSnippet("STR", 0));
         }
     }
+
+    for (auto &j: postfix) {
+        std::cout << j.c_str();
+    }
+    std::cout << std::endl;
 
     return postfix;
 }

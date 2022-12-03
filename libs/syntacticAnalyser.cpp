@@ -5,11 +5,14 @@
 #include <stack>
 #include "codeGenerator.h"
 #include "mainwindow.h"
+#include <cstring>
+
 
 int currentMemoryAllocation = 1;
 int currentLabel = 0;
 bool lastReturn = false;
 bool hadPop = false;
+SymbolNode *attributionIdentifier;
 
 std::stack<SymbolNode *> headerStack;
 
@@ -157,6 +160,7 @@ Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
     } else {
         ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Esperado inicio."));
+        token = getToken(file, ui);
     }
 
     return token;
@@ -297,8 +301,6 @@ TokenExpression analyseFunctionCall(FILE *file, TokenExpression te, Ui::MainWind
 //        exit(1);
     } else {
         SymbolNode *node = symbolTable.searchSymbol(te.token.lexema);
-        codeGen.insertNode(new CodeSnippet("CALL", node->labelStart));
-        codeGen.insertNode(new CodeSnippet("LDV", 0));
     }
     te.expression += te.token.lexema + " ";
     te.token = getToken(file, ui);
@@ -311,7 +313,7 @@ TokenExpression analyseExpressions(FILE *file, TokenExpression te, Ui::MainWindo
 
     if (te.token.simbolo == "smaior" || te.token.simbolo == "smaiorig" ||
         te.token.simbolo == "smenor" || te.token.simbolo == "smenorig" ||
-        te.token.simbolo == "sdif") {
+        te.token.simbolo == "sdif" || te.token.simbolo == "sig") {
         te.expression += te.token.lexema + " ";
         te.token = getToken(file, ui);
         te = analyseSimpleExpressions(file, te, ui);
@@ -326,7 +328,7 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
 
         if (currentNode != nullptr) {
             if (currentNode->type == "funcao inteiro" || currentNode->type == "funcao booleano") {
-                te = analyseFunctionCall(file, te, ui);;
+                te = analyseFunctionCall(file, te, ui);
             } else {
                 te.expression += te.token.lexema + " ";
                 te.token = getToken(file, ui);
@@ -344,6 +346,9 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
         te.expression += te.token.lexema + " ";
         te.token = getToken(file, ui);
         te = analyseFactor(file, te, ui);
+    } else if (te.token.simbolo == "sverdadeiro" || te.token.simbolo == "sfalso") {
+        te.expression += te.token.lexema + " ";
+        te.token = getToken(file, ui);
     } else if (te.token.simbolo == "sabre_parenteses") {
         te.expression += te.token.lexema + " ";
         te.token = getToken(file, ui);
@@ -355,9 +360,6 @@ TokenExpression analyseFactor(FILE *file, TokenExpression te, Ui::MainWindow *ui
             ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Sintático -> Esperado \")\"."));
         }
-    } else if (te.token.lexema == "verdadeiro" || te.token.lexema == "falso") {
-        te.expression += te.token.lexema + " ";
-        te.token = getToken(file, ui);
     } else {
         ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Sintático -> Símbolo \"" + QString::fromStdString(te.token.lexema) +
@@ -409,11 +411,19 @@ Node analyseAttribution(FILE *file, Node token, Node attributionToken, Ui::MainW
     std::list<std::string> postfix;
 
     te = analyseExpressions(file, te, ui);
-
     if (ui->errorArea->toPlainText().isEmpty()) {
         postfix = createInfixListFromExpression(te.expression);
         postfix = toPostfix(postfix);
-        analysePostfix(postfix, tableToken->memoryAllocation, ui);
+        postfix = analysePostfix(postfix, tableToken->memoryAllocation, ui);
+        if ((attributionIdentifier->type == "booleano" || attributionIdentifier->type == "funcao booleano")
+            && strcmpi(postfix.begin()->c_str(), "#B") != 0) {
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Semântico -> Expressão inválida."));
+        } else if ((attributionIdentifier->type == "inteiro" || attributionIdentifier->type == "funcao inteiro")
+                   && strcmpi(postfix.begin()->c_str(), "#I") != 0) {
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Semântico -> Expressão inválida."));
+        }
         postfix.clear();
     }
 
@@ -437,9 +447,15 @@ Node analyseProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
 Node analyseAttributionAndProcedureCall(FILE *file, Node token, Ui::MainWindow *ui) {
     Node auxAttributionToken = token;
 
-    if (!searchDeclaratedProcedureTable(token.lexema))
+    if (!searchDeclaratedProcedureTable(token.lexema)) {
+        if (searchVariableAndFunctionTable(token.lexema)) {
+            attributionIdentifier = symbolTable.searchSymbol(token.lexema);
+        } else {
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Semântico -> Identificador não encontrado."));
+        }
         token = getToken(file, ui);
-
+    }
     if (token.simbolo == "satribuicao") {
         token = analyseAttribution(file, token, auxAttributionToken, ui);
     } else {
@@ -560,7 +576,10 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
     if (ui->errorArea->toPlainText().isEmpty()) {
         postfix = createInfixListFromExpression(te.expression);
         postfix = toPostfix(postfix);
-        analysePostfix(postfix, ui);
+        postfix = analysePostfix(postfix, ui);
+        if (strcmpi(postfix.begin()->c_str(), "#B") != 0)
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Semântico -> Expressão inválida."));
         postfix.clear();
     }
 
@@ -593,7 +612,10 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
     if (ui->errorArea->toPlainText().isEmpty()) {
         postfix = createInfixListFromExpression(te.expression);
         postfix = toPostfix(postfix);
-        analysePostfix(postfix, ui);
+        postfix = analysePostfix(postfix, ui);
+        if (strcmpi(postfix.begin()->c_str(), "#B") != 0)
+            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Semântico -> Expressão inválida."));
         postfix.clear();
     }
 
@@ -601,7 +623,6 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
         codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
         te.token = getToken(file, ui);
         te.token = analyseSimpleCommands(file, te.token, ui);
-
         if (te.token.simbolo == "sponto_virgula") {
             te.token = getToken(file, ui);
         }
@@ -611,6 +632,9 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
             codeGen.insertNode(new CodeSnippet(currentLabel - 1, "NULL"));
             te.token = getToken(file, ui);
             te.token = analyseSimpleCommands(file, te.token, ui);
+            if (te.token.simbolo == "sponto_virgula") {
+                te.token = getToken(file, ui);
+            }
             codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
         } else {
             codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
