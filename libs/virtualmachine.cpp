@@ -20,7 +20,8 @@ VirtualMachine::VirtualMachine(QWidget *parent) :
     ui->CodigoDaMaquinaTable->verticalHeader()->setVisible(false);
     ui->MemoriaTable->verticalHeader()->setVisible(false);
     ui->CodigoDaMaquinaTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    ui->CodigoDaMaquinaTable->setEnabled(false);
+    ui->CodigoDaMaquinaTable->setDisabled(true);
+    ui->MemoriaTable->setDisabled(true);
     ui->MemoriaTable->setSelectionMode(QAbstractItemView::NoSelection);
     ui->MemoriaTable->setFocusPolicy(Qt::NoFocus);
     ui->SaidaDeDadosArea->setReadOnly(true);
@@ -60,19 +61,17 @@ void VirtualMachine::on_PassoAPassoRadioButton_clicked() {
 
 
 void VirtualMachine::on_actionOpen_triggered() {
-    QString filename = QFileDialog::getOpenFileName(this, "Open File",
+    QString filename = QFileDialog::getOpenFileName(this, "Abrir Arquivo",
                                                     "C://Users//renat//CLionProjects//Compiler//cmake-build-debug",
                                                     "Object File (*.obj);");
     QFile file(filename);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "Warning", "Cannot open file!");
         return;
     }
 
     currentFile = filename;
 
-    programCounter = 0;
 
     ui->CodigoDaMaquinaTable->setRowCount(0);
     ui->MemoriaTable->setRowCount(0);
@@ -81,6 +80,17 @@ void VirtualMachine::on_actionOpen_triggered() {
     while (!stream.atEnd()) {
         QString line = stream.readLine();
         formatCodigoDaMaquinaLine(line.toStdString());
+    }
+    programCounter = 0;
+    ui->CodigoDaMaquinaTable->scrollToTop();
+
+    compilerMemoryAllocation = -1;
+    while (!returnStack.empty()) {
+        returnStack.pop();
+    }
+
+    while (!memoryStack.empty()) {
+        memoryStack.pop_back();
     }
 
     while (!labelJmp.empty()) {
@@ -92,11 +102,11 @@ void VirtualMachine::on_actionOpen_triggered() {
             labelJmp.push_front(std::make_tuple(i,
                                                 ui->CodigoDaMaquinaTable->item(i, 0)->text().toStdString()));
     }
-    programCounter = 0;
 
     ui->ExecutarButton->setEnabled(true);
 
     file.close();
+
 }
 
 void VirtualMachine::formatCodigoDaMaquinaLine(std::string line) {
@@ -473,11 +483,10 @@ bool VirtualMachine::uiInteractionsAnalyser() {
 
         do {
             do {
-                text = QInputDialog::getText(this, "Read",
-                                             "Digite o valor da variavel", QLineEdit::Normal,
+                text = QInputDialog::getText(this, "Leia",
+                                             "Digite o valor do identificador", QLineEdit::Normal,
                                              "", &ok);
             } while (text.isEmpty());
-            ui->SaidaDeDadosArea->appendPlainText(text);
         } while (!isNumber(text));
 
         if (text == "verdadeiro") {
@@ -573,4 +582,10 @@ void VirtualMachine::on_ExecutarButton_clicked() {
 
         setStyleSheet("QTableView::item:selected {background-color: #fffc9c; color: black}");
     }
+}
+
+void VirtualMachine::on_actionSobreAMaquinaVirtual_triggered() {
+    QMessageBox::information(this, "Information",
+                             "Máquina Virtual desenvolvida pelos alunos da PUC-Campinas \n Henrique Victorino Dias - 19030550\n Renato Barba dos Santos - 19246529 \n Vinicius Rabelo Mancini - 19006568");
+
 }

@@ -32,11 +32,9 @@ public:
 
 private slots:
 
-    void on_openFileButton_clicked();
+    void on_CodeArea_textChanged();
 
-    void on_codeArea_textChanged();
-
-    void on_compilarButton_clicked();
+    void on_CompilarButton_clicked();
 
     void on_actionOpen_triggered();
 
@@ -46,11 +44,11 @@ private slots:
 
     void on_actionSobre_o_Compilador_triggered();
 
+    void on_actionAbrir_Maquina_Virtual_triggered();
 
 private:
     Ui::MainWindow *ui;
     QString currentFile = "";
-
 
     VirtualMachine *vm;
 };

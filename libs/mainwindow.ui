@@ -6,97 +6,107 @@
             <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>813</width>
-                <height>603</height>
+                <width>800</width>
+                <height>600</height>
             </rect>
         </property>
         <property name="windowTitle">
             <string>MainWindow</string>
         </property>
         <widget class="QWidget" name="centralwidget">
-            <widget class="QLabel" name="arquivoLabel">
+            <widget class="QLabel" name="ArquivoLabel">
                 <property name="geometry">
                     <rect>
-                        <x>40</x>
+                        <x>20</x>
                         <y>30</y>
-                        <width>71</width>
+                        <width>81</width>
                         <height>20</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
                 </property>
                 <property name="text">
                     <string>Arquivo:</string>
                 </property>
             </widget>
-            <widget class="QPushButton" name="openFileButton">
+            <widget class="CodeEditor" name="CodeArea">
                 <property name="geometry">
                     <rect>
-                        <x>100</x>
-                        <y>30</y>
-                        <width>221</width>
-                        <height>29</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Open File</string>
-                </property>
-            </widget>
-            <widget class="CodeEditor" name="codeArea">
-                <property name="geometry">
-                    <rect>
-                        <x>40</x>
+                        <x>20</x>
                         <y>80</y>
-                        <width>661</width>
+                        <width>751</width>
                         <height>321</height>
                     </rect>
                 </property>
             </widget>
-            <widget class="QLabel" name="errorLabel">
+            <widget class="QLabel" name="ErrorLabel">
                 <property name="geometry">
                     <rect>
-                        <x>40</x>
-                        <y>450</y>
+                        <x>20</x>
+                        <y>430</y>
                         <width>63</width>
                         <height>20</height>
                     </rect>
                 </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
                 <property name="text">
-                    <string>Erros:</string>
+                    <string>Erros</string>
                 </property>
             </widget>
-            <widget class="QPlainTextEdit" name="errorArea">
+            <widget class="QPlainTextEdit" name="ErrorArea">
                 <property name="geometry">
                     <rect>
-                        <x>40</x>
-                        <y>470</y>
-                        <width>491</width>
-                        <height>61</height>
+                        <x>20</x>
+                        <y>460</y>
+                        <width>501</width>
+                        <height>101</height>
                     </rect>
                 </property>
+                <property name="styleSheet">
+                    <string notr="true">background-color: white</string>
+                </property>
             </widget>
-            <widget class="QPushButton" name="compilarButton">
+            <widget class="QPushButton" name="CompilarButton">
                 <property name="geometry">
                     <rect>
                         <x>610</x>
-                        <y>430</y>
-                        <width>121</width>
-                        <height>41</height>
+                        <y>470</y>
+                        <width>131</width>
+                        <height>61</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
                 </property>
                 <property name="text">
                     <string>Compilar</string>
                 </property>
             </widget>
-            <widget class="QProgressBar" name="progressBar">
+            <widget class="QLabel" name="ArquivoName">
                 <property name="geometry">
                     <rect>
-                        <x>590</x>
-                        <y>500</y>
-                        <width>161</width>
-                        <height>31</height>
+                        <x>90</x>
+                        <y>30</y>
+                        <width>681</width>
+                        <height>20</height>
                     </rect>
                 </property>
-                <property name="value">
-                    <number>24</number>
+                <property name="font">
+                    <font>
+                        <pointsize>11</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string/>
                 </property>
             </widget>
         </widget>
@@ -105,7 +115,7 @@
                 <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>813</width>
+                    <width>800</width>
                     <height>25</height>
                 </rect>
             </property>
@@ -123,28 +133,40 @@
                 </property>
                 <addaction name="actionSobre_o_Compilador"/>
             </widget>
+            <widget class="QMenu" name="menuMaquina_Virtual">
+                <property name="title">
+                    <string>Máquina Virtual</string>
+                </property>
+                <addaction name="actionAbrir_Maquina_Virtual"/>
+            </widget>
             <addaction name="menuArquivo"/>
+            <addaction name="menuMaquina_Virtual"/>
             <addaction name="menuSobre"/>
         </widget>
         <widget class="QStatusBar" name="statusbar"/>
         <action name="actionSave">
             <property name="text">
-                <string>Save</string>
+                <string>Salvar</string>
             </property>
         </action>
         <action name="actionSave_as">
             <property name="text">
-                <string>Save as</string>
+                <string>Salvar Como</string>
             </property>
         </action>
         <action name="actionOpen">
             <property name="text">
-                <string>Open</string>
+                <string>Abrir</string>
             </property>
         </action>
         <action name="actionSobre_o_Compilador">
             <property name="text">
                 <string>Sobre o Compilador</string>
+            </property>
+        </action>
+        <action name="actionAbrir_Maquina_Virtual">
+            <property name="text">
+                <string>Abrir Máquina Virtual</string>
             </property>
         </action>
     </widget>

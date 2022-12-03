@@ -19,8 +19,7 @@ var a,b,s: inteiro;
   var x: inteiro;
   inicio
     leia(x);   {para parar digite um valor maior que 9 }
-    {abs*4div32*+111+2*+>}
-    se 2 + 2
+    se x < 10
     entao inicio
         ler;
     fim;

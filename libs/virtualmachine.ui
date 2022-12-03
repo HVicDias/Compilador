@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>VirtualMachine</class>
-    <widget class="QMainWindow" name="VirtualMachine">
+    <class>MaquinaVirtual</class>
+    <widget class="QMainWindow" name="MaquinaVirtual">
         <property name="geometry">
             <rect>
                 <x>0</x>
@@ -18,23 +18,33 @@
                 <property name="geometry">
                     <rect>
                         <x>20</x>
-                        <y>30</y>
-                        <width>131</width>
-                        <height>20</height>
+                        <y>60</y>
+                        <width>201</width>
+                        <height>31</height>
                     </rect>
                 </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
                 <property name="text">
-                    <string>Còdigo da Máquina</string>
+                    <string>Código da Máquina</string>
                 </property>
             </widget>
             <widget class="QLabel" name="MemoriaLabel">
                 <property name="geometry">
                     <rect>
-                        <x>950</x>
-                        <y>30</y>
-                        <width>131</width>
-                        <height>20</height>
+                        <x>1010</x>
+                        <y>60</y>
+                        <width>161</width>
+                        <height>31</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
                 </property>
                 <property name="text">
                     <string>Memória (Pilha)</string>
@@ -45,9 +55,14 @@
                     <rect>
                         <x>20</x>
                         <y>450</y>
-                        <width>131</width>
-                        <height>20</height>
+                        <width>151</width>
+                        <height>31</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
                 </property>
                 <property name="text">
                     <string>Saída de Dados</string>
@@ -56,11 +71,16 @@
             <widget class="QLabel" name="ModoDeExecucaoLabel">
                 <property name="geometry">
                     <rect>
-                        <x>640</x>
-                        <y>490</y>
-                        <width>131</width>
-                        <height>20</height>
+                        <x>670</x>
+                        <y>160</y>
+                        <width>191</width>
+                        <height>31</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
                 </property>
                 <property name="text">
                     <string>Modo de Execução</string>
@@ -69,11 +89,16 @@
             <widget class="QRadioButton" name="NormalRadioButton">
                 <property name="geometry">
                     <rect>
-                        <x>650</x>
-                        <y>520</y>
+                        <x>690</x>
+                        <y>190</y>
                         <width>112</width>
-                        <height>26</height>
+                        <height>31</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
                 </property>
                 <property name="text">
                     <string>Normal</string>
@@ -82,11 +107,16 @@
             <widget class="QRadioButton" name="PassoAPassoRadioButton">
                 <property name="geometry">
                     <rect>
-                        <x>650</x>
-                        <y>550</y>
-                        <width>112</width>
-                        <height>26</height>
+                        <x>690</x>
+                        <y>220</y>
+                        <width>161</width>
+                        <height>31</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
                 </property>
                 <property name="text">
                     <string>Passo a Passo</string>
@@ -96,8 +126,8 @@
                 <property name="geometry">
                     <rect>
                         <x>20</x>
-                        <y>480</y>
-                        <width>421</width>
+                        <y>490</y>
+                        <width>521</width>
                         <height>171</height>
                     </rect>
                 </property>
@@ -106,7 +136,7 @@
                 <property name="geometry">
                     <rect>
                         <x>20</x>
-                        <y>60</y>
+                        <y>100</y>
                         <width>501</width>
                         <height>341</height>
                     </rect>
@@ -135,8 +165,8 @@
             <widget class="QTableWidget" name="MemoriaTable">
                 <property name="geometry">
                     <rect>
-                        <x>940</x>
-                        <y>60</y>
+                        <x>1010</x>
+                        <y>100</y>
                         <width>251</width>
                         <height>341</height>
                     </rect>
@@ -155,27 +185,59 @@
             <widget class="QPushButton" name="ExecutarButton">
                 <property name="geometry">
                     <rect>
-                        <x>910</x>
-                        <y>510</y>
-                        <width>83</width>
-                        <height>29</height>
+                        <x>680</x>
+                        <y>290</y>
+                        <width>171</width>
+                        <height>91</height>
                     </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                        <bold>true</bold>
+                    </font>
+                </property>
+                <property name="autoFillBackground">
+                    <bool>false</bool>
                 </property>
                 <property name="text">
                     <string>Executar</string>
                 </property>
             </widget>
-            <widget class="QPushButton" name="PararButton">
+            <widget class="QLabel" name="ArquivoName">
                 <property name="geometry">
                     <rect>
-                        <x>1010</x>
-                        <y>510</y>
-                        <width>83</width>
-                        <height>29</height>
+                        <x>90</x>
+                        <y>20</y>
+                        <width>681</width>
+                        <height>20</height>
                     </rect>
                 </property>
+                <property name="font">
+                    <font>
+                        <pointsize>11</pointsize>
+                    </font>
+                </property>
                 <property name="text">
-                    <string>Parar</string>
+                    <string/>
+                </property>
+            </widget>
+            <widget class="QLabel" name="ArquivoLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>20</y>
+                        <width>81</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Arquivo:</string>
                 </property>
             </widget>
         </widget>
@@ -198,6 +260,7 @@
                 <property name="title">
                     <string>Sobre</string>
                 </property>
+                <addaction name="actionSobreAMaquinaVirtual"/>
             </widget>
             <addaction name="menuArquivo"/>
             <addaction name="menuSobre"/>
@@ -205,7 +268,12 @@
         <widget class="QStatusBar" name="statusbar"/>
         <action name="actionOpen">
             <property name="text">
-                <string>Open</string>
+                <string>Abrir</string>
+            </property>
+        </action>
+        <action name="actionSobreAMaquinaVirtual">
+            <property name="text">
+                <string>Sobre a Máquina Virtual</string>
             </property>
         </action>
     </widget>

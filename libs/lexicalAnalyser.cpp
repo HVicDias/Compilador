@@ -54,12 +54,12 @@ void jumpComentary(FILE *file, Ui::MainWindow *ui) {
         }
 
         if (character == EOF) {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                             ": Erro Léxico -> Comentário sem \"}\"."));
 //            exit(1);
         }
         if (character == '{') {
-            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                             ": Erro Léxico -> Comentário sem \"}\"."));
         }
     } while (character != '}');
@@ -259,7 +259,7 @@ Node getToken(FILE *file, Ui::MainWindow *ui) {
         s_character += character;
         character = (char) fgetc(file);
 
-        ui->errorArea->appendPlainText("Linha: " + QString::number(lineNo) + ": Erro Léxico -> Símbolo inválido.");
+        ui->ErrorArea->appendPlainText("Linha: " + QString::number(lineNo) + ": Erro Léxico -> Símbolo inválido.");
         return {s_character, "invalid symbol"};
     }
 }

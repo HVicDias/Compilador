@@ -18,19 +18,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->setWindowTitle("Compilador");
 
-    ui->compilarButton->setEnabled(false);
-    ui->errorArea->setEnabled(false);
+    ui->CompilarButton->setEnabled(false);
+    ui->ErrorArea->setReadOnly(true);
 }
 
-void MainWindow::on_codeArea_textChanged() {
-    if (ui->codeArea->document()->isEmpty()) {
-        ui->compilarButton->setEnabled(false);
+void MainWindow::on_CodeArea_textChanged() {
+    if (ui->CodeArea->document()->isEmpty()) {
+        ui->CompilarButton->setEnabled(false);
     } else {
-        ui->compilarButton->setEnabled(true);
+        ui->CompilarButton->setEnabled(true);
     }
 }
 
-void MainWindow::on_compilarButton_clicked() {
+void MainWindow::on_CompilarButton_clicked() {
     if (currentFile == "") {
         while (currentFile == "") {
             on_actionSave_as_triggered();
@@ -46,8 +46,8 @@ void MainWindow::on_compilarButton_clicked() {
     currentLabel = 0;
     lastReturn = false;
     hadPop = false;
-    ui->errorArea->clear();
-    ui->errorArea->setPlainText("");
+    ui->ErrorArea->clear();
+    ui->ErrorArea->setPlainText("");
 
     sleep(1);
 
@@ -84,30 +84,31 @@ void MainWindow::on_compilarButton_clicked() {
                         token = analyseBlock(f, token, this->ui);
 
                         if (token.simbolo == "sponto") {
-                            if (ui->errorArea->toPlainText().isEmpty()) {
+                            if (ui->ErrorArea->toPlainText().isEmpty()) {
                                 vm = new VirtualMachine(this);
                                 vm->show();
                             }
                         } else {
-                            ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                                             ": Erro Sintático -> Esperado \".\"."));
                         }
                     } else {
-                        ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                                         ": Erro Sintático -> Esperado \";\"."));
                     }
                 } else {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                                     ": Erro Sintático -> Esperado um identificador."));
                 }
             } else {
                 if (character != EOF) {
-                    ui->errorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
                                                     ": Erro Sintático -> Esperado \"programa\"."));
                 }
             }
         } else {
-            cout << "Erro29" << endl;
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Léxico -> Caracter inválido."));
         }
 
     } while (character != EOF);
@@ -124,7 +125,7 @@ void MainWindow::on_compilarButton_clicked() {
     codeGen.insertNode(snippet);
 
 
-    if (ui->errorArea->toPlainText().isEmpty()) {
+    if (ui->ErrorArea->toPlainText().isEmpty()) {
         codeGen.printList();
         codeGen.generateCode();
         codeGen.deleteCode();
@@ -134,39 +135,15 @@ void MainWindow::on_compilarButton_clicked() {
     cout << lineNo << endl;
 }
 
-void MainWindow::on_openFileButton_clicked() {
-    ui->codeArea->clear();
-    ui->errorArea->clear();
-
-    QString filename = QFileDialog::getOpenFileName(this, "Open File",
-                                                    "C://Users//renat//CLionProjects//Compiler//testes",
-                                                    "Text File (*.txt);");
-    QFile file(filename);
-    currentFile = filename;
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "Warning", "Cannot open file!");
-    }
-
-    QTextStream stream(&file);
-    QString text = stream.readAll();
-
-    ui->codeArea->appendPlainText(text);
-    ui->codeArea->verticalScrollBar()->setValue(0);
-
-    file.close();
-}
-
 void MainWindow::on_actionOpen_triggered() {
-    ui->codeArea->clear();
+    ui->CodeArea->clear();
 
-    QString filename = QFileDialog::getOpenFileName(this, "Open File",
+    QString filename = QFileDialog::getOpenFileName(this, "Abrir Arquivo",
                                                     "C://Users//renat//CLionProjects//Compiler//testes",
                                                     "Text File (*.txt);");
     QFile file(filename);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "Warning", "Cannot open file!");
         return;
     }
 
@@ -174,9 +151,10 @@ void MainWindow::on_actionOpen_triggered() {
 
     QTextStream stream(&file);
     QString text = stream.readAll();
-    ui->codeArea->appendPlainText(text);
-    ui->codeArea->verticalScrollBar()->setValue(0);
-    ui->errorArea->clear();
+    ui->ArquivoName->setText(filename);
+    ui->CodeArea->appendPlainText(text);
+    ui->CodeArea->verticalScrollBar()->setValue(0);
+    ui->ErrorArea->clear();
     file.close();
 }
 
@@ -188,33 +166,39 @@ void MainWindow::on_actionSave_triggered() {
         file.open(QIODevice::WriteOnly);
 
         QByteArray outputByteArray;
-        outputByteArray.append(ui->codeArea->toPlainText().toUtf8());
+        outputByteArray.append(ui->CodeArea->toPlainText().toUtf8());
 
-        ui->errorArea->clear();
+        ui->ErrorArea->clear();
         file.write(outputByteArray);
         file.commit();
     }
 }
 
 void MainWindow::on_actionSave_as_triggered() {
-    QString filename = QFileDialog::getSaveFileName(this, "Save as",
+    QString filename = QFileDialog::getSaveFileName(this, "Salvar como",
                                                     "C://Users//renat//CLionProjects//Compiler//testes",
                                                     "Text File (*.txt);");
     QFile file(filename);
 
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, "Warning", "Cannot save file!");
+        QMessageBox::warning(this, "Warning", "Error ao salvar o arquivo!");
         return;
     }
 
     currentFile = filename;
     QTextStream stream(&file);
-    QString text = ui->codeArea->toPlainText();
+    QString text = ui->CodeArea->toPlainText();
     stream << text;
     file.close();
 
-    ui->errorArea->clear();
-    ui->errorArea->setPlainText("");
+    ui->ErrorArea->clear();
+}
+
+// ToDo abrir Máquina Virtual
+
+void MainWindow::on_actionAbrir_Maquina_Virtual_triggered() {
+    vm = new VirtualMachine(this);
+    vm->show();
 }
 
 void MainWindow::on_actionSobre_o_Compilador_triggered() {

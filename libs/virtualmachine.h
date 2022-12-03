@@ -65,9 +65,12 @@ private slots:
 
     void removeRowMemoriaTable(int row);
 
+    void on_ExecutarButton_clicked();
+
     void on_actionOpen_triggered();
 
-    void on_ExecutarButton_clicked();
+    void on_actionSobreAMaquinaVirtual_triggered();
+
 
 private:
     Ui::VirtualMachine *ui;
