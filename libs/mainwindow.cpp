@@ -81,6 +81,7 @@ void MainWindow::on_CompilarButton_clicked() {
                     token = analyseBlock(f, token, this->ui);
 
                     if (token.simbolo == "sponto") {
+                        // ToDo verificar se tem caracteres apos o fim do programa
                         if (ui->ErrorArea->toPlainText().isEmpty()) {
                             vm = new VirtualMachine(this);
                             vm->show();

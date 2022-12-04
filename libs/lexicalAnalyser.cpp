@@ -79,11 +79,15 @@ Node handleDigit(FILE *file) {
     return {lexema, "snumero"};
 }
 
-Node handleIdAndSpecialWord(FILE *file) {
+Node handleIdAndSpecialWord(FILE *file, Ui::MainWindow *ui) {
     std::string lexema;
     std::string simbolo;
 
-    while (isLetter() || isDigit() || isUnderscore()) {
+    while ((isLetter() || isDigit() || isUnderscore())) {
+        if (lexema.size() > 30) {
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Léxico -> Identificador muito grande."));
+        }
         lexema += character;
         character = (char) fgetc(file);
     }
@@ -246,7 +250,7 @@ Node getToken(FILE *file, Ui::MainWindow *ui) {
     if (isDigit()) {
         return handleDigit(file);
     } else if (isLetter()) {
-        return handleIdAndSpecialWord(file);
+        return handleIdAndSpecialWord(file, ui);
     } else if (character == ':') {
         return handleAttribution(file);
     } else if (isArithmeticOperator()) {

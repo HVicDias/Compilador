@@ -2,27 +2,27 @@
 }
 
 programa test;
-var a,b,s: inteiro;                 
-             
+var a,b,s: inteiro;
+
  funcao soma: inteiro;
  var c,a,s: inteiro;
      z: booleano;
   procedimento ler;
   inicio
-     leia(c);
-     leia(a);
+     leia (c);
+     leia (a);
      s:= soma;
-     escreva(s);
+     escreva (s);
   fim;
-
   procedimento loop;
   var x: inteiro;
   inicio
-    leia(x);   {para parar digite um valor maior que 9 }
+    leia (x);   {para parar digite um valor maior que 9 }
     se x < 10
     entao inicio
-        ler;
-    fim;
+    x:= 1;
+    fim
+   senao ler;
   fim;
 
  inicio  {corpo da funcao soma}
@@ -30,7 +30,10 @@ var a,b,s: inteiro;
   soma:= c+a;
  fim;
 
+
 inicio      {corpo principal}
   s:= soma;
   escreva(s);
 fim.
+
+

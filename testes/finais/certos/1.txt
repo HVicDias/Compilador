@@ -33,8 +33,7 @@ procedimento analisa1;
           {nao ((-a*(-b) = 1064) ou (a<= (-1000)) ou z e (nao z))}
       enquanto nao ((-a*(-b) = 1064) ou (a<= (-1000)) ou z e (nao z))
       faca inicio
-        a:= x+b;
-        z:= falso;
+        analisa2;
       fim;
       escreva(a);
     fim;

@@ -31,7 +31,7 @@ void jumpComentary(FILE *file, Ui::MainWindow *);
 
 Node handleDigit(FILE *file);
 
-Node handleIdAndSpecialWord(FILE *file);
+Node handleIdAndSpecialWord(FILE *file, Ui::MainWindow *);
 
 Node handleAttribution(FILE *file);
 

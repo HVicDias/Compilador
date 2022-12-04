@@ -12,6 +12,7 @@ int currentMemoryAllocation = 1;
 int currentLabel = 0;
 bool lastReturn = false;
 bool hadPop = false;
+bool isIf = false;
 SymbolNode *attributionIdentifier;
 
 std::stack<SymbolNode *> headerStack;
@@ -148,6 +149,7 @@ Node analyseSimpleCommands(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseCommands(FILE *file, Node token, Ui::MainWindow *ui) {
+    isIf = false;
     if (ui->ErrorArea->toPlainText().isEmpty()) {
         if (token.simbolo == "sinicio") {
             SymbolNode *auxSymbol = headerStack.top();
@@ -501,11 +503,13 @@ Node analyseAttributionAndProcedureCall(FILE *file, Node token, Ui::MainWindow *
             token = analyseProcedureCall(file, token, ui);
         }
 
-        if (token.simbolo == "sponto_virgula") {
-            token = getToken(file, ui);
-        } else {
-            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
-                                            ": Erro Sintático -> Esperado \";\"."));
+        if (!isIf) {
+            if (token.simbolo == "sponto_virgula") {
+                token = getToken(file, ui);
+            } else {
+                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                                ": Erro Sintático -> Esperado \";\"."));
+            }
         }
     }
 
@@ -646,6 +650,7 @@ Node analyseWhile(FILE *file, Node token, Ui::MainWindow *ui) {
 }
 
 Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
+    isIf = true;
     TokenExpression te;
     token = getToken(file, ui);
 
@@ -668,9 +673,6 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
             codeGen.insertNode(new CodeSnippet("JMPF", ++currentLabel));
             te.token = getToken(file, ui);
             te.token = analyseSimpleCommands(file, te.token, ui);
-            if (te.token.simbolo == "sponto_virgula") {
-                te.token = getToken(file, ui);
-            }
 
             if (te.token.simbolo == "ssenao") {
                 codeGen.insertNode(new CodeSnippet("JMP", ++currentLabel));
@@ -682,6 +684,15 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
                 }
                 codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
             } else {
+                if (te.token.simbolo == "sponto_virgula") {
+                    te.token = getToken(file, ui);
+                }
+
+                if (te.token.simbolo == "ssenao") {
+                    ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                                    ": Erro Sintático -> \";\" inesperado."));
+                }
+
                 codeGen.insertNode(new CodeSnippet(currentLabel, "NULL"));
             }
         } else {
@@ -690,5 +701,6 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
         }
     }
 
+    isIf = false;
     return te.token;
 }
