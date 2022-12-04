@@ -68,12 +68,17 @@ void jumpComentary(FILE *file, Ui::MainWindow *ui) {
     character = (char) fgetc(file);
 }
 
-Node handleDigit(FILE *file) {
+Node handleDigit(FILE *file, Ui::MainWindow *ui) {
     std::string lexema;
 
     while (isDigit()) {
         lexema += character;
         character = (char) fgetc(file);
+
+        if (isLetter() || isUnderscore()) {
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Léxico -> Letra ou \"_\" inesperado."));
+        }
     }
 
     return {lexema, "snumero"};
@@ -82,13 +87,16 @@ Node handleDigit(FILE *file) {
 Node handleIdAndSpecialWord(FILE *file, Ui::MainWindow *ui) {
     std::string lexema;
     std::string simbolo;
+    int size = 0;
 
-    while ((isLetter() || isDigit() || isUnderscore())) {
-        if (lexema.size() > 30) {
+    while (isLetter() || isDigit() || isUnderscore()) {
+        if (size > 29) {
             ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Léxico -> Identificador muito grande."));
+            break;
         }
         lexema += character;
+        size++;
         character = (char) fgetc(file);
     }
 
@@ -248,7 +256,7 @@ Node getToken(FILE *file, Ui::MainWindow *ui) {
     }
 
     if (isDigit()) {
-        return handleDigit(file);
+        return handleDigit(file, ui);
     } else if (isLetter()) {
         return handleIdAndSpecialWord(file, ui);
     } else if (character == ':') {

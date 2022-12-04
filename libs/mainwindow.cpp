@@ -46,7 +46,7 @@ void MainWindow::on_CompilarButton_clicked() {
     hadPop = false;
     ui->ErrorArea->clear();
     ui->ErrorArea->setPlainText("");
-
+    codeGen.deleteCode();
     sleep(1);
 
     Node token;
@@ -124,9 +124,9 @@ void MainWindow::on_CompilarButton_clicked() {
     if (ui->ErrorArea->toPlainText().isEmpty()) {
         codeGen.printList();
         codeGen.generateCode();
-        codeGen.deleteCode();
     }
 
+    codeGen.deleteCode();
     fclose(f);
     cout << lineNo << endl;
 }

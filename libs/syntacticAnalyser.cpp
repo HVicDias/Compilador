@@ -88,6 +88,9 @@ Node analyseVariablesStep(FILE *file, Node token, Ui::MainWindow *ui) {
 
             if (token.simbolo == "sidentificador") {
                 while (token.simbolo == "sidentificador") {
+                    if (!ui->ErrorArea->toPlainText().isEmpty()) {
+                        break;
+                    }
                     token = analyseVariables(file, token, ui);
 
                     if (token.simbolo == "sponto_virgula") {
@@ -535,11 +538,18 @@ Node analyseRead(FILE *file, Node token, Ui::MainWindow *ui) {
                     if (token.simbolo == "sfecha_parenteses") {
                         token = getToken(file, ui);
 
-                        if (token.simbolo == "sponto_virgula") {
-                            token = getToken(file, ui);
+                        if (!isIf) {
+                            if (token.simbolo == "sponto_virgula") {
+                                token = getToken(file, ui);
+                            } else {
+                                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                                                ": Erro Sintático -> Esperado \";\"."));
+                            }
                         } else {
-                            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
-                                                            ": Erro Sintático -> Esperado \";\"."));
+                            if (token.simbolo == "sponto_virgula") {
+                                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                                                ": Erro Sintático -> \";\" inesperado."));
+                            }
                         }
                     } else {
                         ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
@@ -584,11 +594,18 @@ Node analyseWrite(FILE *file, Node token, Ui::MainWindow *ui) {
                     if (token.simbolo == "sfecha_parenteses") {
                         token = getToken(file, ui);
 
-                        if (token.simbolo == "sponto_virgula") {
-                            token = getToken(file, ui);
+                        if (!isIf) {
+                            if (token.simbolo == "sponto_virgula") {
+                                token = getToken(file, ui);
+                            } else {
+                                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                                                ": Erro Sintático -> Esperado \";\"."));
+                            }
                         } else {
-                            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
-                                                            ": Erro Sintático -> Esperado \";\"."));
+                            if (token.simbolo == "sponto_virgula") {
+                                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                                                ": Erro Sintático -> \";\" inesperado."));
+                            }
                         }
                     } else {
                         ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
@@ -677,6 +694,7 @@ Node analyseIf(FILE *file, Node token, Ui::MainWindow *ui) {
             if (te.token.simbolo == "ssenao") {
                 codeGen.insertNode(new CodeSnippet("JMP", ++currentLabel));
                 codeGen.insertNode(new CodeSnippet(currentLabel - 1, "NULL"));
+                isIf = false;
                 te.token = getToken(file, ui);
                 te.token = analyseSimpleCommands(file, te.token, ui);
                 if (te.token.simbolo == "sponto_virgula") {

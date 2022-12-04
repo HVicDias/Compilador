@@ -477,17 +477,19 @@ bool isNumber(QString s) {
 bool VirtualMachine::uiInteractionsAnalyser() {
     int value1, result;
     QString text;
-    bool ok, ok2;
+    bool ok;
 
     if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "RD") {
 
         do {
             do {
-                text = QInputDialog::getText(this, "Leia",
-                                             "Digite o valor do identificador", QLineEdit::Normal,
-                                             "", &ok);
-            } while (text.isEmpty());
-        } while (!isNumber(text));
+                do {
+                    text = QInputDialog::getText(this, "Leia",
+                                                 "Digite o valor do identificador", QLineEdit::Normal,
+                                                 "", &ok);
+                } while (text.isEmpty());
+            } while ((!isNumber(text)));
+        } while (text.size() > 4);
 
         if (text == "verdadeiro") {
             text = "1";
@@ -557,6 +559,7 @@ bool VirtualMachine::executeLine() {
 void VirtualMachine::on_ExecutarButton_clicked() {
     if (programCounter == ui->CodigoDaMaquinaTable->rowCount()) {
         programCounter = 0;
+        ui->SaidaDeDadosArea->setPlainText("");
         compilerMemoryAllocation = -1;
         while (!returnStack.empty()) {
             returnStack.pop();

@@ -29,7 +29,7 @@ void jumpSpaces(FILE *file);
 
 void jumpComentary(FILE *file, Ui::MainWindow *);
 
-Node handleDigit(FILE *file);
+Node handleDigit(FILE *file, Ui::MainWindow *);
 
 Node handleIdAndSpecialWord(FILE *file, Ui::MainWindow *);
 

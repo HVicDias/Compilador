@@ -42,6 +42,6 @@ inicio
     leia(c);
     analisa1;
     se b > (c+ a*a)
-    entao escreva(b);
+    entao inicio escreva(b); fim
     senao escreva(c);
 fim.
