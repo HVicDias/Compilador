@@ -54,13 +54,14 @@ void jumpComentary(FILE *file, Ui::MainWindow *ui) {
         }
 
         if (character == EOF) {
-            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Léxico -> Comentário sem \"}\"."));
-//            exit(1);
+            break;
         }
         if (character == '{') {
-            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                             ": Erro Léxico -> Comentário sem \"}\"."));
+            break;
         }
     } while (character != '}');
 
@@ -196,7 +197,7 @@ Node handleRelationalOperator(FILE *file) {
         lexema += character;
         if (simbolo.empty()) {
             simbolo = "sig";
-            character = (char) fgetc(file);
+//            character = (char) fgetc(file);
         } else {
             if (simbolo == "smenor" || simbolo == "smaior") {
                 simbolo += "ig";

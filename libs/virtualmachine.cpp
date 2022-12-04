@@ -71,8 +71,7 @@ void VirtualMachine::on_actionOpen_triggered() {
     }
 
     currentFile = filename;
-
-
+    
     ui->CodigoDaMaquinaTable->setRowCount(0);
     ui->MemoriaTable->setRowCount(0);
 
@@ -83,6 +82,7 @@ void VirtualMachine::on_actionOpen_triggered() {
     }
     programCounter = 0;
     ui->CodigoDaMaquinaTable->scrollToTop();
+    ui->SaidaDeDadosArea->setPlainText("");
 
     compilerMemoryAllocation = -1;
     while (!returnStack.empty()) {
@@ -426,7 +426,6 @@ bool VirtualMachine::labelAnalyser() {
 //std::list<std::tuple<int, int>> memoryStack {memoryAlocation, value}
 //std::list<std::tuple<int, std::string>> labelJmp {PC, label}
 
-// ToDo colocar condição para não alocar ou desalocar desnecessariamente
 bool VirtualMachine::allocDallocAnalyser() {
     int value1, value2, currentStackTop, result;
     if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "ALLOC") {
@@ -557,6 +556,7 @@ bool VirtualMachine::executeLine() {
 void VirtualMachine::on_ExecutarButton_clicked() {
     if (programCounter == ui->CodigoDaMaquinaTable->rowCount()) {
         programCounter = 0;
+        ui->SaidaDeDadosArea->setPlainText("");
         compilerMemoryAllocation = -1;
         while (!returnStack.empty()) {
             returnStack.pop();

@@ -17,12 +17,12 @@ fim;
 
 procedimento sub;
 inicio
-  z:=x-y;
+              z:=x-y;
 fim;
 
 procedimento escolha;
 inicio
-  se a = 1
+  se                                                                                                                                                                                                                                                                                                        a = 1
     entao soma;
   senao sub;
   escreva(z);

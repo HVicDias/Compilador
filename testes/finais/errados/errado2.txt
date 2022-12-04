@@ -1,4 +1,4 @@
-{Teste errado z:= inteiro e escreva(z)}
+{Teste errado z:= booleano e escreva(z)}
 programa test1;
 var a,b,c,x: inteiro;
 {proc 1}

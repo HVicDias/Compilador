@@ -309,7 +309,7 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
         } else if (analyseLogicOperator(j.c_str())) {
 
         } else if (isNumber(j)) {
-            codeGen.insertNode(new CodeSnippet("LDC", j.c_str()));
+            codeGen.insertNode(new CodeSnippet("LDC", j));
         } else if (symbolTable.searchSymbol(j) != nullptr) {
             auto node = symbolTable.searchSymbol(j);
             if (node->memoryAllocation > 0) {
@@ -349,8 +349,11 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                     op2Symbol = symbolTable.searchSymbol(*op2);
                 }
 
+                if (op2 == postfix.begin())
+                    break;
 
                 auto op1 = std::prev(op2);
+
 
                 if (!isNumber(*op1) && !isIntOperation(op1->c_str()) && !isBooleanOperation(op1->c_str()) &&
                     strcmpi(op1->c_str(), "#I") != 0 && strcmpi(op1->c_str(), "#B") != 0
@@ -542,6 +545,11 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
         std::cout << j.c_str();
     }
     std::cout << std::endl;
+
+    std::cout << postfix.size() << std::endl;
+    if (postfix.size() != 1)
+        ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                        ": Erro Semântico -> Expressão inválida."));
 
     return postfix;
 }

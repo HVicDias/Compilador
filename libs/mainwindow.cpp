@@ -6,8 +6,6 @@
 #include "semanticAnalyser.h"
 #include <unistd.h>
 
-// ToDo descobrir um modo de quando algum erro que utiliza exit(1) não crashar o QT
-
 using namespace std;
 CodeGenerator codeGen;
 string mainProgramIndentifier;
@@ -59,59 +57,56 @@ void MainWindow::on_CompilarButton_clicked() {
     character = (char) fgetc(f);
     auto *snippet = new CodeSnippet("START");
 
-    do {
-        token = getToken(f, ui);
+    token = getToken(f, ui);
 
-        if (!token.lexema.empty() && !token.simbolo.empty()) {
-            if (token.simbolo == "sprograma") {
+    if (!token.lexema.empty() && !token.simbolo.empty()) {
+        if (token.simbolo == "sprograma") {
+            token = getToken(f, ui);
+
+            if (token.simbolo == "sidentificador") {
+                mainProgramIndentifier = token.lexema;
+                symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa",
+                                      lineNo == 1 ? lineNo : lineNo + 1, -1, -1, -1);
+                headerStack.push(symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName,
+                                                          "programa", lineNo == 1 ? lineNo : lineNo + 1, -1, -1,
+                                                          -1));
+
                 token = getToken(f, ui);
 
-                if (token.simbolo == "sidentificador") {
-                    mainProgramIndentifier = token.lexema;
-                    symbolTable.downLayer(token.lexema, token.lexema, token.lexema, "programa",
-                                          lineNo == 1 ? lineNo : lineNo + 1, -1, -1, -1);
-                    headerStack.push(symbolTable.insertSymbol(token.lexema, symbolTable.symbolListNode->layerName,
-                                                              "programa", lineNo == 1 ? lineNo : lineNo + 1, -1, -1,
-                                                              -1));
+                if (token.simbolo == "sponto_virgula") {
+                    codeGen.insertNode(snippet);
+                    snippet = new CodeSnippet("ALLOC", 0, 1);
+                    codeGen.insertNode(snippet);
 
-                    token = getToken(f, ui);
+                    token = analyseBlock(f, token, this->ui);
 
-                    if (token.simbolo == "sponto_virgula") {
-                        codeGen.insertNode(snippet);
-                        snippet = new CodeSnippet("ALLOC", 0, 1);
-                        codeGen.insertNode(snippet);
-
-                        token = analyseBlock(f, token, this->ui);
-
-                        if (token.simbolo == "sponto") {
-                            if (ui->ErrorArea->toPlainText().isEmpty()) {
-                                vm = new VirtualMachine(this);
-                                vm->show();
-                            }
-                        } else {
-                            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
-                                                            ": Erro Sintático -> Esperado \".\"."));
+                    if (token.simbolo == "sponto") {
+                        if (ui->ErrorArea->toPlainText().isEmpty()) {
+                            vm = new VirtualMachine(this);
+                            vm->show();
                         }
                     } else {
                         ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
-                                                        ": Erro Sintático -> Esperado \";\"."));
+                                                        ": Erro Sintático -> Esperado \".\"."));
                     }
                 } else {
                     ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
-                                                    ": Erro Sintático -> Esperado um identificador."));
+                                                    ": Erro Sintático -> Esperado \";\"."));
                 }
             } else {
-                if (character != EOF) {
-                    ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
-                                                    ": Erro Sintático -> Esperado \"programa\"."));
-                }
+                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                ": Erro Sintático -> Esperado um identificador."));
             }
         } else {
-            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
-                                            ": Erro Léxico -> Caracter inválido."));
+            if (character != EOF) {
+                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                                                ": Erro Sintático -> Esperado \"programa\"."));
+            }
         }
-
-    } while (character != EOF);
+    } else {
+        ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                        ": Erro Léxico -> Caracter inválido."));
+    }
 
     int numberDeletion = symbolTable.deleteLayer();
     if (numberDeletion != 0) {
@@ -136,8 +131,6 @@ void MainWindow::on_CompilarButton_clicked() {
 }
 
 void MainWindow::on_actionOpen_triggered() {
-    ui->CodeArea->clear();
-
     QString filename = QFileDialog::getOpenFileName(this, "Abrir Arquivo",
                                                     "C://Users//renat//CLionProjects//Compiler//testes",
                                                     "Text File (*.txt);");
@@ -147,6 +140,7 @@ void MainWindow::on_actionOpen_triggered() {
         return;
     }
 
+    ui->CodeArea->clear();
     currentFile = filename;
 
     QTextStream stream(&file);
@@ -155,6 +149,7 @@ void MainWindow::on_actionOpen_triggered() {
     ui->CodeArea->appendPlainText(text);
     ui->CodeArea->verticalScrollBar()->setValue(0);
     ui->ErrorArea->clear();
+
     file.close();
 }
 
@@ -181,11 +176,11 @@ void MainWindow::on_actionSave_as_triggered() {
     QFile file(filename);
 
     if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, "Warning", "Error ao salvar o arquivo!");
         return;
     }
 
     currentFile = filename;
+    ui->ArquivoName->setText(filename);
     QTextStream stream(&file);
     QString text = ui->CodeArea->toPlainText();
     stream << text;
@@ -193,8 +188,6 @@ void MainWindow::on_actionSave_as_triggered() {
 
     ui->ErrorArea->clear();
 }
-
-// ToDo abrir Máquina Virtual
 
 void MainWindow::on_actionAbrir_Maquina_Virtual_triggered() {
     vm = new VirtualMachine(this);

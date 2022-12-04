@@ -4,7 +4,7 @@ var a,b,c,x: inteiro;
 {proc 1}
 
 procedimento analisa1;
-    var x: inteiro;
+    var x: inteiro;;
         z: booleano;
 
     procedimento analisa2;
@@ -27,7 +27,7 @@ procedimento analisa1;
       se (x>1) ou (+x * (-100) > (-func1)) e (nao z)  entao
           inicio
               x:= 3;
-              z:= falso;;
+              z:= falso;
               escreva(x);
           fim;
       enquanto nao ((-a*(-b) = 1064) ou (a<= (-1000)) ou z e (nao z))
@@ -35,7 +35,7 @@ procedimento analisa1;
         a:= x+b;
         z:= falso;
       fim;
-      escreva(a);;
+      escreva(a);
     fim;
 
 inicio
