@@ -100,7 +100,7 @@ void CodeGenerator::printList() {
 }
 
 void CodeGenerator::generateCode() {
-    ofstream MyFile("teste.obj");
+    ofstream MyFile("GERA.obj");
     string snippet;
     CodeSnippet *auxNode = head;
 

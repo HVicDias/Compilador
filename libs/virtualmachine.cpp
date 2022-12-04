@@ -71,7 +71,9 @@ void VirtualMachine::on_actionOpen_triggered() {
     }
 
     currentFile = filename;
-    
+    ui->ArquivoName->setText(filename);
+
+
     ui->CodigoDaMaquinaTable->setRowCount(0);
     ui->MemoriaTable->setRowCount(0);
 
@@ -82,7 +84,6 @@ void VirtualMachine::on_actionOpen_triggered() {
     }
     programCounter = 0;
     ui->CodigoDaMaquinaTable->scrollToTop();
-    ui->SaidaDeDadosArea->setPlainText("");
 
     compilerMemoryAllocation = -1;
     while (!returnStack.empty()) {
@@ -556,7 +557,6 @@ bool VirtualMachine::executeLine() {
 void VirtualMachine::on_ExecutarButton_clicked() {
     if (programCounter == ui->CodigoDaMaquinaTable->rowCount()) {
         programCounter = 0;
-        ui->SaidaDeDadosArea->setPlainText("");
         compilerMemoryAllocation = -1;
         while (!returnStack.empty()) {
             returnStack.pop();
