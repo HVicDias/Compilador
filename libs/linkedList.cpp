@@ -11,7 +11,6 @@ Node::Node() {
     next = nullptr;
 }
 
-// Parameterised Constructor
 Node::Node(string lexema, string simbolo) {
     this->lexema = std::move(lexema);
     this->simbolo = std::move(simbolo);
@@ -70,14 +69,12 @@ void LinkedList::insertNode(string lexema, string simbolo) {
         auxNode = auxNode->next;
     }
 
-    // Insert at the last.
     auxNode->next = newNode;
 }
 
 void LinkedList::printList() {
     Node *auxNode = head;
 
-    // Check for empty list.
     if (head == nullptr) {
         cout << "List empty" << endl;
         return;

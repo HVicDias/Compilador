@@ -27,7 +27,11 @@ bool isPunctuation();
 
 void jumpSpaces(FILE *file);
 
+bool jumpLastSpaces(FILE *file);
+
 void jumpComentary(FILE *file, Ui::MainWindow *);
+
+bool jumpLastComentary(FILE *file, Ui::MainWindow *);
 
 Node handleDigit(FILE *file, Ui::MainWindow *);
 
@@ -42,5 +46,7 @@ Node handleRelationalOperator(FILE *file);
 Node handlePunctuation(FILE *file);
 
 Node getToken(FILE *file, Ui::MainWindow *);
+
+bool getLastToken(FILE *file, Ui::MainWindow *);
 
 #endif //COMPILER_LEXICALANALYSER_H

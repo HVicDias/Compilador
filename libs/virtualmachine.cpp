@@ -5,9 +5,9 @@
 #include <list>
 #include <tuple>
 
-std::stack<int> returnStack; // PC return values
-std::list<std::tuple<int, int, int>> memoryStack; // {memoryAlocation, value, memoryReference}
-std::list<std::tuple<int, std::string>> labelJmp; // {PC, label}
+std::stack<int> returnStack;
+std::list<std::tuple<int, int, int>> memoryStack;
+std::list<std::tuple<int, std::string>> labelJmp;
 int compilerMemoryAllocation = -1;
 
 VirtualMachine::VirtualMachine(QWidget *parent) :
@@ -122,17 +122,6 @@ void VirtualMachine::formatCodigoDaMaquinaLine(std::string line) {
                                QString::fromStdString(p3).trimmed(),
                                QString::fromStdString(p4).trimmed());
 }
-
-//Operacional
-//Inverter
-//Carregar
-//Guardar
-//Mudança de PC
-//Colocar Label
-//Alocar/Liberar espaço
-//Interações de UI
-//Simbolo de inicio/final
-
 
 bool VirtualMachine::operationalAnalyser() {
     int value1, value2, result;
@@ -419,14 +408,6 @@ bool VirtualMachine::labelAnalyser() {
     return false;
 }
 
-// 0 -> linha
-// 1 -> instrução
-// 2 -> attr1
-// 3 -> attr2
-//std::stack<int> returnStack PC return values
-//std::list<std::tuple<int, int>> memoryStack {memoryAlocation, value}
-//std::list<std::tuple<int, std::string>> labelJmp {PC, label}
-
 bool VirtualMachine::allocDallocAnalyser() {
     int value1, value2, currentStackTop, result;
     if (ui->CodigoDaMaquinaTable->item(programCounter, 1)->text() == "ALLOC") {
@@ -506,7 +487,6 @@ bool VirtualMachine::uiInteractionsAnalyser() {
         memoryStack.pop_back();
         removeRowMemoriaTable();
         compilerMemoryAllocation--;
-        //print
         ui->SaidaDeDadosArea->appendPlainText(QString::number(value1));
         return true;
     }

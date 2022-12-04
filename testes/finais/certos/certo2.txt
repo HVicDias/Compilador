@@ -23,7 +23,7 @@ fim;
 procedimento escolha;
 inicio
   se                                                                                                                                                                                                                                                                                                        a = 1
-    entao soma;
+    entao soma
   senao sub;
   escreva(z);
 fim;

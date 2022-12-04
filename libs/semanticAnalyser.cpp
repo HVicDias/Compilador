@@ -327,11 +327,6 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
         }
     }
 
-    for (auto &j: postfix) {
-        std::cout << j.c_str();
-    }
-    std::cout << std::endl;
-
     for (auto i = postfix.begin(); i != postfix.end(); i++) {
         if (i != postfix.begin() && postfix.size() != 1) {
             if (isIntOperation(i->c_str()) || isBooleanOperation(i->c_str())) {
@@ -341,7 +336,6 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                     strcmpi(op2->c_str(), "#I") != 0 && strcmpi(op2->c_str(), "#B") != 0 &&
                     strcmpi(op2->c_str(), "verdadeiro") != 0 && strcmpi(op2->c_str(), "falso") != 0) {
                     if (symbolTable.searchSymbol(*op2) == nullptr) {
-//                        exit(1);
                         ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Semântico -> Expressão inválida."));
                     }
@@ -512,11 +506,6 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
                 }
 
                 postfix.erase(op1);
-
-                for (auto &j: postfix) {
-                    std::cout << j.c_str();
-                }
-                std::cout << std::endl;
             }
         } else if (i == postfix.begin() && postfix.size() == 1) {
             if (isNumber(*i)) {
@@ -541,12 +530,6 @@ analysePostfix(std::list<std::string> postfix, int attribution, Ui::MainWindow *
         }
     }
 
-    for (auto &j: postfix) {
-        std::cout << j.c_str();
-    }
-    std::cout << std::endl;
-
-    std::cout << postfix.size() << std::endl;
     if (postfix.size() != 1)
         ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                         ": Erro Semântico -> Expressão inválida."));

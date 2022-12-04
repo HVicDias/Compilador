@@ -37,7 +37,6 @@ bool isPunctuation() {
 void jumpSpaces(FILE *file) {
     while (character == ' ' || character == '\n' || character == '\t') {
         if (character == '\n') {
-            std::cout << (int) character << "//" << lineNo << std::endl;
             lineNo++;
         }
         character = (char) fgetc(file);
@@ -49,7 +48,6 @@ void jumpComentary(FILE *file, Ui::MainWindow *ui) {
         character = (char) fgetc(file);
 
         if (character == '\n') {
-            std::cout << (int) character << "//" << lineNo << std::endl;
             lineNo++;
         }
 
@@ -209,7 +207,6 @@ Node handleRelationalOperator(FILE *file) {
         lexema += character;
         if (simbolo.empty()) {
             simbolo = "sig";
-//            character = (char) fgetc(file);
         } else {
             if (simbolo == "smenor" || simbolo == "smaior") {
                 simbolo += "ig";
@@ -275,4 +272,73 @@ Node getToken(FILE *file, Ui::MainWindow *ui) {
         ui->ErrorArea->appendPlainText("Linha: " + QString::number(lineNo) + ": Erro Léxico -> Símbolo inválido.");
         return {s_character, "invalid symbol"};
     }
+}
+
+bool getLastToken(FILE *file, Ui::MainWindow *ui) {
+    while (isSpace() || isCommentary()) {
+        if (isCommentary()) {
+            if (!jumpLastComentary(file, ui)) {
+                if (!isCommentary() && character != EOF) {
+                    return false;
+                } else if (character == EOF) {
+                    return true;
+                }
+            }
+        }
+        if (isSpace()) {
+            if (!jumpLastSpaces(file)) {
+                if (!isCommentary() && character != EOF) {
+                    return false;
+                } else if (character == EOF) {
+                    return true;
+                }
+            }
+        }
+    }
+    if (character == '\377') {
+        return true;
+    }
+
+    return false;
+}
+
+bool jumpLastComentary(FILE *file, Ui::MainWindow *ui) {
+    do {
+        character = (char) fgetc(file);
+
+        if (character == '\n') {
+
+        }
+
+        if (character == EOF) {
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Léxico -> Comentário sem \"}\"."));
+            return false;
+        }
+        if (character == '{') {
+            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                            ": Erro Léxico -> Comentário sem \"}\"."));
+            return false;
+        }
+    } while (character != '}');
+
+    character = (char) fgetc(file);
+    return true;
+}
+
+bool jumpLastSpaces(FILE *file) {
+    while (character == ' ' || character == '\n' || character == '\t') {
+        if (character == '\n') {
+
+        }
+        if (character == EOF) {
+            return true;
+        }
+        character = (char) fgetc(file);
+    }
+
+    if (character == EOF) {
+        return true;
+    }
+    return false;
 }

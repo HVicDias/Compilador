@@ -8,7 +8,7 @@ funcao func1:inteiro;
 var w:inteiro;
 inicio
  se x = 1
-  entao func1:=1;
+  entao func1:=1
   senao
     inicio
        w := x;

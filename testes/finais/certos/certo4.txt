@@ -17,7 +17,7 @@ programa exemplo;
 		inicio
 		desconto := verdadeiro;
 
-		fim;
+		fim
 		senao desconto := falso;
 	totaldesc := inss+ir;
 escreva(totaldesc);
@@ -29,7 +29,7 @@ escreva(totaldesc);
 leia(valorhora);
 
 	se desconto
-		entao escreva(valorhora);
+		entao escreva(valorhora)
 senao totaldesc := 0;
 total := horastrab*valorhora-totaldesc;
 	fim;
@@ -37,13 +37,13 @@ total := horastrab*valorhora-totaldesc;
 inicio
 	calculasal;
 	se total > 1500
-		entao escreva(total);
+		entao escreva(total)
 	senao se total > totaldesc
 entao
 	inicio
 total := 1000;
 			escreva(total);
-			fim;
+			fim
 	senao escreva(total);
 fim.
 

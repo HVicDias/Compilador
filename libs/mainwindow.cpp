@@ -6,9 +6,9 @@
 #include "semanticAnalyser.h"
 #include <unistd.h>
 
-using namespace std;
+
 CodeGenerator codeGen;
-string mainProgramIndentifier;
+std::string mainProgramIndentifier;
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -59,6 +59,7 @@ void MainWindow::on_CompilarButton_clicked() {
 
     token = getToken(f, ui);
 
+
     if (!token.lexema.empty() && !token.simbolo.empty()) {
         if (token.simbolo == "sprograma") {
             token = getToken(f, ui);
@@ -81,26 +82,31 @@ void MainWindow::on_CompilarButton_clicked() {
                     token = analyseBlock(f, token, this->ui);
 
                     if (token.simbolo == "sponto") {
-                        // ToDo verificar se tem caracteres apos o fim do programa
-                        if (ui->ErrorArea->toPlainText().isEmpty()) {
-                            vm = new VirtualMachine(this);
-                            vm->show();
+                        if (getLastToken(f, ui)) {
+                            if (ui->ErrorArea->toPlainText().isEmpty()) {
+                                vm = new VirtualMachine(this);
+                                vm->show();
+                            }
+                        } else {
+                            ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
+                                                            ": Erro Léxico -> Caracter inválido após o final do programa."));
                         }
                     } else {
-                        ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                        ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                         ": Erro Sintático -> Esperado \".\"."));
                     }
                 } else {
-                    ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                    ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                     ": Erro Sintático -> Esperado \";\"."));
                 }
             } else {
-                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                 ": Erro Sintático -> Esperado um identificador."));
             }
+
         } else {
             if (character != EOF) {
-                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo + 1) +
+                ui->ErrorArea->appendPlainText(("Linha " + QString::number(lineNo) +
                                                 ": Erro Sintático -> Esperado \"programa\"."));
             }
         }
@@ -122,13 +128,11 @@ void MainWindow::on_CompilarButton_clicked() {
 
 
     if (ui->ErrorArea->toPlainText().isEmpty()) {
-        codeGen.printList();
         codeGen.generateCode();
     }
 
     codeGen.deleteCode();
     fclose(f);
-    cout << lineNo << endl;
 }
 
 void MainWindow::on_actionOpen_triggered() {

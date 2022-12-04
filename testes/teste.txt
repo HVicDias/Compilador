@@ -31,6 +31,4 @@ var a,b,s: inteiro;
 inicio      {corpo principal}
   s:= soma;                              
   escreva(s);
-fim.                               
-
-
+fim.
