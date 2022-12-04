@@ -15,7 +15,7 @@ inicio
   faca inicio
            a:= x+a {era x+z (int+bool) = erro}
        fim;
-  escreva(a)
+  escreva(a);
 fim;
 
 
@@ -30,8 +30,8 @@ inicio
     analisa1;
     analisa2;
     se b > (c+ a*a)
-    entao escreva(b)
-    senao escreva(c)
+    entao escreva(b);
+    senao escreva(c);
 fim
 fim.
 

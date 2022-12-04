@@ -11,7 +11,7 @@ var a, x: inteiro;
 procedimento analisa2;
 inicio
   leia(a);
-  b:= a*a+(c div b) 
+  b:= a*a+(c div b);
 fim;
 
 inicio
@@ -19,11 +19,10 @@ inicio
       x:= 0;
   leia(z);
   enquanto (a != 89) (a<= 1000)  {condicao de parada}
-  faca inicio
-           a:= x+z
-       fim;
-  escreva(a)
-fim;
+  faca 
+      a:= x+a;
+  escreva(a);
+fim.
 
 
 

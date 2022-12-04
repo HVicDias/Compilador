@@ -3,22 +3,27 @@
 #include <utility>
 #include "symbolTable.h"
 
-using namespace std;
-
 SymbolNode::SymbolNode() {
     identifier = "";
     scope = "";
     type = "";
+    labelStart = -1;
+    labelJump = -1;
     lineNo = -1;
+    memoryAllocation = -1;
     next = nullptr;
 }
 
 // Parameterised Constructor
-SymbolNode::SymbolNode(string identifier, string scope, string type, int lineNo) {
+SymbolNode::SymbolNode(std::string identifier, std::string scope, std::string type, int lineNo, int labelStart,
+                       int labelJump, int memoryAllocation) {
     this->identifier = std::move(identifier);
     this->scope = std::move(scope);
     this->type = std::move(type);
     this->lineNo = lineNo;
+    this->memoryAllocation = memoryAllocation;
+    this->labelStart = labelStart;
+    this->labelJump = labelJump;
     this->next = nullptr;
 }
 
@@ -29,7 +34,7 @@ void SymbolList::deleteNode(int nodeIndex) {
     int ListLen = 0;
 
     if (symbolNode == nullptr) {
-        cout << "List empty." << endl;
+        std::cout << "List empty." << std::endl;
         return;
     }
 
@@ -39,7 +44,7 @@ void SymbolList::deleteNode(int nodeIndex) {
     }
 
     if (ListLen < nodeIndex) {
-        cout << "Index out of range" << endl;
+        std::cout << "Index out of range" << std::endl;
         return;
     }
 
@@ -61,12 +66,15 @@ void SymbolList::deleteNode(int nodeIndex) {
     delete currentNode;
 }
 
-void SymbolList::insertNode(string identifier, string scope, string type, int lineNo) {
-    auto *newNode = new SymbolNode(std::move(identifier), std::move(scope), std::move(type), lineNo);
+SymbolNode *SymbolList::insertNode(std::string identifier, std::string scope, std::string type, int lineNo,
+                                   int labelStart, int labelJump, int memoryAllocation) {
+    auto *newNode = new SymbolNode(std::move(identifier), std::move(scope), std::move(type), lineNo, labelStart,
+                                   labelJump,
+                                   memoryAllocation);
 
     if (symbolNode == nullptr) {
         symbolNode = newNode;
-        return;
+        return newNode;
     }
 
     SymbolNode *auxNode = symbolNode;
@@ -76,6 +84,8 @@ void SymbolList::insertNode(string identifier, string scope, string type, int li
 
     // Insert at the last.
     auxNode->next = newNode;
+
+    return newNode;
 }
 
 void SymbolList::printList() {
@@ -83,40 +93,47 @@ void SymbolList::printList() {
 
     // Check for empty list.
     if (symbolNode == nullptr) {
-        cout << "List empty" << endl;
+        std::cout << "List empty" << std::endl;
         return;
     }
 
-    cout << "Identifier" << "\tScope" << "\tType" << "\tLineNumber" << endl;
+    std::cout << "Identifier" << "\tScope" << "\tType" << "\tLineNumber" << "\tLabel" << "\tMemory Allocation"
+              << std::endl;
     while (auxNode != nullptr) {
-        cout << auxNode->identifier << " : " << auxNode->scope << " : " << auxNode->type << " : " << auxNode->lineNo
-             << endl;
+        std::cout << auxNode->identifier << " : " << auxNode->scope << " : " << auxNode->type << " : "
+                  << auxNode->lineNo << " : " << auxNode->labelStart << " : " << auxNode->memoryAllocation << std::endl;
         auxNode = auxNode->next;
     }
 }
 
-SymbolListNode::SymbolListNode(std::string layerName, string identifier, string scope, string type, int lineNo)
+SymbolListNode::SymbolListNode(std::string layerName, std::string identifier, std::string scope, std::string type,
+                               int lineNo, int labelStart, int labelJump, int memoryAllocation)
         : SymbolList() {
     previous = nullptr;
     this->layerName = layerName;
-    symbolNode = new SymbolNode(identifier, scope, type, lineNo);
+    symbolNode = new SymbolNode(identifier, scope, type, lineNo, labelStart, labelJump,
+                                memoryAllocation);
 }
 
 SymbolTable::SymbolTable() {
     symbolListNode = nullptr;
 }
 
-void SymbolTable::insertSymbol(string identifier, string scope, string type, int lineNo) {
+SymbolNode *SymbolTable::insertSymbol(std::string identifier, std::string scope, std::string type,
+                                      int lineNo, int labelStart, int labelJump, int memoryAllocation) {
     if (symbolListNode != nullptr) {
-        symbolListNode->insertNode(identifier, scope, type, lineNo);
+        return symbolListNode->insertNode(identifier, scope, type, lineNo, labelStart, labelJump, memoryAllocation);
     } else {
-        cout << "SymbolTable Head is null" << endl;
+        std::cout << "SymbolTable Head is null" << std::endl;
         exit(1);
     }
 }
 
-void SymbolTable::downLayer(std::string layerName, string identifier, string scope, string type, int lineNo) {
-    SymbolListNode *newNode = new SymbolListNode(layerName, identifier, scope, type, lineNo);
+void
+SymbolTable::downLayer(std::string layerName, std::string identifier, std::string scope, std::string type, int lineNo,
+                       int labelStart, int labelJump, int memoryAllocation) {
+    SymbolListNode *newNode = new SymbolListNode(layerName, identifier, scope, type, lineNo, labelStart, labelJump,
+                                                 memoryAllocation);
     newNode->previous = symbolListNode;
     symbolListNode = newNode;
 }
@@ -126,7 +143,7 @@ SymbolNode *SymbolTable::searchSymbol(std::string lexema) {
     SymbolNode *currentSymbol;
 
     if (currentNode == nullptr) {
-        cout << "SymbolTable Head is null" << endl;
+        std::cout << "SymbolTable Head is null" << std::endl;
         exit(1);
     }
 
@@ -151,7 +168,7 @@ SymbolNode *SymbolTable::searchScopeSymbol(std::string lexema, std::string scope
     SymbolNode *currentSymbol;
 
     if (currentNode == nullptr) {
-        cout << "SymbolTable Head is null" << endl;
+        std::cout << "SymbolTable Head is null" << std::endl;
         exit(1);
     }
 
@@ -179,7 +196,7 @@ SymbolNode *SymbolTable::searchLocalSymbol(std::string lexema) {
     SymbolNode *currentSymbol;
 
     if (currentNode == nullptr) {
-        cout << "SymbolTable Head is null" << endl;
+        std::cout << "SymbolTable Head is null" << std::endl;
         exit(1);
     }
 
@@ -201,30 +218,43 @@ void SymbolTable::printList() {
 
     // Check for empty list.
     if (symbolListNode == nullptr) {
-        cout << "Empty Tree" << endl;
+        std::cout << "Empty Tree" << std::endl;
         return;
     }
 
-    cout << "\nCurrent Head: " << auxNode->layerName << endl;
-    cout << "\nHead Info:  " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
-         << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << endl;
+    std::cout << "\nCurrent Head: " << auxNode->layerName << std::endl;
     while (auxNode != nullptr) {
+        std::cout << "\nHead Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
+                  << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << std::endl;
         auxNode->printList();
-        cout << "\nHead Info " << auxNode->symbolNode->identifier << " : " << auxNode->symbolNode->scope << " : "
-             << auxNode->symbolNode->type << " : " << auxNode->symbolNode->lineNo << endl;
         auxNode = auxNode->previous;
         leafs++;
     }
 }
 
-void SymbolTable::deleteLayer() {
+int SymbolTable::deleteLayer() {
     SymbolListNode *currentNode = symbolListNode;
+    SymbolNode *currentSymbol;
+    int desalocation = 0;
 
     if (currentNode == nullptr) {
-        cout << "List empty." << endl;
-        return;
+        std::cout << "List empty." << std::endl;
+        return desalocation;
     }
+
+    currentSymbol = currentNode->symbolNode;
+
+
+    while (currentSymbol != 0) {
+        if (currentSymbol->memoryAllocation != -1) {
+            desalocation++;
+        }
+        currentSymbol = currentSymbol->next;
+    }
+
 
     symbolListNode = symbolListNode->previous;
     delete currentNode;
+    return desalocation;
 }
+

@@ -3,16 +3,19 @@
 
 #include <string>
 
+
 class SymbolNode {
 public:
     std::string identifier;
     std::string scope;
     std::string type;
     int lineNo;
-    int label; //ToDo Add Label HERE DO NOT FORGET TO CHANGE
+    int labelJump;
+    int labelStart;
+    int memoryAllocation;
     SymbolNode *next;
 
-    SymbolNode(std::string, std::string, std::string, int);
+    SymbolNode(std::string, std::string, std::string, int, int, int, int);
 
     SymbolNode();
 };
@@ -23,7 +26,7 @@ public:
 
     SymbolList();
 
-    void insertNode(std::string, std::string, std::string, int);
+    SymbolNode *insertNode(std::string, std::string, std::string, int, int, int, int);
 
     void printList();
 
@@ -38,7 +41,7 @@ public:
 
     SymbolNode headNode;
 
-    explicit SymbolListNode(std::string, std::string, std::string, std::string, int);
+    explicit SymbolListNode(std::string, std::string, std::string, std::string, int, int, int, int);
 };
 
 class SymbolTable {
@@ -47,9 +50,9 @@ public:
 
     SymbolTable();
 
-    void insertSymbol(std::string, std::string, std::string, int);
+    SymbolNode *insertSymbol(std::string, std::string, std::string, int, int, int, int);
 
-    void downLayer(std::string, std::string, std::string, std::string, int);
+    void downLayer(std::string, std::string, std::string, std::string, int, int, int, int);
 
     SymbolNode *searchSymbol(std::string);
 
@@ -59,7 +62,7 @@ public:
 
     void printList();
 
-    void deleteLayer();
+    int deleteLayer();
 };
 
 #endif //COMPILER_SYMBOLTABLE_H

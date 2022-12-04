@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>800</width>
+                <height>600</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>MainWindow</string>
+        </property>
+        <widget class="QWidget" name="centralwidget">
+            <widget class="QLabel" name="ArquivoLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>30</y>
+                        <width>81</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Arquivo:</string>
+                </property>
+            </widget>
+            <widget class="CodeEditor" name="CodeArea">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>80</y>
+                        <width>751</width>
+                        <height>321</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QLabel" name="ErrorLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>430</y>
+                        <width>63</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Erros</string>
+                </property>
+            </widget>
+            <widget class="QPlainTextEdit" name="ErrorArea">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>460</y>
+                        <width>501</width>
+                        <height>101</height>
+                    </rect>
+                </property>
+                <property name="styleSheet">
+                    <string notr="true">background-color: white</string>
+                </property>
+            </widget>
+            <widget class="QPushButton" name="CompilarButton">
+                <property name="geometry">
+                    <rect>
+                        <x>610</x>
+                        <y>470</y>
+                        <width>131</width>
+                        <height>61</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Compilar</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="ArquivoName">
+                <property name="geometry">
+                    <rect>
+                        <x>90</x>
+                        <y>30</y>
+                        <width>681</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>11</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string/>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>800</width>
+                    <height>25</height>
+                </rect>
+            </property>
+            <widget class="QMenu" name="menuArquivo">
+                <property name="title">
+                    <string>Arquivo</string>
+                </property>
+                <addaction name="actionOpen"/>
+                <addaction name="actionSave"/>
+                <addaction name="actionSave_as"/>
+            </widget>
+            <widget class="QMenu" name="menuSobre">
+                <property name="title">
+                    <string>Sobre</string>
+                </property>
+                <addaction name="actionSobre_o_Compilador"/>
+            </widget>
+            <widget class="QMenu" name="menuMaquina_Virtual">
+                <property name="title">
+                    <string>Máquina Virtual</string>
+                </property>
+                <addaction name="actionAbrir_Maquina_Virtual"/>
+            </widget>
+            <addaction name="menuArquivo"/>
+            <addaction name="menuMaquina_Virtual"/>
+            <addaction name="menuSobre"/>
+        </widget>
+        <widget class="QStatusBar" name="statusbar"/>
+        <action name="actionSave">
+            <property name="text">
+                <string>Salvar</string>
+            </property>
+        </action>
+        <action name="actionSave_as">
+            <property name="text">
+                <string>Salvar Como</string>
+            </property>
+        </action>
+        <action name="actionOpen">
+            <property name="text">
+                <string>Abrir</string>
+            </property>
+        </action>
+        <action name="actionSobre_o_Compilador">
+            <property name="text">
+                <string>Sobre o Compilador</string>
+            </property>
+        </action>
+        <action name="actionAbrir_Maquina_Virtual">
+            <property name="text">
+                <string>Abrir Máquina Virtual</string>
+            </property>
+        </action>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>CodeEditor</class>
+            <extends>QPlainTextEdit</extends>
+            <header location="global">codeeditor.h</header>
+        </customwidget>
+    </customwidgets>
+    <resources/>
+    <connections/>
+</ui>

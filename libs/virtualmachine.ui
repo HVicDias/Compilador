@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MaquinaVirtual</class>
+    <widget class="QMainWindow" name="MaquinaVirtual">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1280</width>
+                <height>720</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>MainWindow</string>
+        </property>
+        <widget class="QWidget" name="centralwidget">
+            <widget class="QLabel" name="CodigoDaMaquinaLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>60</y>
+                        <width>201</width>
+                        <height>31</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Código da Máquina</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="MemoriaLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>1010</x>
+                        <y>60</y>
+                        <width>161</width>
+                        <height>31</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Memória (Pilha)</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="SaidaDeDadosLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>450</y>
+                        <width>151</width>
+                        <height>31</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Saída de Dados</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="ModoDeExecucaoLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>670</x>
+                        <y>160</y>
+                        <width>191</width>
+                        <height>31</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Modo de Execução</string>
+                </property>
+            </widget>
+            <widget class="QRadioButton" name="NormalRadioButton">
+                <property name="geometry">
+                    <rect>
+                        <x>690</x>
+                        <y>190</y>
+                        <width>112</width>
+                        <height>31</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Normal</string>
+                </property>
+            </widget>
+            <widget class="QRadioButton" name="PassoAPassoRadioButton">
+                <property name="geometry">
+                    <rect>
+                        <x>690</x>
+                        <y>220</y>
+                        <width>161</width>
+                        <height>31</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Passo a Passo</string>
+                </property>
+            </widget>
+            <widget class="QPlainTextEdit" name="SaidaDeDadosArea">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>490</y>
+                        <width>521</width>
+                        <height>171</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QTableWidget" name="CodigoDaMaquinaTable">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>100</y>
+                        <width>501</width>
+                        <height>341</height>
+                    </rect>
+                </property>
+                <column>
+                    <property name="text">
+                        <string>Linha</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Instrução</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Atributo 1</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Atributo 2</string>
+                    </property>
+                </column>
+            </widget>
+            <widget class="QTableWidget" name="MemoriaTable">
+                <property name="geometry">
+                    <rect>
+                        <x>1010</x>
+                        <y>100</y>
+                        <width>251</width>
+                        <height>341</height>
+                    </rect>
+                </property>
+                <column>
+                    <property name="text">
+                        <string>Endereço</string>
+                    </property>
+                </column>
+                <column>
+                    <property name="text">
+                        <string>Valor</string>
+                    </property>
+                </column>
+            </widget>
+            <widget class="QPushButton" name="ExecutarButton">
+                <property name="geometry">
+                    <rect>
+                        <x>680</x>
+                        <y>290</y>
+                        <width>171</width>
+                        <height>91</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                        <bold>true</bold>
+                    </font>
+                </property>
+                <property name="autoFillBackground">
+                    <bool>false</bool>
+                </property>
+                <property name="text">
+                    <string>Executar</string>
+                </property>
+            </widget>
+            <widget class="QLabel" name="ArquivoName">
+                <property name="geometry">
+                    <rect>
+                        <x>90</x>
+                        <y>20</y>
+                        <width>681</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>11</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string/>
+                </property>
+            </widget>
+            <widget class="QLabel" name="ArquivoLabel">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>20</y>
+                        <width>81</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+                <property name="font">
+                    <font>
+                        <pointsize>13</pointsize>
+                    </font>
+                </property>
+                <property name="text">
+                    <string>Arquivo:</string>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>1280</width>
+                    <height>25</height>
+                </rect>
+            </property>
+            <widget class="QMenu" name="menuArquivo">
+                <property name="title">
+                    <string>Arquivo</string>
+                </property>
+                <addaction name="actionOpen"/>
+            </widget>
+            <widget class="QMenu" name="menuSobre">
+                <property name="title">
+                    <string>Sobre</string>
+                </property>
+                <addaction name="actionSobreAMaquinaVirtual"/>
+            </widget>
+            <addaction name="menuArquivo"/>
+            <addaction name="menuSobre"/>
+        </widget>
+        <widget class="QStatusBar" name="statusbar"/>
+        <action name="actionOpen">
+            <property name="text">
+                <string>Abrir</string>
+            </property>
+        </action>
+        <action name="actionSobreAMaquinaVirtual">
+            <property name="text">
+                <string>Sobre a Máquina Virtual</string>
+            </property>
+        </action>
+    </widget>
+    <resources/>
+    <connections/>
+</ui>
