@@ -1,0 +1,40 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/Compiler_autogen.dir/AutogenUsed.txt"
+  "CMakeFiles/Compiler_autogen.dir/ParseCache.txt"
+  "Compiler_autogen"
+  "CMakeFiles/Compiler.dir/Compiler_autogen/mocs_compilation.cpp.obj"
+  "CMakeFiles/Compiler.dir/Compiler_autogen/mocs_compilation.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/gui/CodeEditor/codeeditor.cpp.obj"
+  "CMakeFiles/Compiler.dir/gui/CodeEditor/codeeditor.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/gui/compilerGUI.cpp.obj"
+  "CMakeFiles/Compiler.dir/gui/compilerGUI.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/codeGenerator.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/codeGenerator.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/lexicalAnalyser.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/lexicalAnalyser.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/linkedList.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/linkedList.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/mainwindow.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/mainwindow.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/semanticAnalyser.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/semanticAnalyser.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/symbolTable.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/symbolTable.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/syntacticAnalyser.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/syntacticAnalyser.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/utils.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/utils.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/libs/virtualmachine.cpp.obj"
+  "CMakeFiles/Compiler.dir/libs/virtualmachine.cpp.obj.d"
+  "CMakeFiles/Compiler.dir/source/main.cpp.obj"
+  "CMakeFiles/Compiler.dir/source/main.cpp.obj.d"
+  "Compiler.exe"
+  "Compiler.exe.manifest"
+  "Compiler.pdb"
+  "libCompiler.dll.a"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/Compiler.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()
